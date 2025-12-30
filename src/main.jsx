@@ -10,6 +10,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import PaluwaganMain from "./LandingPage/paluwaganMain";
 import SignIn from "./LandingPage/registrationComponents/SignIn";
 import Register from "./LandingPage/registrationComponents/register";
+
 //404
 import Eror404 from "./Eror404/404";
 

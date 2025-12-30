@@ -22,6 +22,7 @@ function SignIn() {
       <h2 className="text-center font-semibold text-xl font-sans mb-3">
         Sign in to your account
       </h2>
+
       <Inputform
         type="email"
         placeholder="Enter your email"
