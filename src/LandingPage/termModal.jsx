@@ -5,9 +5,9 @@ import React, {
   useState,
 } from "react";
 
-const TermsModal = forwardRef((props, ref) => {
+const TermsModal = forwardRef(({ onAccept }, ref) => {
   const dialogRef = useRef(null);
-  const scrollRef = useRef(null); // Ref para sa scrollable div
+  const scrollRef = useRef(null);
   const [isDisabled, setIsDisabled] = useState(true);
 
   useImperativeHandle(ref, () => ({
@@ -21,8 +21,7 @@ const TermsModal = forwardRef((props, ref) => {
     if (scrollRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
 
-      // Mag-allow tayo ng 2px margin para hindi masyadong mahigpit
-      if (scrollTop + clientHeight >= scrollHeight - 2) {
+      if (scrollTop + clientHeight >= scrollHeight - 5) {
         setIsDisabled(false);
       }
     }
@@ -89,6 +88,8 @@ const TermsModal = forwardRef((props, ref) => {
         <div className="modal-action">
           <form method="dialog" className="w-full flex justify-between gap-4">
             <button
+              type="submit"
+              onClick={onAccept}
               disabled={isDisabled}
               className={`btn flex-1 ${
                 isDisabled ? "btn-disabled" : "bg-sky-500 text-white"

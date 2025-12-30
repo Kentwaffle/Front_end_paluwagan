@@ -1,5 +1,5 @@
 import React from "react";
-import Inputform from "./Inputform";
+import Inputform from "../../reusableComponents/Inputform";
 import { Link, Outlet } from "react-router-dom";
 import { useState } from "react";
 
