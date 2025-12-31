@@ -14,6 +14,7 @@ import Register from "./LandingPage/registrationComponents/register";
 //404
 import Eror404 from "./Eror404/404";
 
+import Otp from "./LandingPage/registrationComponents/Otp";
 const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
@@ -24,6 +25,11 @@ const router = createBrowserRouter([
       { path: "/", element: <SignIn /> },
       { path: "/register", element: <Register /> },
     ],
+    errorElement: <Eror404 />,
+  },
+  {
+    path: "/Otp",
+    element: <Otp />,
     errorElement: <Eror404 />,
   },
 ]);
