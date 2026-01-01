@@ -34,3 +34,29 @@ export const ValidateRegister = (formData) => {
     errors,
   };
 };
+
+export const ValidateLogIn = (formData) => {
+  let errors = {};
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!formData.email) {
+    errors.email = "Email is required";
+  } else if (!emailRegex.test(formData.email)) {
+    errors.email = "Invalid email format";
+  }
+
+  if (!formData.password) {
+    errors.password = "Password is required";
+  } else if (formData.password.length < 8) {
+    errors.password = "Must be at least 8 characters";
+  }
+
+  if (!formData.otp) {
+    errors.otp = "OTP is required";
+  }
+
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors,
+  };
+};

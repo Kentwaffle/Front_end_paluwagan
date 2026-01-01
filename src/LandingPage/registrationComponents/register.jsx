@@ -4,36 +4,36 @@ import { Link } from "react-router-dom";
 import { useState, useRef } from "react";
 import TermsModal from "../termModal";
 import SelectDropdown from "../../reusableComponents/selectdropdown";
-import { ValidateRegister } from "../../validations/registerValidation";
-import { Eye } from "lucide-react";
-import { EyeClosed } from "lucide-react";
+import { ValidateRegister } from "../../validations/CredentialValidation";
+import { Eye, EyeClosed } from "lucide-react";
 import { showAlert } from "../../reusableComponents/Alerts/SweetAlerts";
 import { useNavigate } from "react-router-dom";
+import { usePasswordToggle } from "../../reusableComponents/Hooks/ToggleEye";
+import { useForm } from "../../reusableComponents/Hooks/HandleChange&Submit";
 
 function Register() {
-  const navigate = useNavigate();
+  const { formData, formErrors, handleChange, setFormErrors, handleSubmit } =
+    useForm(
+      {
+        first_name: "",
+        middle_name: "",
+        last_name: "",
+        suffix: "",
+        email: "",
+        number: "",
+        password: "",
+        otp: "",
+      },
+      ValidateRegister
+    );
 
-  const [formData, setFormData] = useState({
-    first_name: "",
-    middle_name: "",
-    last_name: "",
-    suffix: "",
-    email: "",
-    number: "",
-    password: "",
-    otp: "",
-  });
+  const navigate = useNavigate();
   const modalRef = useRef(null);
-  const [formErrors, setFormErrors] = useState({});
-  const [show, setShow] = useState(false);
   const [isAccepted, setIsAccepted] = useState(false);
+  const passwordField = usePasswordToggle();
 
   const handleAccept = () => {
     setIsAccepted(true);
-  };
-
-  const handleShow = () => {
-    setShow(!show);
   };
 
   const openTermsModal = () => {
@@ -42,45 +42,17 @@ function Register() {
     }
   };
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    const finalValue =
-      name === "number" ? value.replace(/\D/g, "").slice(0, 11) : value;
-    setFormData((prevData) => ({ ...prevData, [name]: finalValue }));
-    if (formErrors[name]) {
-      setFormErrors((prev) => ({ ...prev, [name]: "" }));
-    }
-  };
-
-  const handleRegister = (e) => {
-    e.preventDefault();
-    const { isValid, errors } = ValidateRegister(formData);
-
-    if (!isValid) {
-      setFormErrors(errors);
-      return;
-    }
-
-    if (!isAccepted) {
-      showAlert.warning(
-        "Terms & Conditions",
-        "Kailangan mo munang basahin at tanggapin ang aming Terms and Conditions bago makapag-register."
-      );
-      return;
-    }
+  const onRegisterSuccess = () => {
     showAlert
       .success(
         "Submitted!",
-        `We will send a One-Time Password (OTP) to <b>${formData.email}</b>. Please check your inbox`
+        `We will send a One-Time Password (OTP) to <b>${formData.email}</b>. Please check your inbox or spam`
       )
       .then((result) => {
         if (result.isConfirmed) {
-          console.log("Succes! Redirecting to OTP");
-
           navigate("/Otp", { state: { email: formData.email } });
         }
       });
-    console.log("Success! Submitting formData...", formData);
   };
 
   return (
@@ -89,7 +61,19 @@ function Register() {
         Register for Paluwagan
       </h2>
 
-      <form onSubmit={handleRegister} className="flex flex-col gap-2">
+      <form
+        onSubmit={(e) =>
+          handleSubmit(e, onRegisterSuccess, {
+            condition: isAccepted,
+            onError: () =>
+              showAlert.warning(
+                "Terms & Conditions",
+                "Kailangan mo munang basahin at tanggapin ang aming Terms and Conditions bago makapag-register."
+              ),
+          })
+        }
+        className="flex flex-col gap-2"
+      >
         <div className="flex flex-col">
           <span>First name</span>
           <Inputform
@@ -198,18 +182,15 @@ function Register() {
           >
             <div className="flex items-center justify-between w-full">
               <Inputform
-                type={show ? "text" : "password"}
+                type={passwordField.type}
                 placeholder="Minimun 8 characters"
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
                 className="!border-none !outline-none !ring-0 !focus:ring-0 !focus:outline-none w-full px-0 shadow-none bg-transparent"
               />
-              <div
-                onClick={handleShow}
-                className="cursor-pointer text-gray-500 hover:text-sky-600 ml-2"
-              >
-                {show ? <Eye /> : <EyeClosed />}
+              <div onClick={passwordField.toggle} className="cursor-pointer">
+                {passwordField.show ? <Eye /> : <EyeClosed />}
               </div>
             </div>
           </div>

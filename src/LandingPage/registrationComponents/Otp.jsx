@@ -5,13 +5,14 @@ import Inputform from "../../reusableComponents/Inputform";
 import { X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { showAlert } from "../../reusableComponents/Alerts/SweetAlerts";
-
+import { useOtpTimer } from "../../reusableComponents/Hooks/SendOTPhook";
+import { useForm } from "../../reusableComponents/Hooks/HandleChange&Submit";
 function Otp() {
   const location = useLocation();
   const navigate = useNavigate();
   const [otpValue, setOtpValue] = useState("");
-  const [timer, setTimer] = useState(30);
-  const [canResend, setCanResend] = useState(false);
+  const { timer, isCounting, sendOtp } = useOtpTimer(30);
+  const { formData, handleChange } = useForm({ otp: "" });
 
   const handleOtpChange = (e) => {
     const val = e.target.value.replace(/\D/g, "").slice(0, 6);
@@ -42,25 +43,6 @@ function Otp() {
     console.log("Success Nega!", otpValue);
   };
 
-  React.useEffect(() => {
-    let interval;
-    if (timer > 0) {
-      interval = setInterval(() => setTimer((prev) => prev - 1), 1000);
-    } else {
-      setCanResend(true);
-    }
-    return () => clearInterval(interval);
-  }, [timer]);
-
-  const handleResendOtp = () => {
-    setTimer(30);
-    setCanResend(false);
-    showAlert.success(
-      "Sent!",
-      "New code sent. Please check your inbox or spam"
-    );
-  };
-
   const email = location.state?.email || "your email";
 
   return (
@@ -74,7 +56,9 @@ function Otp() {
           </button>
         </div>
         <div className="flex gap-3 flex-col">
-          <span>Verify email via OTP(One time password)</span>
+          <span className="text-xl font-semibold">
+            Verify email via OTP(One time password)
+          </span>
           <p>
             We sent a verification code to <b>{email}</b>
           </p>
@@ -84,8 +68,8 @@ function Otp() {
             type="text"
             placeholder="I.E 123456"
             name="otp"
-            value={otpValue}
-            onChange={handleOtpChange}
+            value={formData.otp}
+            onChange={handleChange}
           />
           <button
             type="submit"
@@ -96,11 +80,15 @@ function Otp() {
         </form>
         <button
           type="button"
-          disabled={!canResend}
-          onClick={handleResendOtp}
-          className="text-stone-600 font-medium underline w-full flex justify-end mt-3"
+          disabled={isCounting}
+          onClick={() => sendOtp(email, "bypass-password")}
+          className={`text-sm text-end py-2 font-semibold underline transition-colors ${
+            isCounting
+              ? "text-gray-400 cursor-not-allowed"
+              : "text-sky-600 hover:text-sky-700"
+          }`}
         >
-          {canResend ? "Resend OTP" : `Resend OTP in ${timer}s`}
+          {!isCounting ? "Resend OTP" : `Resend again in ${timer}s`}
         </button>
       </div>
     </div>
