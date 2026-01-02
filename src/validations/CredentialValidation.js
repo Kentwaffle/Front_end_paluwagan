@@ -1,12 +1,12 @@
 export const ValidateRegister = (formData) => {
   let errors = {};
 
-  if (!formData.first_name.trim()) {
-    errors.first_name = "First name is required";
+  if (!formData.firstName.trim()) {
+    errors.firstName = "First name is required";
   }
 
-  if (!formData.last_name.trim()) {
-    errors.last_name = "Last name is required";
+  if (!formData.lastName.trim()) {
+    errors.lastName = "Last name is required";
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -17,10 +17,10 @@ export const ValidateRegister = (formData) => {
   }
 
   const phoneRegex = /^[0-9]{11}$/;
-  if (!formData.number) {
-    errors.number = "Mobile number is required";
-  } else if (!phoneRegex.test(formData.number)) {
-    errors.number = "Enter a valid 11-digit number";
+  if (!formData.phoneNumber) {
+    errors.phoneNumber = "Mobile number is required";
+  } else if (!phoneRegex.test(formData.phoneNumber)) {
+    errors.phoneNumber = "Enter a valid 11-digit number";
   }
 
   if (!formData.password) {

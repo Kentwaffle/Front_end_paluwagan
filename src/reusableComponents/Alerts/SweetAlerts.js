@@ -27,4 +27,15 @@ export const showAlert = {
       text: text,
     });
   },
+
+  loading: (title = "Processing...", text = "Please wait") => {
+    Swal.fire({
+      title: title,
+      html: text,
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+  },
 };

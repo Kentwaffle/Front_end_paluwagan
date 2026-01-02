@@ -10,7 +10,7 @@ export const useForm = (initialValues, validateFunc) => {
 
     let finalValue = value;
 
-    if (name === "otp" || name === " number" || name === "phone") {
+    if (name === "otp" || name === "number" || name === "phoneNumber") {
       const maxLength = name === "otp" ? 6 : 11;
 
       finalValue = value.replace(/\D/g, "").slice(0, maxLength);

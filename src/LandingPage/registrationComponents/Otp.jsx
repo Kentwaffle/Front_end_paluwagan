@@ -7,43 +7,87 @@ import { Link } from "react-router-dom";
 import { showAlert } from "../../reusableComponents/Alerts/SweetAlerts";
 import { useOtpTimer } from "../../reusableComponents/Hooks/SendOTPhook";
 import { useForm } from "../../reusableComponents/Hooks/HandleChange&Submit";
+
+//API
+import api from "../../serviceToApi/ApiInstance";
+import { API_ENDPOINTS } from "../../serviceToApi/ApiEndpoint";
+
 function Otp() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [otpValue, setOtpValue] = useState("");
+
   const { timer, isCounting, sendOtp } = useOtpTimer(30);
   const { formData, handleChange } = useForm({ otp: "" });
+  const { email, userId } = location.state || {};
 
-  const handleOtpChange = (e) => {
-    const val = e.target.value.replace(/\D/g, "").slice(0, 6);
-    setOtpValue(val);
-  };
+  useEffect(() => {
+    console.log("Data from Navigation:", { email, userId });
+    if (!userId) {
+      showAlert.error(
+        "Missing Info",
+        "User ID not found. Please register again."
+      );
+    }
+  }, [userId]);
 
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
+    showAlert.loading("Verifiying email", "Please wait");
 
-    if (otpValue.length < 6) {
-      showAlert.error("Invalid Code", "Please enter the 6-digit code.");
-      return;
-    }
+    // if (otpValue.length < 6) {
+    //   showAlert.error("Invalid Code", "Please enter the 6-digit code.");
+    //   return;
+    // }
 
-    if (otpValue === "123456") {
-      const result = await showAlert.success(
-        "Email verified!",
-        "Your email has been successfully verified. Click OK to sign in."
-      );
+    const payload = {
+      otp: formData.otp,
+    };
 
-      if (result.isConfirmed) {
-        navigate("/");
+    console.log("Full URL:", API_ENDPOINTS.VERIFY_OTP(userId));
+    console.log("Payload being sent:", payload);
+
+    try {
+      const response = await api.post(API_ENDPOINTS.VERIFY_OTP(userId), {
+        otp: formData.otp,
+      });
+
+      if (response.status === 200) {
+        const result = await showAlert.success(
+          "Verified",
+          "Please log in you account"
+        );
+        if (result.isConfirmed) navigate("/");
       }
-    } else {
-      showAlert.error("Wrong Code!", "Please check your inbox or spam");
-    }
+    } catch (error) {
+      const serverMessage = error.response?.data;
 
-    console.log("Success Nega!", otpValue);
+      showAlert.error(
+        "Verification Failed",
+        typeof serverMessage === "string"
+          ? serverMessage
+          : "Check console for details"
+      );
+    }
+    console.log(userId);
   };
 
-  const email = location.state?.email || "your email";
+  const handleResend = async () => {
+    showAlert.loading("Resending OTP", "Please wait");
+
+    try {
+      await api.post(API_ENDPOINTS.RESEND_OTP(userId), {
+        email: email,
+      });
+
+      sendOtp(email, "Verified User");
+      showAlert.success("OTP sent", "New OTP code has been sent successfully!");
+    } catch (error) {
+      showAlert.error(
+        "Error",
+        "OTP not send. Please try again after 30 seconds"
+      );
+    }
+  };
 
   return (
     <div>
@@ -81,7 +125,7 @@ function Otp() {
         <button
           type="button"
           disabled={isCounting}
-          onClick={() => sendOtp(email, "bypass-password")}
+          onClick={handleResend}
           className={`text-sm text-end py-2 font-semibold underline transition-colors ${
             isCounting
               ? "text-gray-400 cursor-not-allowed"

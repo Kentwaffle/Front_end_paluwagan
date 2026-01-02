@@ -10,6 +10,10 @@ import { useForm } from "../../reusableComponents/Hooks/HandleChange&Submit";
 import { useNavigate } from "react-router-dom";
 import { useOtpTimer } from "../../reusableComponents/Hooks/SendOTPhook";
 
+//Api
+import api from "../../serviceToApi/ApiInstance";
+import { API_ENDPOINTS } from "../../serviceToApi/ApiEndpoint";
+
 function SignIn() {
   const { formData, formErrors, handleChange, setFormErrors, handleSubmit } =
     useForm(
@@ -29,36 +33,48 @@ function SignIn() {
     sendOtp(formData.email, formData.password);
   };
 
-  const onSigninSuccess = () => {
-    const MOCK_USER = {
-      email: "test@gmail.com",
-      password: "Password123",
-      otp: "123456",
-    };
+  const onSigninSuccess = async (e) => {
+    e.preventDefault();
 
-    if (
-      formData.email === MOCK_USER.email &&
-      formData.password === MOCK_USER.password &&
-      formData.otp === MOCK_USER.otp
-    ) {
-      showAlert
-        .success("Success!", "Logged in successfully! Redirecting...")
-        .then((result) => {
-          if (result.isConfirmed) {
-            navigate("/dashboard", { state: { email: formData.email } });
-          }
-        });
-    } else {
-      setFormErrors({
-        email: "Account not found.",
-        password: "Incorrect password.",
-      });
-
-      showAlert.error(
-        "Login Failed",
-        "Invalid email or password. Try: test@gmail.com / Password123"
-      );
+    try {
+      const response = await api.post(API_ENDPOINTS.LOGIN, formData);
+      const setToken = response.data.token;
+      localStorage.getItem("token", setToken);
+      showAlert.success("Success! login", "Logged in successfully!");
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Login failed", error);
     }
+
+    // const MOCK_USER = {
+    //   email: "test@gmail.com",
+    //   password: "Password123",
+    //   otp: "123456",
+    // };
+
+    // if (
+    //   formData.email === MOCK_USER.email &&
+    //   formData.password === MOCK_USER.password &&
+    //   formData.otp === MOCK_USER.otp
+    // ) {
+    //   showAlert
+    //     .success("Success!", "Logged in successfully! Redirecting...")
+    //     .then((result) => {
+    //       if (result.isConfirmed) {
+    //         navigate("/dashboard", { state: { email: formData.email } });
+    //       }
+    //     });
+    // } else {
+    //   setFormErrors({
+    //     email: "Account not found.",
+    //     password: "Incorrect password.",
+    //   });
+
+    //   showAlert.error(
+    //     "Login Failed",
+    //     "Invalid email or password. Try: test@gmail.com / Password123"
+    //   );
+    // }
 
     // showAlert.success("Successfully login!").then((result) => {
     //   if (result.isConfirmed) {

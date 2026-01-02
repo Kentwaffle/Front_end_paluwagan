@@ -1,4 +1,3 @@
-import React from "react";
 import Inputform from "../../reusableComponents/Inputform";
 import { Link } from "react-router-dom";
 import { useState, useRef } from "react";
@@ -11,18 +10,21 @@ import { useNavigate } from "react-router-dom";
 import { usePasswordToggle } from "../../reusableComponents/Hooks/ToggleEye";
 import { useForm } from "../../reusableComponents/Hooks/HandleChange&Submit";
 
+//Api
+import api from "../../serviceToApi/ApiInstance";
+import { API_ENDPOINTS } from "../../serviceToApi/ApiEndpoint";
+
 function Register() {
   const { formData, formErrors, handleChange, setFormErrors, handleSubmit } =
     useForm(
       {
-        first_name: "",
-        middle_name: "",
-        last_name: "",
+        firstName: "",
+        middleName: "",
+        lastName: "",
         suffix: "",
         email: "",
-        number: "",
+        phoneNumber: "",
         password: "",
-        otp: "",
       },
       ValidateRegister
     );
@@ -42,17 +44,27 @@ function Register() {
     }
   };
 
-  const onRegisterSuccess = () => {
-    showAlert
-      .success(
-        "Submitted!",
-        `We will send a One-Time Password (OTP) to <b>${formData.email}</b>. Please check your inbox or spam`
-      )
-      .then((result) => {
-        if (result.isConfirmed) {
-          navigate("/Otp", { state: { email: formData.email } });
-        }
-      });
+  const onRegisterSuccess = async () => {
+    showAlert.loading("Loading...", "Please wait");
+    try {
+      const response = await api.post(API_ENDPOINTS.REGISTER, formData);
+      const userId = response.data.userId;
+      showAlert
+        .success(
+          "Submitted!",
+          `We will send a One-Time Password (OTP) to <b>${formData.email}</b>. Please check your inbox or spam`
+        )
+        .then((result) => {
+          if (result.isConfirmed) {
+            navigate("/otp", {
+              state: { email: formData.email, userId: userId },
+            });
+          }
+        });
+    } catch (error) {
+      console.log(error);
+      showAlert.error("Error", error.response?.data?.message || "Failed");
+    }
   };
 
   return (
@@ -79,16 +91,14 @@ function Register() {
           <Inputform
             type="text"
             placeholder="i.e Juan"
-            name="first_name"
-            value={formData.first_name}
+            name="firstName"
+            value={formData.firstName}
             onChange={handleChange}
-            className={
-              formErrors.first_name ? "input-error border-red-500" : ""
-            }
+            className={formErrors.firstName ? "input-error border-red-500" : ""}
           />
-          {formErrors.first_name && (
+          {formErrors.firstName && (
             <span className="text-red-500 text-xs mt-1">
-              {formErrors.first_name}
+              {formErrors.firstName}
             </span>
           )}
         </div>
@@ -98,8 +108,8 @@ function Register() {
           <Inputform
             type="text"
             placeholder="i.e. Garcia"
-            name="middle_name"
-            value={formData.middle_name}
+            name="middleName"
+            value={formData.middleName}
             onChange={handleChange}
           />
         </div>
@@ -109,14 +119,14 @@ function Register() {
           <Inputform
             type="text"
             placeholder="i.e. Dela Cruz"
-            name="last_name"
-            value={formData.last_name}
+            name="lastName"
+            value={formData.lastName}
             onChange={handleChange}
-            className={formErrors.last_name ? "input-error border-red-500" : ""}
+            className={formErrors.lastName ? "input-error border-red-500" : ""}
           />
-          {formErrors.last_name && (
+          {formErrors.lastName && (
             <span className="text-red-500 text-xs mt-1">
-              {formErrors.last_name}
+              {formErrors.lastName}
             </span>
           )}
         </div>
@@ -130,7 +140,7 @@ function Register() {
             options={["Jr.", "Sr.", "II", "III", "IV"]}
             className={formErrors.suffix ? "input-error border-red-500" : ""}
           />
-          {formErrors.first_name && (
+          {formErrors.firstName && (
             <span className="text-red-500 text-xs mt-1">
               {formErrors.suffix}
             </span>
@@ -142,14 +152,16 @@ function Register() {
           <Inputform
             type="text"
             placeholder="i.e 0912 345 6789"
-            name="number"
-            value={formData.number}
+            name="phoneNumber"
+            value={formData.phoneNumber}
             onChange={handleChange}
-            className={formErrors.number ? "input-error border-red-500" : ""}
+            className={
+              formErrors.phoneNumber ? "input-error border-red-500" : ""
+            }
           />
-          {formErrors.number && (
+          {formErrors.phoneNumber && (
             <span className="text-red-500 text-xs mt-1">
-              {formErrors.number}
+              {formErrors.phoneNumber}
             </span>
           )}
         </div>
@@ -164,7 +176,7 @@ function Register() {
             onChange={handleChange}
             className={formErrors.email ? "input-error border-red-500" : ""}
           />
-          {formErrors.first_name && (
+          {formErrors.firstName && (
             <span className="text-red-500 text-xs mt-1">
               {formErrors.email}
             </span>
@@ -194,7 +206,7 @@ function Register() {
               </div>
             </div>
           </div>
-          {formErrors.first_name && (
+          {formErrors.firstName && (
             <span className="text-red-500 text-xs mt-1">
               {formErrors.password}
             </span>

@@ -18,11 +18,11 @@ export const useOtpTimer = (initialTime = 30) => {
     return () => clearInterval(interval);
   }, [timer]);
 
-  const sendOtp = (email, password) => {
+  const sendOtp = (email, password = "bypass") => {
     if (isCounting) return;
 
     if (!email?.trim() || !password?.trim()) {
-      showAlert.warning("Error!", "Please enter email and password");
+      showAlert.warning("Error!", "Please enter required information");
       return;
     }
 
