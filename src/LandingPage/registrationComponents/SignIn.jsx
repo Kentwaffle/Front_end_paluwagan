@@ -1,4 +1,3 @@
-import React from "react";
 import Inputform from "../../reusableComponents/Inputform";
 import { Link, Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -28,59 +27,49 @@ function SignIn() {
   const navigate = useNavigate();
   const { timer, isCounting, sendOtp } = useOtpTimer(30);
   const passwordField = usePasswordToggle();
+  const [hasSent, setHasSent] = useState(false);
+  const { userId } = location.state || {};
 
-  const handleSendOtpTrigger = () => {
-    sendOtp(formData.email, formData.password);
+  const handleSendOtpTrigger = async () => {
+    showAlert.loading("Sending", "Please wait");
+
+    try {
+      await api.post(API_ENDPOINTS.SEND_OTP, {
+        email: formData.email,
+      });
+      sendOtp(formData.email, formData.password);
+      setHasSent(true);
+    } catch (error) {
+      console.log(error);
+      showAlert.error("Error", error.response?.data?.message || "Failed");
+    }
   };
 
-  const onSigninSuccess = async (e) => {
-    e.preventDefault();
+  const onSigninSuccess = async () => {
+    showAlert.loading("Loading...", "Please wait");
+    if (!formData.otp) {
+      showAlert.warning("Wait!", "Please enter the OTP sent to your email.");
+      return;
+    }
 
     try {
       const response = await api.post(API_ENDPOINTS.LOGIN, formData);
-      const setToken = response.data.token;
-      localStorage.getItem("token", setToken);
-      showAlert.success("Success! login", "Logged in successfully!");
-      navigate("/dashboard");
+
+      if (response.data.token) {
+        const token = response.data.token;
+        localStorage.setItem("token", token);
+
+        showAlert.success("Success!", "Logged in successfully!").then(() => {
+          console.log("Navigating to Dashboard...");
+          // navigate("/dashboard");
+        });
+      }
     } catch (error) {
       console.error("Login failed", error);
+      const errorMessage =
+        error.response?.data?.message || "Invalid email or password";
+      showAlert.error("Login Failed", errorMessage);
     }
-
-    // const MOCK_USER = {
-    //   email: "test@gmail.com",
-    //   password: "Password123",
-    //   otp: "123456",
-    // };
-
-    // if (
-    //   formData.email === MOCK_USER.email &&
-    //   formData.password === MOCK_USER.password &&
-    //   formData.otp === MOCK_USER.otp
-    // ) {
-    //   showAlert
-    //     .success("Success!", "Logged in successfully! Redirecting...")
-    //     .then((result) => {
-    //       if (result.isConfirmed) {
-    //         navigate("/dashboard", { state: { email: formData.email } });
-    //       }
-    //     });
-    // } else {
-    //   setFormErrors({
-    //     email: "Account not found.",
-    //     password: "Incorrect password.",
-    //   });
-
-    //   showAlert.error(
-    //     "Login Failed",
-    //     "Invalid email or password. Try: test@gmail.com / Password123"
-    //   );
-    // }
-
-    // showAlert.success("Successfully login!").then((result) => {
-    //   if (result.isConfirmed) {
-    //     navigate("/dashboard", { state: { email: formData.email } });
-    //   }
-    // });
   };
 
   return (
@@ -90,11 +79,12 @@ function SignIn() {
       </h2>
 
       <form
-        onSubmit={(e) =>
+        onSubmit={(e) => {
+          e.preventDefault();
           handleSubmit(e, onSigninSuccess, {
             onError: () => showAlert.warning("Error!", "Wrong credential"),
-          })
-        }
+          });
+        }}
         className="flex flex-col gap-3"
       >
         <div>
@@ -169,7 +159,11 @@ function SignIn() {
                   : "text-sky-600 hover:text-sky-500 cursor-pointer"
               }`}
             >
-              {!isCounting ? "Send OTP" : `Resend ${timer}s`}
+              {isCounting
+                ? `Resend ${timer}s`
+                : hasSent
+                ? "Resend OTP"
+                : "Send OTP"}
             </button>
           </div>
           {formErrors.otp && (
@@ -187,7 +181,10 @@ function SignIn() {
           </Link>
         </span>
 
-        <button className="w-full bg-sky-500 font-semibold p-2 rounded shadow-sm hover:bg-sky-600 transition duration-300">
+        <button
+          type="submit"
+          className="w-full bg-sky-500 font-semibold p-2 rounded shadow-sm hover:bg-sky-600 transition duration-300"
+        >
           Sign In
         </button>
       </form>

@@ -44,7 +44,7 @@ export const useForm = (initialValues, validateFunc) => {
       return;
     }
 
-    callback();
+    await callback();
     console.log("Success! Submitting formData...", formData);
   };
 
