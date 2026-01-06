@@ -61,7 +61,7 @@ function SignIn() {
 
         showAlert.success("Success!", "Logged in successfully!").then(() => {
           console.log("Navigating to Dashboard...");
-          // navigate("/dashboard");
+          navigate("/dashboard");
         });
       }
     } catch (error) {
@@ -73,8 +73,8 @@ function SignIn() {
   };
 
   return (
-    <div className="w-full max-w-lg mt-10 sm:p-10  flex flex-col gap-3 bg-white-300 sm:shadow-lg sm:rounded-lg">
-      <h2 className="text-center font-semibold text-xl font-sans mb-3">
+    <div className="w-full max-w-lg mt-10 sm:p-10  flex flex-col sm gap-3 bg-white-300 sm:shadow-lg sm:rounded-lg">
+      <h2 className="text-center font-semibold text-2xl font-sans mb-3 text-stone-700">
         Sign in to your account
       </h2>
 

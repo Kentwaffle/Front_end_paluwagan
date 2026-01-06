@@ -11,6 +11,9 @@ import PaluwaganMain from "./LandingPage/paluwaganMain";
 import SignIn from "./LandingPage/registrationComponents/SignIn";
 import Register from "./LandingPage/registrationComponents/register";
 
+//dashboard
+import Dashboard from "./Dashboard/Dashboard";
+
 //404
 import Eror404 from "./Eror404/404";
 
@@ -23,14 +26,20 @@ const router = createBrowserRouter([
     element: <PaluwaganMain />,
     children: [
       { path: "/", element: <SignIn /> },
-      { path: "/register", element: <Register /> },
+      { path: "register", element: <Register /> },
     ],
-    errorElement: <Eror404 />,
   },
   {
-    path: "/Otp",
+    path: "/register/otp",
     element: <Otp />,
-    errorElement: <Eror404 />,
+  },
+  {
+    path: "/dashboard",
+    element: <Dashboard />,
+  },
+  {
+    path: "*",
+    element: <Eror404 />,
   },
 ]);
 

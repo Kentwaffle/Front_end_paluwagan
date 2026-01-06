@@ -69,7 +69,7 @@ function Register() {
 
   return (
     <div className="w-full max-w-lg sm:p-10 py-5 flex flex-col gap-3 bg-white-300 sm:shadow-lg sm:rounded-lg">
-      <h2 className="text-center font-semibold text-xl font-sans">
+      <h2 className="text-center font-semibold text-2xl font-sans text-stone-700">
         Register for Paluwagan
       </h2>
 
