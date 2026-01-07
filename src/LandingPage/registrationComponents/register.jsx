@@ -49,18 +49,38 @@ function Register() {
     try {
       const response = await api.post(API_ENDPOINTS.REGISTER, formData);
       const userId = response.data.userId;
-      showAlert
-        .success(
-          "Submitted!",
-          `We will send a One-Time Password (OTP) to <b>${formData.email}</b>. Please check your inbox or spam`
-        )
-        .then((result) => {
-          if (result.isConfirmed) {
-            navigate("/register/otp", {
-              state: { email: formData.email, userId: userId },
-            });
-          }
-        });
+      const messageFromServer = response.data.message;
+
+      if (
+        messageFromServer ===
+        "User exists but not yet verified. Verification email resent."
+      ) {
+        showAlert
+          .success(
+            "Already registered but not Verified",
+            "OTP sent!, Please check your inbox or spam to get verified"
+          )
+          .then((result) => {
+            if (result.isConfirmed) {
+              navigate("/register/otp", {
+                state: { email: formData.email, userId: userId },
+              });
+            }
+          });
+      } else {
+        showAlert
+          .success(
+            "Submitted!",
+            `We will send a One-Time Password (OTP) to <b>${formData.email}</b>. Please check your inbox or spam`
+          )
+          .then((result) => {
+            if (result.isConfirmed) {
+              navigate("/register/otp", {
+                state: { email: formData.email, userId: userId },
+              });
+            }
+          });
+      }
     } catch (error) {
       console.log(error);
       showAlert.error("Error", error.response?.data?.message || "Failed");

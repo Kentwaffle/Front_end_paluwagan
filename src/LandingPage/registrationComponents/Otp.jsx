@@ -34,11 +34,6 @@ function Otp() {
     e.preventDefault();
     showAlert.loading("Verifiying email", "Please wait");
 
-    // if (otpValue.length < 6) {
-    //   showAlert.error("Invalid Code", "Please enter the 6-digit code.");
-    //   return;
-    // }
-
     const payload = {
       otp: formData.otp,
     };
