@@ -90,9 +90,9 @@ function Otp() {
   };
 
   return (
-    <div>
-      <div className="flex flex-col m-5">
-        <div className="w-full flex justify-end">
+    <div className=" h-full flex justify-center items-center">
+      <div className="flex flex-col justify-center m-5 max-w-xl md:border md:border-stone-300 md:p-5 md:rounded md:shadow-md">
+        <div className="w-full  flex justify-end">
           <button>
             <Link to={"/register"} className="cursor-pointer  font-semibold">
               <X />

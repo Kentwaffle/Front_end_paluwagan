@@ -73,8 +73,8 @@ function SignIn() {
   };
 
   return (
-    <div className="w-full max-w-lg mt-10 sm:p-10  flex flex-col sm gap-3 bg-white-300 sm:shadow-lg sm:rounded-lg">
-      <h2 className="text-center font-semibold text-2xl font-sans mb-3 text-stone-700">
+    <div className="w-full max-w-lg flex flex-col gap-3 bg-white-300 md:px-5 md:py-0">
+      <h2 className="text-center font-semibold text-2xl font-sans mb-3  text-stone-700 md:mb-5">
         Sign in to your account
       </h2>
 

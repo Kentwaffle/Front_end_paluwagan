@@ -56,7 +56,7 @@ function Register() {
         )
         .then((result) => {
           if (result.isConfirmed) {
-            navigate("/otp", {
+            navigate("/register/otp", {
               state: { email: formData.email, userId: userId },
             });
           }
@@ -68,7 +68,7 @@ function Register() {
   };
 
   return (
-    <div className="w-full max-w-lg sm:p-10 py-5 flex flex-col gap-3 bg-white-300 sm:shadow-lg sm:rounded-lg">
+    <div className="w-full max-w-lg  py-5 flex flex-col gap-3 bg-white-300 md:px-5 md:py-0">
       <h2 className="text-center font-semibold text-2xl font-sans text-stone-700">
         Register for Paluwagan
       </h2>
@@ -84,164 +84,172 @@ function Register() {
               ),
           })
         }
-        className="flex flex-col gap-2"
+        className="flex flex-col gap-3"
       >
-        <div className="flex flex-col">
-          <span>First name</span>
-          <Inputform
-            type="text"
-            placeholder="i.e Juan"
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleChange}
-            className={formErrors.firstName ? "input-error border-red-500" : ""}
-          />
-          {formErrors.firstName && (
-            <span className="text-red-500 text-xs mt-1">
-              {formErrors.firstName}
-            </span>
-          )}
-        </div>
+        <div className="md:grid md:grid-cols-6 md:gap-4 md:mb-1">
+          <div className="flex flex-col md:col-span-2">
+            <span>First name</span>
+            <Inputform
+              type="text"
+              placeholder="i.e Juan"
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleChange}
+              className={
+                formErrors.firstName ? "input-error border-red-500" : ""
+              }
+            />
+            {formErrors.firstName && (
+              <span className="text-red-500 text-xs mt-1">
+                {formErrors.firstName}
+              </span>
+            )}
+          </div>
 
-        <div className="flex flex-col">
-          <span>Middle name</span>
-          <Inputform
-            type="text"
-            placeholder="i.e. Garcia"
-            name="middleName"
-            value={formData.middleName}
-            onChange={handleChange}
-          />
-        </div>
+          <div className="flex flex-col md:col-span-2">
+            <span>Middle name</span>
+            <Inputform
+              type="text"
+              placeholder="i.e. Garcia"
+              name="middleName"
+              value={formData.middleName}
+              onChange={handleChange}
+            />
+          </div>
 
-        <div className="flex flex-col">
-          <span>Last name</span>
-          <Inputform
-            type="text"
-            placeholder="i.e. Dela Cruz"
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleChange}
-            className={formErrors.lastName ? "input-error border-red-500" : ""}
-          />
-          {formErrors.lastName && (
-            <span className="text-red-500 text-xs mt-1">
-              {formErrors.lastName}
-            </span>
-          )}
-        </div>
+          <div className="flex flex-col md:col-span-2">
+            <span>Last name</span>
+            <Inputform
+              type="text"
+              placeholder="i.e. Dela Cruz"
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleChange}
+              className={
+                formErrors.lastName ? "input-error border-red-500" : ""
+              }
+            />
+            {formErrors.lastName && (
+              <span className="text-red-500 text-xs mt-1">
+                {formErrors.lastName}
+              </span>
+            )}
+          </div>
 
-        <div className="flex flex-col">
-          <span>Suffix</span>
-          <SelectDropdown
-            name="suffix"
-            value={formData.suffix}
-            onChange={handleChange}
-            options={["Jr.", "Sr.", "II", "III", "IV"]}
-            className={formErrors.suffix ? "input-error border-red-500" : ""}
-          />
-          {formErrors.firstName && (
-            <span className="text-red-500 text-xs mt-1">
-              {formErrors.suffix}
-            </span>
-          )}
-        </div>
+          <div className="flex flex-col md:col-span-3">
+            <span>Suffix</span>
+            <SelectDropdown
+              name="suffix"
+              value={formData.suffix}
+              onChange={handleChange}
+              options={["Jr.", "Sr.", "II", "III", "IV"]}
+              className={formErrors.suffix ? "input-error border-red-500" : ""}
+            />
+            {formErrors.firstName && (
+              <span className="text-red-500 text-xs mt-1">
+                {formErrors.suffix}
+              </span>
+            )}
+          </div>
 
-        <div className="flex flex-col">
-          <span>Phone number</span>
-          <Inputform
-            type="text"
-            placeholder="i.e 0912 345 6789"
-            name="phoneNumber"
-            value={formData.phoneNumber}
-            onChange={handleChange}
-            className={
-              formErrors.phoneNumber ? "input-error border-red-500" : ""
-            }
-          />
-          {formErrors.phoneNumber && (
-            <span className="text-red-500 text-xs mt-1">
-              {formErrors.phoneNumber}
-            </span>
-          )}
-        </div>
+          <div className="flex flex-col md:col-span-3">
+            <span>Phone number</span>
+            <Inputform
+              type="text"
+              placeholder="i.e 0912 345 6789"
+              name="phoneNumber"
+              value={formData.phoneNumber}
+              onChange={handleChange}
+              className={
+                formErrors.phoneNumber ? "input-error border-red-500" : ""
+              }
+            />
+            {formErrors.phoneNumber && (
+              <span className="text-red-500 text-xs mt-1">
+                {formErrors.phoneNumber}
+              </span>
+            )}
+          </div>
 
-        <div className="flex flex-col">
-          <span>Email address</span>
-          <Inputform
-            type="email"
-            placeholder="example@email.com"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className={formErrors.email ? "input-error border-red-500" : ""}
-          />
-          {formErrors.firstName && (
-            <span className="text-red-500 text-xs mt-1">
-              {formErrors.email}
-            </span>
-          )}
-        </div>
+          <div className="flex flex-col  md:col-span-3">
+            <span>Email address</span>
+            <Inputform
+              type="email"
+              placeholder="example@email.com"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className={formErrors.email ? "input-error border-red-500" : ""}
+            />
+            {formErrors.firstName && (
+              <span className="text-red-500 text-xs mt-1">
+                {formErrors.email}
+              </span>
+            )}
+          </div>
 
-        <div className="flex flex-col">
-          <span>Password</span>
-          <div
-            className={`flex items-center border rounded-md px-3 transition-all duration-200 ${
-              formErrors.password
-                ? "border-red-500 ring-1 ring-red-500"
-                : "border-gray-300 focus-within:border-sky-500 focus-within:ring-1 focus-within:ring-sky-500"
-            }`}
-          >
-            <div className="flex items-center justify-between w-full">
-              <Inputform
-                type={passwordField.type}
-                placeholder="Minimun 8 characters"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                className="!border-none !outline-none !ring-0 !focus:ring-0 !focus:outline-none w-full px-0 shadow-none bg-transparent"
-              />
-              <div onClick={passwordField.toggle} className="cursor-pointer">
-                {passwordField.show ? <Eye /> : <EyeClosed />}
+          <div className="flex flex-col md:col-span-3">
+            <span>Password</span>
+            <div
+              className={`flex items-center border rounded-md px-3 transition-all duration-200 ${
+                formErrors.password
+                  ? "border-red-500 ring-1 ring-red-500"
+                  : "border-gray-300 focus-within:border-sky-500 focus-within:ring-1 focus-within:ring-sky-500"
+              }`}
+            >
+              <div className="flex items-center justify-between w-full">
+                <Inputform
+                  type={passwordField.type}
+                  placeholder="Minimun 8 characters"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="!border-none !outline-none !ring-0 !focus:ring-0 !focus:outline-none w-full px-0 shadow-none bg-transparent"
+                />
+                <div onClick={passwordField.toggle} className="cursor-pointer">
+                  {passwordField.show ? <Eye /> : <EyeClosed />}
+                </div>
               </div>
             </div>
+            {formErrors.firstName && (
+              <span className="text-red-500 text-xs mt-1">
+                {formErrors.password}
+              </span>
+            )}
           </div>
-          {formErrors.firstName && (
-            <span className="text-red-500 text-xs mt-1">
-              {formErrors.password}
-            </span>
-          )}
         </div>
 
         {/* Terms */}
-        <span className="flex gap-1 justify-center items-center">
-          <input
-            type="checkbox"
-            disabled={!isAccepted}
-            readOnly
-            className="checkbox  checkbox-sm"
-            checked={isAccepted}
-          />
-          <a
-            className="underline text-center text-sky-600 hover:text-sky-700 transition duration-150"
-            onClick={openTermsModal}
-          >
-            Please read our Terms and Conditions
-          </a>
-          {formErrors.terms && (
-            <span className="text-red-500 text-xs italic font-medium">
-              {formErrors.terms}
-            </span>
-          )}
-        </span>
+        <div className="flex flex-col gap-2 ">
+          <span className="flex gap-1 justify-center items-center">
+            <input
+              type="checkbox"
+              disabled={!isAccepted}
+              readOnly
+              className="checkbox  checkbox-sm"
+              checked={isAccepted}
+            />
+            <a
+              className="underline text-center text-sky-600 hover:text-sky-700 transition duration-150"
+              onClick={openTermsModal}
+            >
+              Please read our Terms and Conditions
+            </a>
+            {formErrors.terms && (
+              <span className="text-red-500 text-xs italic font-medium">
+                {formErrors.terms}
+              </span>
+            )}
+          </span>
 
-        {/* Submit */}
-        <button
-          type="submit"
-          className="w-full bg-sky-500 font-semibold p-2 rounded shadow-sm hover:bg-sky-600 transition duration-300"
-        >
-          Register
-        </button>
+          {/* Submit */}
+          <button
+            type="submit"
+            className="w-full bg-sky-500 font-semibold p-2 rounded shadow-sm hover:bg-sky-600 transition duration-300"
+          >
+            Register
+          </button>
+        </div>
       </form>
 
       <span className="text-sm  pl-2 text-center">
