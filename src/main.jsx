@@ -11,6 +11,10 @@ import PaluwaganMain from "./LandingPage/paluwaganMain";
 import SignIn from "./LandingPage/registrationComponents/SignIn";
 import Register from "./LandingPage/registrationComponents/register";
 
+//forgot pass
+import ForgotPassword from "./LandingPage/registrationComponents/ForgotPassword";
+import ChangePassword from "./LandingPage/registrationComponents/ChangePassword";
+
 //dashboard
 import Dashboard from "./Dashboard/Dashboard";
 
@@ -32,6 +36,13 @@ const router = createBrowserRouter([
   {
     path: "/register/otp",
     element: <Otp />,
+  },
+  {
+    path: "forgot-password",
+    children: [
+      { index: true, element: <ForgotPassword /> },
+      { path: "changepassword", element: <ChangePassword /> },
+    ],
   },
   {
     path: "/dashboard",

@@ -30,14 +30,14 @@ const TermsModal = forwardRef(({ onAccept }, ref) => {
   return (
     <dialog id="terms_modal" className="modal" ref={dialogRef}>
       <div className="modal-box max-w-lg">
-        <h3 className="pb-5 text-xl text-center font-bold">
+        <h3 className="pb-5 text-3xl text-center font-bold">
           Paluwagan Terms and Conditions
         </h3>
 
         <div
           ref={scrollRef}
           onScroll={handleScroll}
-          className="py-4 p-3 max-h-80 overflow-y-auto text-sm text-gray-700 space-y-3 bg-stone-100"
+          className="py-4 p-3 max-h-80 overflow-y-auto text-sm text-gray-700 space-y-3 bg-stone-100 rounded"
         >
           <p>
             **1. Layunin:** Ang Paluwagan ay para lamang sa lehitimong miyembro.
@@ -84,6 +84,11 @@ const TermsModal = forwardRef(({ onAccept }, ref) => {
             pinal.
           </p>
         </div>
+
+        <span className="block text-sky-400 text-sm text-center italic mt-3">
+          Mangyaring basahin ang detalye sa ibaba para ma-click ang button.
+          <span className="text-red-500">*</span>
+        </span>
 
         <div className="modal-action">
           <form method="dialog" className="w-full flex justify-between gap-4">

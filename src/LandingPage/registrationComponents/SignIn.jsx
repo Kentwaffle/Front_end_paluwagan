@@ -47,6 +47,7 @@ function SignIn() {
 
   const onSigninSuccess = async () => {
     showAlert.loading("Loading...", "Please wait");
+
     if (!formData.otp) {
       showAlert.warning("Wait!", "Please enter the OTP sent to your email.");
       return;
@@ -85,7 +86,7 @@ function SignIn() {
             onError: () => showAlert.warning("Error!", "Wrong credential"),
           });
         }}
-        className="flex flex-col gap-3"
+        className="flex flex-col gap-3 p-1"
       >
         <div>
           <Inputform
@@ -107,7 +108,7 @@ function SignIn() {
           <div
             className={`flex items-center border rounded-md px-3 transition-all duration-200 ${
               formErrors.password
-                ? "border-red-500 ring-1 ring-red-500"
+                ? "border-red-500 "
                 : "border-gray-300 focus-within:border-sky-500 focus-within:ring-1 focus-within:ring-sky-500"
             }`}
           >
@@ -136,7 +137,7 @@ function SignIn() {
           <div
             className={`flex items-center border rounded-md px-3 transition-all duration-200 ${
               formErrors.otp
-                ? "border-red-500 ring-1 ring-red-500"
+                ? "border-red-500"
                 : "border-gray-300 focus-within:border-sky-500 focus-within:ring-1 focus-within:ring-sky-500"
             }`}
           >
@@ -170,17 +171,15 @@ function SignIn() {
             <span className="text-red-500 text-xs mt-1">{formErrors.otp}</span>
           )}
         </div>
-
         <span className="text-sm text-center">
-          Dont have an account?{" "}
+          Forgot password?
           <Link
-            to="/register"
-            className="text-sky-600 font-semibold hover:underline cursor-pointer underline"
+            to="/forgot-password"
+            className="text-sky-600 text-sm font-semibold hover:underline cursor-pointer underline ml-1"
           >
-            Register here
+            Click here
           </Link>
         </span>
-
         <button
           type="submit"
           className="w-full bg-sky-500 font-semibold p-2 rounded shadow-sm hover:bg-sky-600 transition duration-300"
@@ -188,6 +187,15 @@ function SignIn() {
           Sign In
         </button>
       </form>
+      <span className="text-sm text-center">
+        Dont have an account?{" "}
+        <Link
+          to="/register"
+          className="text-sky-600 font-semibold hover:underline cursor-pointer underline"
+        >
+          Register here
+        </Link>
+      </span>
     </div>
   );
 }

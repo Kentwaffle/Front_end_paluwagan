@@ -104,7 +104,7 @@ function Register() {
               ),
           })
         }
-        className="flex flex-col gap-3"
+        className="flex flex-col gap-3 p-1"
       >
         <div className="md:grid md:grid-cols-6 md:gap-4 md:mb-1">
           <div className="flex flex-col md:col-span-2">
@@ -163,13 +163,7 @@ function Register() {
               value={formData.suffix}
               onChange={handleChange}
               options={["Jr.", "Sr.", "II", "III", "IV"]}
-              className={formErrors.suffix ? "input-error border-red-500" : ""}
             />
-            {formErrors.firstName && (
-              <span className="text-red-500 text-xs mt-1">
-                {formErrors.suffix}
-              </span>
-            )}
           </div>
 
           <div className="flex flex-col md:col-span-3">
@@ -201,7 +195,7 @@ function Register() {
               onChange={handleChange}
               className={formErrors.email ? "input-error border-red-500" : ""}
             />
-            {formErrors.firstName && (
+            {formErrors.email && (
               <span className="text-red-500 text-xs mt-1">
                 {formErrors.email}
               </span>
@@ -213,14 +207,14 @@ function Register() {
             <div
               className={`flex items-center border rounded-md px-3 transition-all duration-200 ${
                 formErrors.password
-                  ? "border-red-500 ring-1 ring-red-500"
+                  ? "border-red-500"
                   : "border-gray-300 focus-within:border-sky-500 focus-within:ring-1 focus-within:ring-sky-500"
               }`}
             >
               <div className="flex items-center justify-between w-full">
                 <Inputform
                   type={passwordField.type}
-                  placeholder="Minimun 8 characters"
+                  placeholder="i.e Juancruz21"
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
@@ -231,7 +225,7 @@ function Register() {
                 </div>
               </div>
             </div>
-            {formErrors.firstName && (
+            {formErrors.password && (
               <span className="text-red-500 text-xs mt-1">
                 {formErrors.password}
               </span>

@@ -10,22 +10,24 @@ export const useForm = (initialValues, validateFunc) => {
 
     let finalValue = value;
 
-    if (name === "otp" || name === "number" || name === "phoneNumber") {
-      const maxLength = name === "otp" ? 6 : 11;
-
+    if (
+      name.toLowerCase().includes("otp") ||
+      name === "number" ||
+      name === "phoneNumber"
+    ) {
+      const maxLength = name.toLowerCase().includes("otp") ? 6 : 11;
       finalValue = value.replace(/\D/g, "").slice(0, maxLength);
     }
 
-    // const finalValue =
-    //   name === "number" || name === "phone"
-    //     ? value.replace(/\D/g, "").slice(0, 11)
-    //     : value;
+    const newFormData = { ...formData, [name]: finalValue };
+    setFormData(newFormData);
 
-    setFormData((prev) => ({ ...prev, [name]: finalValue }));
+    const validationResults = validateFunc(newFormData);
 
-    if (formErrors[name]) {
-      setFormErrors((prev) => ({ ...prev, [name]: "" }));
-    }
+    setFormErrors((prev) => ({
+      ...prev,
+      [name]: validationResults.errors[name] || "",
+    }));
   };
 
   //Submit

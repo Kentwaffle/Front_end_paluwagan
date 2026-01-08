@@ -23,12 +23,10 @@ function Otp() {
   useEffect(() => {
     console.log("Data from Navigation:", { email, userId });
     if (!userId) {
-      showAlert.error(
-        "Missing Info",
-        "User ID not found. Please register again."
-      );
+      navigate("/register");
+      showAlert.error("Error!", "Email not found. Please register again.");
     }
-  }, [userId]);
+  }, [userId, navigate]);
 
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
@@ -48,7 +46,7 @@ function Otp() {
 
       if (response.status === 200) {
         const result = await showAlert.success(
-          "Verified",
+          "Verified!",
           "Please log in you account"
         );
         if (result.isConfirmed) navigate("/");
