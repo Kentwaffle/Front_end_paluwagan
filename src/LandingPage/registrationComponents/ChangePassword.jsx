@@ -56,10 +56,7 @@ function ChangePassword() {
       );
 
       if (response.status === 200) {
-        await showAlert.success(
-          "Verified!",
-          "Click OK to change your password"
-        );
+        await showAlert.success("Verified!", "Click OK to login your account");
         navigate("/");
       }
     } catch (error) {

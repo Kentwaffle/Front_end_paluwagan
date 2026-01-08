@@ -106,7 +106,7 @@ function Register() {
         }
         className="flex flex-col gap-3 p-1"
       >
-        <div className="md:grid md:grid-cols-6 md:gap-4 md:mb-1">
+        <div className="flex flex-col gap-3 md:grid  md:grid-cols-6 md:gap-4 md:mb-1">
           <div className="flex flex-col md:col-span-2">
             <span>First name</span>
             <Inputform
