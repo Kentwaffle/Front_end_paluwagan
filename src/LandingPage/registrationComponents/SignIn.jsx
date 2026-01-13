@@ -1,12 +1,11 @@
 import Inputform from "../../reusableComponents/Inputform";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { showAlert } from "../../reusableComponents/Alerts/SweetAlerts";
 import { Eye, EyeClosed } from "lucide-react";
 import { usePasswordToggle } from "../../reusableComponents/Hooks/ToggleEye";
 import { ValidateLogIn } from "../../validations/CredentialValidation";
 import { useForm } from "../../reusableComponents/Hooks/HandleChange&Submit";
-import { useNavigate } from "react-router-dom";
 import { useOtpTimer } from "../../reusableComponents/Hooks/SendOTPhook";
 
 //Api
@@ -62,7 +61,7 @@ function SignIn() {
 
         showAlert.success("Success!", "Logged in successfully!").then(() => {
           console.log("Navigating to Dashboard...");
-          navigate("/dashboard");
+          navigate("/loan");
         });
       }
     } catch (error) {
@@ -70,6 +69,14 @@ function SignIn() {
       const errorMessage =
         error.response?.data?.message || "Invalid email or password";
       showAlert.error("Login Failed", errorMessage);
+
+      if (error.response) {
+        const statusMessage = error.response.data.status;
+
+        if (statusMessage === "failed - OTP expired") {
+          showAlert.error("Failed", "OTP expired");
+        }
+      }
     }
   };
 
