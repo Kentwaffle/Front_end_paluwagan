@@ -20,6 +20,7 @@ import ChangePassword from "./LandingPage/registrationComponents/ChangePassword"
 import Loan from "./Loan/Loan";
 import Savings from "./Savings/Savings";
 import Profile from "./Profile/Profile";
+import Edit_Profile from "./Profile/Edit_Profile";
 
 //404
 import Eror404 from "./Eror404/404";
@@ -92,6 +93,14 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <Profile />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/profile/edit_profile",
+    element: (
+      <ProtectedRoute>
+        <Edit_Profile />
       </ProtectedRoute>
     ),
   },
