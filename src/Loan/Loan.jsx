@@ -13,10 +13,11 @@ import {
 import Sidebar from "../MainComponents/sidebar";
 import Header from "../MainComponents/Header";
 import { formatDate, formatCurrency } from "../reusableComponents/formatter";
+import { LoadingSpinnerLoan } from "../reusableComponents/loading";
+import Error from "../reusableComponents/Error";
 
 function Loan() {
   const [isOpen, setIsOpen] = useState(false);
-
   const { data, isLoading, isError, error } = useFetchData(
     "/loan",
     API_ENDPOINTS.LOAN_GET
@@ -57,6 +58,24 @@ function Loan() {
     }
   };
 
+  // return <LoadingSpinnerLoan isOpen={isOpen} setIsOpen={setIsOpen} />;
+  // return <Error isOpen={isOpen} setIsOpen={setIsOpen} error={error} />;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen">
+        <LoadingSpinnerLoan isOpen={isOpen} setIsOpen={setIsOpen} />
+      </div>
+    );
+  }
+  if (isError) {
+    return (
+      <div className="min-h-screen">
+        <Error isOpen={isOpen} setIsOpen={setIsOpen} error={error} />
+      </div>
+    );
+  }
+
   return (
     <>
       <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
@@ -73,7 +92,7 @@ function Loan() {
                     {"#" + app_Number}
                   </div>
                 </div>
-                <span className="bg-sky-200 p-1 rounded-md ">
+                <span className="bg-sky-100 p-1 rounded-md ">
                   <Download />
                 </span>
               </div>
@@ -164,18 +183,10 @@ function Loan() {
                 className="card border my-5 border-slate-200 shadow"
               >
                 <div className="px-5 py-3 flex flex-col gap-3">
-                  <div className="flex flex-col gap-1">
+                  <div className="flex flex-col">
                     <div className="flex justify-between items-center text-[18px]">
-                      <span className="font-semibold">
-                        {formatDate(payment.paymentDate)}
-                      </span>
-                      <span className="font-semibold">
+                      <span className="font-semibold text-xl">
                         {formatCurrency(payment.amountPaid)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="font-semibold text-stone-400 text-[14px]">
-                        {payment.paymentMethod}
                       </span>
                       <span
                         className={`badge badge-sm badge-soft rounded-xl ${statusColor(
@@ -184,6 +195,14 @@ function Loan() {
                       >
                         {statusIcon(payment.paymentStatus)}
                         {payment.paymentStatus}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center text-[12px]">
+                      <span className="font-semibold text-stone-600 ">
+                        {formatDate(payment.paymentDate)}
+                      </span>
+                      <span className="font-semibold text-[12px] text-stone-600">
+                        {payment.paymentMethod}
                       </span>
                     </div>
                   </div>
