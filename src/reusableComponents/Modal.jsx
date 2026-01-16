@@ -4,11 +4,11 @@ const Modal = ({ id, title, children, actionButton }) => {
   return (
     <dialog id={id} className="modal modal-center sm:modal-middle">
       <div className="modal-box bg-white">
-        <h3 className="font-bold text-lg text-slate-800">{title}</h3>
+        {title && <h3 className="font-bold text-xl text-slate-800">{title}</h3>}
 
         {children && <div className="py-4">{children}</div>}
 
-        <div className="modal-action">
+        <div className="modal-action ">
           <form method="dialog" className="flex gap-2">
             <button className="btn bg-red-400">Close</button>
             {actionButton}
@@ -20,6 +20,7 @@ const Modal = ({ id, title, children, actionButton }) => {
       </form> */}
     </dialog>
   );
+  return createPortal(modalContent, document.body);
 };
 
 export default Modal;

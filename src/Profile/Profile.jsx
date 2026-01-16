@@ -25,7 +25,7 @@ function Profile() {
   return (
     <div className="min-h-screen p-5">
       <div className="flex justify-between items-center mb-3">
-        <button className=" bg-sky-200 rounded-xl p-1">
+        <button className=" bg-sky-300 rounded-xl p-1">
           <Link to={"/loan"}>
             <ChevronLeft size={32} />
           </Link>
@@ -33,10 +33,9 @@ function Profile() {
         <span className="text-2xl font-bold text-center">Profile</span>
         <button
           onClick={openModal}
-          className="flex items-center gap-1 underline text-xl"
+          className="flex items-center gap-1 text-xl "
         >
-          <Pencil size={20} />
-          <span>Edit</span>
+          <span className="text-sky-500 ">Edit</span>
         </button>
         <Modal
           id="edit_modal"
