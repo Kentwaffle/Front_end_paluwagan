@@ -13,7 +13,7 @@ import {
   Save,
 } from "lucide-react";
 import Default_pic from "../assets/images/default_pic.jpg";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useFetchData } from "../serviceToApi/fetchData";
 import { API_ENDPOINTS } from "../serviceToApi/ApiEndpoint";
 import Modal from "../reusableComponents/Modal";
@@ -22,13 +22,24 @@ import { usePasswordToggle } from "../reusableComponents/Hooks/ToggleEye";
 import SelectDropdown from "../reusableComponents/selectdropdown";
 import { useForm } from "../reusableComponents/Hooks/HandleChange&Submit";
 import { ValidateEditProfile } from "../validations/CredentialValidation";
+import { usePostData } from "../serviceToApi/PostData";
+import { dataTagErrorSymbol } from "@tanstack/react-query";
+import { showAlert } from "../reusableComponents/Alerts/SweetAlerts";
+import { useQueryClient } from "@tanstack/react-query";
 
 function Edit_Profile() {
   const passwordField = usePasswordToggle();
   const confirmPasswordField = usePasswordToggle();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const openModal = () => document.getElementById("back_modal").showModal();
   const { data } = useFetchData("/edit_profile", API_ENDPOINTS.PROFILE_GET);
+
+  const { mutate } = usePostData(
+    "api/profile/update",
+    API_ENDPOINTS.PROFILE_POST,
+  );
 
   const { formData, formErrors, handleChange, setFormErrors, handleSubmit } =
     useForm(
@@ -40,13 +51,37 @@ function Edit_Profile() {
         email: data?.email || "",
         phoneNumber: data?.phoneNumber || "",
         password: "",
-        age: "",
-        gender: "",
-        address: "",
-        birthday: "",
+        gender: data?.gender || "",
+        address: data?.address || "",
+        birthDay: data?.birthday || "",
       },
-      ValidateEditProfile
+      ValidateEditProfile,
     );
+
+  const handleSave = (e) => {
+    console.log("1. Save button clicked");
+    showAlert.loading("Loading...", "Please wait");
+
+    handleSubmit(e, () => {
+      mutate(formData, {
+        onSuccess: (data) => {
+          console.log("Success!", data);
+          queryClient.invalidateQueries(["/profile"]);
+          queryClient.invalidateQueries(["/edit_profile"]);
+          showAlert.success(
+            "Successfully updated",
+            "Your information has been saved",
+          );
+          console.log("Edit profile", formData);
+          navigate("/profile");
+        },
+        onError: (error) => {
+          console.error("Error saving data", error);
+          showAlert.warning("Error saving!", error);
+        },
+      });
+    });
+  };
 
   return (
     <div className="min-h-screen p-5">
@@ -67,7 +102,10 @@ function Edit_Profile() {
         </div>
 
         <span className="text-2xl font-bold text-center">Edit profile</span>
-        <button className="flex-1 flex text-xl justify-end text-sky-500 ">
+        <button
+          onClick={handleSave}
+          className="flex-1 flex text-xl justify-end text-sky-500 "
+        >
           Save
         </button>
       </div>
@@ -156,6 +194,7 @@ function Edit_Profile() {
             </span>
             <SelectDropdown
               name="suffix"
+              label="Suffix"
               value={formData.suffix}
               onChange={handleChange}
               options={["Jr.", "Sr.", "II", "III", "IV"]}
@@ -163,6 +202,20 @@ function Edit_Profile() {
           </div>
         </div>
         <div className="flex flex-col relative">
+          <div>
+            <span className="absolute -top-2 left-3 bg-white px-1 text-sm font-bold text-gray-500 z-10 ">
+              Birthday
+            </span>
+            <Inputform
+              type="date"
+              placeholder="Enter your first name"
+              name="birthDay"
+              value={formData.birthDay}
+              onChange={handleChange}
+            />
+          </div>
+        </div>
+        {/* <div className="flex flex-col relative">
           <div>
             <span className="absolute -top-2 left-3 bg-white px-1 text-sm font-bold text-gray-500 z-10 ">
               Age
@@ -173,20 +226,22 @@ function Edit_Profile() {
               name="age"
               value={formData.age}
               onChange={handleChange}
+              readOnly={true}
+              className="bg-gray-200 cursor-not-allowed"
             />
           </div>
-        </div>
+        </div> */}
         <div className="flex flex-col relative">
           <div>
             <span className="absolute -top-2 left-3 bg-white px-1 text-sm font-bold text-gray-500 z-10 ">
               Gender
             </span>
-            <Inputform
-              type="text"
-              placeholder="Enter your first name"
+            <SelectDropdown
               name="gender"
+              label="Gender"
               value={formData.gender}
               onChange={handleChange}
+              options={["Male", "Female"]}
             />
           </div>
         </div>
@@ -224,23 +279,9 @@ function Edit_Profile() {
             )}
           </div>
         </div>
-        <div className="flex flex-col relative">
-          <div>
-            <span className="absolute -top-2 left-3 bg-white px-1 text-sm font-bold text-gray-500 z-10 ">
-              Birthday
-            </span>
-            <Inputform
-              type="date"
-              placeholder="Enter your first name"
-              name="birthday"
-              value={formData.birthday}
-              onChange={handleChange}
-            />
-          </div>
-        </div>
       </div>
 
-      <div className="flex flex-col gap-5 mt-5 bg-gray-50 shadow-md p-3 rounded-xl">
+      {/* <div className="flex flex-col gap-5 mt-5 bg-gray-50 shadow-md p-3 rounded-xl">
         <span className="text-xl font-semibold">Account</span>
         <div className="flex flex-col relative">
           <div>
@@ -320,7 +361,7 @@ function Edit_Profile() {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

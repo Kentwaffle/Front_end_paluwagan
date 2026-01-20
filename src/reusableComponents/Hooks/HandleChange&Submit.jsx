@@ -1,8 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export const useForm = (initialValues, validateFunc) => {
   const [formData, setFormData] = useState(initialValues);
   const [formErrors, setFormErrors] = useState({});
+
+  useEffect(() => {
+    if (initialValues && initialValues.firstName) {
+      setFormData(initialValues);
+    }
+  }, [initialValues?.firstName]); // Isa lang ay sapat na para magsilbing "signal"
 
   //Change
   const handleChange = (e) => {

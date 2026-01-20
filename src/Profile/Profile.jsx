@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import { useFetchData } from "../serviceToApi/fetchData";
 import { API_ENDPOINTS } from "../serviceToApi/ApiEndpoint";
 import Modal from "../reusableComponents/Modal";
+import { formatDate } from "../reusableComponents/formatter";
 
 function Profile() {
   const { data } = useFetchData("/profile", API_ENDPOINTS.PROFILE_GET);
@@ -22,6 +23,23 @@ function Profile() {
     navigate("/");
   };
 
+  const calculateAge = (birthday) => {
+    if (!birthday) return "";
+    const today = new Date();
+    const birthDate = new Date(birthday);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+    return age >= 0 ? age.toString() : "0";
+  };
+
+  const displayAge = data?.birthday ? calculateAge(data.birthday) : "No Age";
   return (
     <div className="min-h-screen p-5">
       <div className="flex justify-between items-center mb-3">
@@ -59,7 +77,7 @@ function Profile() {
         />
 
         <div className="flex flex-col py-3 ">
-          <div className="flex uppercase gap-1 font-extrabold">
+          <div className="flex uppercase gap-1 font-extrabold justify-center items-center">
             <span>{data?.firstName}</span>
             <span>{data?.middlleName}</span>
             <span>{data?.lastName}</span>
@@ -91,7 +109,7 @@ function Profile() {
             <div className=" flex flex-col">
               <span className="text-stone-500 text-sm">Age</span>
               <span className="text-md font-semibold">
-                {data?.age || "No Age"}
+                {displayAge || "No Age"}
               </span>
             </div>
           </div>
@@ -100,7 +118,7 @@ function Profile() {
             <div className=" flex flex-col">
               <span className="text-stone-500 text-sm">Birthday</span>
               <span className="text-md font-semibold">
-                {data?.birthday || "No Birthday"}
+                {formatDate(data?.birthday || "No Birthday")}
               </span>
             </div>
           </div>

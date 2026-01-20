@@ -124,30 +124,30 @@ export const ValidateEditProfile = (formData) => {
     errors.phoneNumber = "Enter a valid 11-digit number";
   }
 
-  if (!formData.password) {
-    errors.password = "Password is required";
-  } else if (formData.password.length < 8) {
-    errors.password = "Must be at least 8 characters";
-  } else if (!/[A-Z]/.test(formData.password)) {
-    errors.password = "Must contain at least one uppercase letter";
-  } else if (!/[0-9]/.test(formData.password)) {
-    errors.password = "Must contain at least one number";
-  }
+  // if (!formData.password) {
+  //   errors.password = "Password is required";
+  // } else if (formData.password.length < 8) {
+  //   errors.password = "Must be at least 8 characters";
+  // } else if (!/[A-Z]/.test(formData.password)) {
+  //   errors.password = "Must contain at least one uppercase letter";
+  // } else if (!/[0-9]/.test(formData.password)) {
+  //   errors.password = "Must contain at least one number";
+  // }
 
-  if (!formData.confirmPassword) {
-    errors.confirmPassword = "Confirmpassword is required";
-  }
+  // if (!formData.confirmPassword) {
+  //   errors.confirmPassword = "Confirmpassword is required";
+  // }
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!formData.email) {
-    errors.email = "Email is required";
-  } else if (!emailRegex.test(formData.email)) {
-    errors.email = "Invalid email format";
-  }
+  // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  // if (!formData.email) {
+  //   errors.email = "Email is required";
+  // } else if (!emailRegex.test(formData.email)) {
+  //   errors.email = "Invalid email format";
+  // }
 
-  if (!formData.otp) {
-    errors.otp = "OTP is required";
-  }
+  // if (!formData.otp) {
+  //   errors.otp = "OTP is required";
+  // }
 
   return {
     isValid: Object.keys(errors).length === 0,

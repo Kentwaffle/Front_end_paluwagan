@@ -13,4 +13,5 @@ export const API_ENDPOINTS = {
 
   LOAN_GET: `${BASE_URL}/api/loan/user-details`,
   PROFILE_GET: `${BASE_URL}/api/profile/info`,
+  PROFILE_POST: `${BASE_URL}/api/profile/update`,
 };
