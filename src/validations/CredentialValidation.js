@@ -154,3 +154,15 @@ export const ValidateEditProfile = (formData) => {
     errors,
   };
 };
+
+export const ValidateLoan = (formData) => {
+  let errors = {};
+  if (formData.borrow > 20000) {
+    errors.borrow = "20,000 is the maximum loan";
+  }
+
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors,
+  };
+};

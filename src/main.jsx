@@ -21,7 +21,7 @@ import Loan from "./Loan/Loan";
 import Savings from "./Savings/Savings";
 import Profile from "./Profile/Profile";
 import Edit_Profile from "./Profile/Edit_Profile";
-
+import ApplyLoan from "./Loan/ApplyLoan";
 //404
 import Eror404 from "./Eror404/404";
 
@@ -105,6 +105,14 @@ const router = createBrowserRouter([
     ),
   },
   {
+    path: "apply_loan",
+    element: (
+      <ProtectedRoute>
+        <ApplyLoan />
+      </ProtectedRoute>
+    ),
+  },
+  {
     path: "*",
     element: <Eror404 />,
   },
@@ -115,5 +123,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
     </QueryClientProvider>
-  </StrictMode>
+  </StrictMode>,
 );

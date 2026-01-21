@@ -1,10 +1,12 @@
-import React from "react";
+import React, { forwardRef } from "react";
 
-function Inputform(props) {
-  const { type, placeholder, name, value, onChange, className } = props;
+const Inputform = forwardRef((props, ref) => {
+  const { type, placeholder, name, value, onChange, className, ...rest } =
+    props;
 
   return (
     <input
+      ref={ref}
       className={`
         border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500
         ${className || ""} 
@@ -16,6 +18,6 @@ function Inputform(props) {
       onChange={onChange}
     />
   );
-}
+});
 
 export default Inputform;
