@@ -1,14 +1,34 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export const useForm = (initialValues, validateFunc) => {
   const [formData, setFormData] = useState(initialValues);
   const [formErrors, setFormErrors] = useState({});
 
+  // useEffect(() => {
+  //   if (initialValues && initialValues.firstName) {
+  //     setFormData(initialValues);
+  //   }
+  // }, [initialValues?.firstName]); // Isa lang ay sapat na para magsilbing "signal"
+
+  useEffect(() => {
+    // Para sa Edit Profile (May firstName)
+    if (initialValues && initialValues.firstName) {
+      setFormData(initialValues);
+    }
+    // Para sa Loan/Other Forms (Walang firstName pero may initial values gaya ng startdate)
+    else if (initialValues && initialValues.startdate && !formData.startdate) {
+      setFormData((prev) => ({ ...prev, ...initialValues }));
+    }
+  }, [initialValues]);
   //Change
   const handleChange = (e) => {
     const { name, value } = e.target;
 
     let finalValue = value;
+
+    if (name === "borrow") {
+      finalValue = value.replace(/\D/g, ""); // Numero lang
+    }
 
     if (
       name.toLowerCase().includes("otp") ||
@@ -59,34 +79,3 @@ export const useForm = (initialValues, validateFunc) => {
     handleSubmit,
   };
 };
-
-// const handleRegister = (e) => {
-//   e.preventDefault();
-//   const { isValid, errors } = ValidateRegister(formData);
-
-//   if (!isValid) {
-//     setFormErrors(errors);
-//     return;
-//   }
-
-//   if (!isAccepted) {
-//     showAlert.warning(
-//       "Terms & Conditions",
-//       "Kailangan mo munang basahin at tanggapin ang aming Terms and Conditions bago makapag-register."
-//     );
-//     return;
-//   }
-//   showAlert
-//     .success(
-//       "Submitted!",
-//       `We will send a One-Time Password (OTP) to <b>${formData.email}</b>. Please check your inbox`
-//     )
-//     .then((result) => {
-//       if (result.isConfirmed) {
-//         console.log("Succes! Redirecting to OTP");
-
-//         navigate("/Otp", { state: { email: formData.email } });
-//       }
-//     });
-//   console.log("Success! Submitting formData...", formData);
-// };

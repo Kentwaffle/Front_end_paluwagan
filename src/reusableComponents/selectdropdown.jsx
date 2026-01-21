@@ -1,6 +1,6 @@
 import React from "react";
 
-function SelectDropdown({ name, value, onChange, options, className }) {
+function SelectDropdown({ name, value, onChange, options, className, label }) {
   return (
     <div className="form-control w-full ">
       <select
@@ -12,7 +12,7 @@ function SelectDropdown({ name, value, onChange, options, className }) {
         }`}
       >
         <option value="" disabled>
-          Select Suffix
+          {label}
         </option>
         {options.map((opt) => (
           <option key={opt} value={opt}>

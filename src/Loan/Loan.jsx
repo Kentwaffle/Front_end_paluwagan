@@ -20,17 +20,18 @@ function Loan() {
   const [isOpen, setIsOpen] = useState(false);
   const { data, isLoading, isError, error } = useFetchData(
     "/loan",
-    API_ENDPOINTS.LOAN_GET
+    API_ENDPOINTS.LOAN_GET,
   );
 
   //Option
   const filterOptions = ["Pending", "Paid", "Failed"];
 
   //Get the json derulo
-  const loanAmount = data?.loans?.[0]?.loanAmount || 0;
-  const interestRate = data?.loans?.[0]?.interestRate || 0;
-  const app_Number = data?.applications?.[0]?.applicationNumber || "N/A";
-  const loanTerm = data?.applications?.[0]?.termLength || 0;
+  const loanAmount = data?.payload?.loans?.[0]?.loanAmount || 0;
+  const interestRate = data?.payload?.loans?.[0]?.interestRate || 0;
+  const app_Number =
+    data?.payload?.applications?.[0]?.applicationNumber || "N/A";
+  const loanTerm = data?.payload?.applications?.[0]?.termLength || 0;
 
   const statusColor = (status) => {
     switch (status?.toLowerCase()) {
@@ -99,18 +100,20 @@ function Loan() {
 
               <h2 className="text-stone-600 mt-5">Total remaining loan</h2>
               <span className="text-4xl font-extrabold">
-                {formatCurrency(data?.remainingBalance)}
+                {formatCurrency(data?.payload?.remainingBalance)}
               </span>
             </div>
             <div>
               <div className="flex justify-between">
                 <span>Payment progress</span>
-                <span>{data?.paymentProgress?.toLocaleString() + "%"}</span>
+                <span>
+                  {data?.payload?.paymentProgress?.toLocaleString() + "%"}
+                </span>
               </div>
               <div>
                 <progress
                   className="progress progress-info w-full"
-                  value={data?.paymentProgress}
+                  value={data?.payload?.paymentProgress}
                   max="100"
                 ></progress>
               </div>
@@ -131,7 +134,7 @@ function Loan() {
 
             <div className="flex justify-between items-center border-t border-slate-200 py-5">
               <span className="text-slate-500 text-md">Loan Term</span>
-              <span className="font-semibold">{loanTerm + " " + "months"}</span>
+              <span className="font-semibold">{formatDate(loanTerm)}</span>
             </div>
 
             {/* <div className="flex justify-between items-center border-t border-slate-200 py-5">
@@ -149,7 +152,7 @@ function Loan() {
                 <input
                   type="search"
                   required
-                  placeholder="Search"
+                  placeholder="Search reference"
                   className="grow"
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -176,8 +179,8 @@ function Loan() {
             </div>
           </div>
 
-          {data?.payments?.length > 0 ? (
-            data.payments.map((payment) => (
+          {data?.payload?.payments?.length > 0 ? (
+            data.payload?.payments.map((payment) => (
               <div
                 key={payment.paymentId}
                 className="card border my-5 border-slate-200 shadow"
@@ -190,7 +193,7 @@ function Loan() {
                       </span>
                       <span
                         className={`badge badge-sm badge-soft rounded-xl ${statusColor(
-                          payment.paymentStatus
+                          payment.paymentStatus,
                         )} `}
                       >
                         {statusIcon(payment.paymentStatus)}
