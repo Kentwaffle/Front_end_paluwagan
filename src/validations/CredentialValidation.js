@@ -157,8 +157,26 @@ export const ValidateEditProfile = (formData) => {
 
 export const ValidateLoan = (formData) => {
   let errors = {};
-  if (formData.borrow > 20000) {
-    errors.borrow = "20,000 is the maximum loan";
+  if (!formData.loanAmount) {
+    errors.loanAmount = "Please enter the amount you want to borrow";
+  } else if (formData.loanAmount > 20000) {
+    errors.loanAmount = "20,000 is the maximum loan";
+  } else if (formData.loanAmount < 1000) {
+    errors.loanAmount = "1,000 is the minimun loan";
+  }
+
+  if (!formData.enddate.trim()) {
+    errors.enddate = "Select loan end date";
+  } else {
+    const start = new Date(formData.startdate);
+    const end = new Date(formData.enddate);
+
+    const diffInTime = end.getTime() - start.getTime();
+    const diffInDays = diffInTime / (1000 * 3600 * 24);
+
+    if (diffInDays < 7) {
+      errors.enddate = "Loan period must be at least 7 days";
+    }
   }
 
   return {

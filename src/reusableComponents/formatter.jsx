@@ -19,3 +19,12 @@ export const formatCurrency = (amount) => {
     currency: "PHP",
   }).format(amount || 0);
 };
+
+export const formatMonthDay = (dateString) => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
+};

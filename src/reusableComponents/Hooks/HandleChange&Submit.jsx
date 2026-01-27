@@ -26,7 +26,7 @@ export const useForm = (initialValues, validateFunc) => {
 
     let finalValue = value;
 
-    if (name === "borrow") {
+    if (name === "loanAmount") {
       finalValue = value.replace(/\D/g, ""); // Numero lang
     }
 
