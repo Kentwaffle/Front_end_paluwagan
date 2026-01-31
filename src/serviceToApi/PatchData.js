@@ -1,17 +1,18 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "./ApiInstance";
 
-export const usePostData = (endpoint, key) => {
+export const usePatchData = (endpoint, successKey) => {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (payload) => {
-      const response = await api.post(endpoint, payload);
+      const response = await api.patch(endpoint, payload);
       console.log(`API Response: ${endpoint}`, response.data);
       return response.data;
     },
     onSuccess: () => {
-      if (key) {
-        queryClient.invalidateQueries({ queryKey: [key] });
+      if (successKey) {
+        queryClient.invalidateQueries({ queryKey: [successKey] });
       }
     },
   });

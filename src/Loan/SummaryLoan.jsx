@@ -7,23 +7,30 @@ import {
   Banknote,
   Percent,
   Receipt,
+  IdCard,
 } from "lucide-react";
-
+import Modal from "../reusableComponents/Modal";
 function SummaryLoan({
   isOpen,
   isClose,
   loanAmount,
-  repaymentPeriod,
-  startdate,
-  enddate,
-  weeklypay,
+  repayPeriodDays,
+  repayPeriodWeeks,
+  startDate,
+  endDate,
+  weeklyPay,
   interest,
   totalRepayable,
+  applicationId,
+  onSubmit,
 }) {
+  const continue_openModal = () =>
+    document.getElementById("continue").showModal();
   if (!isOpen) return null;
+
   return (
-    <div className=" p-5 fixed inset-0 z-[99] flex items-center justify-center bg-black/50 backdrop-blur">
-      <div className=" bg-white p-5 rounded-3xl w-full">
+    <div className="p-5 fixed inset-0 overflow-y-auto z-[99] flex items-center justify-center bg-black/50 backdrop-blur">
+      <div className="bg-white p-5 rounded-3xl w-full max-w-md h-fit my-auto shadow-2xl flex flex-col">
         <div className="flex items-center justify-center m-3">
           {/* <span className="p-2 bg-sky-100 rounded-xl text-sky-600 border border-slate-200 ">
             <FileText />
@@ -38,11 +45,20 @@ function SummaryLoan({
           <div className="flex justify-between items-center text-sm  py-3 px-2 bg-slate-100 rounded-2xl shadow-sm border border-slate-100">
             <div className="flex items-center gap-2 text-stone-600">
               <span className="p-2 bg-sky-100 rounded-xl text-sky-600 border border-sky-200 ">
+                <IdCard size={18} />
+              </span>
+              <span className="text-stone-500">ID</span>
+            </div>
+            <span className="font-semibold">{applicationId}</span>
+          </div>
+          <div className="flex justify-between items-center text-sm  py-3 px-2 bg-slate-100 rounded-2xl shadow-sm border border-slate-100">
+            <div className="flex items-center gap-2 text-stone-600">
+              <span className="p-2 bg-sky-100 rounded-xl text-sky-600 border border-sky-200 ">
                 <Calendar size={18} />
               </span>
-              <span className="text-stone-500">Date</span>
+              <span className="text-stone-500">Date range</span>
             </div>
-            <span className="font-semibold">{`${startdate}-${enddate}`}</span>
+            <span className="font-semibold">{`${startDate} - ${endDate}`}</span>
           </div>
           <div className="flex justify-between items-center text-sm  py-3 px-2 bg-slate-100 rounded-2xl shadow-sm border border-slate-100">
             <div className="flex items-center gap-2 text-stone-600">
@@ -51,7 +67,7 @@ function SummaryLoan({
               </span>
               <span className="text-stone-500">Repay period</span>
             </div>
-            <span className="font-semibold">{repaymentPeriod}</span>
+            <span className="font-semibold">{`${repayPeriodWeeks}w(${repayPeriodDays}d)`}</span>
           </div>
           <div className="flex justify-between items-center  text-sm py-3 px-2 bg-slate-100  rounded-2xl shadow-sm border border-slate-100">
             <div className="flex items-center gap-2 text-stone-600">
@@ -60,17 +76,8 @@ function SummaryLoan({
               </span>
               <span className="text-stone-500">Weekly pay</span>
             </div>
-            <span className="font-semibold">{weeklypay}</span>
+            <span className="font-semibold">{weeklyPay}</span>
           </div>
-          {/* <div className="flex justify-between items-center  text-sm py-3 px-2 bg-slate-100  rounded-2xl shadow-sm border border-slate-100">
-            <div className="flex items-center gap-2 text-stone-600">
-              <span className="p-2 bg-sky-100 rounded-xl text-sky-600 border border-sky-200 ">
-                <Percent size={18} />
-              </span>
-              <span className="text-stone-500">Interest Rate</span>
-            </div>
-            <span className="font-semibold">{weeklypay}</span>
-          </div> */}
         </div>
 
         <div className="divider"></div>
@@ -104,6 +111,16 @@ function SummaryLoan({
             <span className="text-lg font-semibold">{totalRepayable}</span>
           </div>
         </div>
+        <Modal
+          id="continue"
+          title="Submit Loan summary"
+          children="Are you sure you want to submit?"
+          actionButton={
+            <button onClick={onSubmit} className="btn btn-info text-white">
+              Yes
+            </button>
+          }
+        ></Modal>
         <div className="flex gap-1 mt-5">
           <button
             onClick={isClose}
@@ -112,7 +129,7 @@ function SummaryLoan({
             Cancel
           </button>
           <button
-            // onClick={isClose}
+            onClick={continue_openModal}
             className="bg-sky-500 text-white w-full py-2 rounded-lg"
           >
             I agree

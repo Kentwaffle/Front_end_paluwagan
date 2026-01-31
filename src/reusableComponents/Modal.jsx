@@ -6,7 +6,7 @@ const Modal = ({ id, title, children, actionButton }) => {
       <div className="modal-box bg-white">
         {title && <h3 className="font-bold text-xl text-slate-800">{title}</h3>}
 
-        {children && <div className="py-4">{children}</div>}
+        {children && <div className="py-2">{children}</div>}
 
         <div className="modal-action ">
           <form method="dialog" className="flex gap-2">

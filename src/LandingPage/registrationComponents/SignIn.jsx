@@ -1,5 +1,5 @@
 import Inputform from "../../reusableComponents/Inputform";
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { data, Link, Outlet, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { showAlert } from "../../reusableComponents/Alerts/SweetAlerts";
 import { Eye, EyeClosed } from "lucide-react";
@@ -11,6 +11,8 @@ import { useOtpTimer } from "../../reusableComponents/Hooks/SendOTPhook";
 //Api
 import api from "../../serviceToApi/ApiInstance";
 import { API_ENDPOINTS } from "../../serviceToApi/ApiEndpoint";
+import { jwtDecode } from "jwt-decode";
+import { usePostData } from "../../serviceToApi/PostData";
 
 function SignIn() {
   const { formData, formErrors, handleChange, setFormErrors, handleSubmit } =
@@ -20,7 +22,7 @@ function SignIn() {
         password: "",
         otp: "",
       },
-      ValidateLogIn
+      ValidateLogIn,
     );
 
   const navigate = useNavigate();
@@ -28,7 +30,7 @@ function SignIn() {
   const passwordField = usePasswordToggle();
   const [hasSent, setHasSent] = useState(false);
   const { userId } = location.state || {};
-
+  const { mutate: loginMutate } = usePostData(API_ENDPOINTS.LOGIN);
   const handleSendOtpTrigger = async () => {
     showAlert.loading("Sending", "Please wait");
 
@@ -44,7 +46,7 @@ function SignIn() {
     }
   };
 
-  const onSigninSuccess = async () => {
+  const onSigninSuccess = () => {
     showAlert.loading("Loading...", "Please wait");
 
     if (!formData.otp) {
@@ -52,32 +54,55 @@ function SignIn() {
       return;
     }
 
-    try {
-      const response = await api.post(API_ENDPOINTS.LOGIN, formData);
-
-      if (response.data.token) {
-        const token = response.data.token;
-        localStorage.setItem("token", token);
-
-        showAlert.success("Success!", "Logged in successfully!").then(() => {
-          console.log("Navigating to Dashboard...");
-          navigate("/loan");
-        });
-      }
-    } catch (error) {
-      console.error("Login failed", error);
-      const errorMessage =
-        error.response?.data?.message || "Invalid email or password";
-      showAlert.error("Login Failed", errorMessage);
-
-      if (error.response) {
-        const statusMessage = error.response.data.status;
-
-        if (statusMessage === "failed - OTP expired") {
-          showAlert.error("Failed", "OTP expired");
+    loginMutate(formData, {
+      onSuccess: (data) => {
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+          showAlert.success("Success!", "Logged in successfully!").then(() => {
+            const decodedToken = jwtDecode(data.token);
+            if (decodedToken.hasLoan) {
+              navigate("/loan");
+            } else {
+              navigate("/apply_loan");
+            }
+          });
         }
-      }
-    }
+      },
+      onError: (error) => {
+        const errorMessage = error.response?.data?.message;
+
+        if (error.response?.data?.status === "failed - OTP expired") {
+          showAlert.error("Failed", "OTP expired");
+        } else {
+          showAlert.error("Login Failed", errorMessage);
+        }
+      },
+    });
+
+    // try {
+    //   if (response.data.token) {
+    //     const token = response.data.token;
+    //     localStorage.setItem("token", token);
+
+    //     showAlert.success("Success!", "Logged in successfully!").then(() => {
+    //       console.log("Navigating to Dashboard...");
+    //       navigate("/loan");
+    //     });
+    //   }
+    // } catch (error) {
+    //   console.error("Login failed", error);
+    //   const errorMessage =
+    //     error.response?.data?.message || "Invalid email or password";
+    //   showAlert.error("Login Failed", errorMessage);
+
+    //   if (error.response) {
+    //     const statusMessage = error.response.data.status;
+
+    //     if (statusMessage === "failed - OTP expired") {
+    //       showAlert.error("Failed", "OTP expired");
+    //     }
+    //   }
+    // }
   };
 
   return (
@@ -170,8 +195,8 @@ function SignIn() {
               {isCounting
                 ? `Resend ${timer}s`
                 : hasSent
-                ? "Resend OTP"
-                : "Send OTP"}
+                  ? "Resend OTP"
+                  : "Send OTP"}
             </button>
           </div>
           {formErrors.otp && (
