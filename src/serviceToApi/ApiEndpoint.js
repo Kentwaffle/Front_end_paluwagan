@@ -14,4 +14,9 @@ export const API_ENDPOINTS = {
   LOAN_GET: `${BASE_URL}/api/loan/user-details`,
   PROFILE_GET: `${BASE_URL}/api/profile/info`,
   PROFILE_POST: `${BASE_URL}/api/profile/update`,
+
+  APPLY_LOAN: `${BASE_URL}/api/loan/calculate-loan`,
+  APPLY_LOAN_POST: `${BASE_URL}/api/loan/apply-loan`,
+  APPLY_STATUS: `${BASE_URL}/api/loan/status`,
+  APPLICATION_DETAILS: `${BASE_URL}/api/loan/status/details`,
 };

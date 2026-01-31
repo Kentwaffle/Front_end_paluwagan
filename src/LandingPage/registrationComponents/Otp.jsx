@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 import { showAlert } from "../../reusableComponents/Alerts/SweetAlerts";
 import { useOtpTimer } from "../../reusableComponents/Hooks/SendOTPhook";
 import { useForm } from "../../reusableComponents/Hooks/HandleChange&Submit";
-
+import { ValidateOTP } from "../../validations/CredentialValidation";
 //API
 import api from "../../serviceToApi/ApiInstance";
 import { API_ENDPOINTS } from "../../serviceToApi/ApiEndpoint";
@@ -17,7 +17,7 @@ function Otp() {
   const navigate = useNavigate();
 
   const { timer, isCounting, sendOtp } = useOtpTimer(30);
-  const { formData, handleChange } = useForm({ otp: "" });
+  const { formData, handleChange } = useForm({ otp: "" }, ValidateOTP);
   const { email, userId } = location.state || {};
 
   useEffect(() => {
@@ -47,7 +47,7 @@ function Otp() {
       if (response.status === 200) {
         const result = await showAlert.success(
           "Verified!",
-          "Please log in you account"
+          "Please log in you account",
         );
         if (result.isConfirmed) navigate("/");
       }
@@ -58,7 +58,7 @@ function Otp() {
         "Verification Failed",
         typeof serverMessage === "string"
           ? serverMessage
-          : "Check console for details"
+          : "Check console for details",
       );
     }
     console.log(userId);
@@ -77,7 +77,7 @@ function Otp() {
     } catch (error) {
       showAlert.error(
         "Error",
-        "OTP not send. Please try again after 30 seconds"
+        "OTP not send. Please try again after 30 seconds",
       );
     }
   };

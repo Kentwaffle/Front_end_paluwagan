@@ -43,7 +43,7 @@ function Profile() {
   return (
     <div className="min-h-screen p-5">
       <div className="flex justify-between items-center mb-3">
-        <button className=" bg-sky-300 rounded-xl p-1">
+        <button className=" bg-sky-200 text-sky-500 rounded-lg p-1">
           <Link to={"/loan"}>
             <ChevronLeft size={32} />
           </Link>
@@ -53,7 +53,7 @@ function Profile() {
           onClick={openModal}
           className="flex items-center gap-1 text-xl "
         >
-          <span className="text-sky-500 ">Edit</span>
+          <span className="text-sky-500">Edit</span>
         </button>
         <Modal
           id="edit_modal"
@@ -109,13 +109,13 @@ function Profile() {
             <div className=" flex flex-col">
               <span className="text-stone-500 text-sm">Age</span>
               <span className="text-md font-semibold">
-                {displayAge || "No Age"}
+                {`${displayAge} years old` || "No Age"}
               </span>
             </div>
           </div>
           <div className="flex items-center gap-3 rounded-md shadow bg-gray-100 p-2">
             <Cake />
-            <div className=" flex flex-col">
+            <div className=" flex flex-col w-full">
               <span className="text-stone-500 text-sm">Birthday</span>
               <span className="text-md font-semibold">
                 {formatDate(data?.birthday || "No Birthday")}
@@ -135,7 +135,7 @@ function Profile() {
       </div>
 
       <button
-        className="w-full bg-red-200 rounded-xl shadow p-3 text-xl font-semibold"
+        className="w-full bg-red-200 text-red-500 rounded-xl shadow p-3 text-xl"
         onClick={handleLogout}
       >
         Log out

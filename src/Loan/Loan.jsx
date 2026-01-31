@@ -12,26 +12,38 @@ import {
 } from "lucide-react";
 import Sidebar from "../MainComponents/sidebar";
 import Header from "../MainComponents/Header";
-import { formatDate, formatCurrency } from "../reusableComponents/formatter";
+import {
+  formatDate,
+  formatCurrency,
+  formatMonthDay,
+} from "../reusableComponents/formatter";
 import { LoadingSpinnerLoan } from "../reusableComponents/loading";
 import Error from "../reusableComponents/Error";
 
 function Loan() {
   const [isOpen, setIsOpen] = useState(false);
-  const { data, isLoading, isError, error } = useFetchData(
+  const { data, isLoading, isError, error, refetch } = useFetchData(
     "/loan",
     API_ENDPOINTS.LOAN_GET,
   );
 
+  useEffect(() => {
+    if (refetch) {
+      refetch();
+    }
+  }, [refetch]);
   //Option
   const filterOptions = ["Pending", "Paid", "Failed"];
 
   //Get the json derulo
-  const loanAmount = data?.payload?.loans?.[0]?.loanAmount || 0;
-  const interestRate = data?.payload?.loans?.[0]?.interestRate || 0;
+  const loanAmount = data?.payload?.loans?.[0]?.totalLoan || 0;
+  const interestRate = data?.payload?.loans?.[0]?.interest || 0;
   const app_Number =
     data?.payload?.applications?.[0]?.applicationNumber || "N/A";
-  const loanTerm = data?.payload?.applications?.[0]?.termLength || 0;
+  const startDate = data?.payload?.loans?.[0]?.startDate;
+  const endDate = data?.payload?.loans?.[0]?.endDate;
+  const weeklyPay = data?.payload?.loans?.[0]?.weeklyPay;
+  const totalRepayable = data?.payload?.loans?.[0]?.totalRepayable;
 
   const statusColor = (status) => {
     switch (status?.toLowerCase()) {
@@ -40,6 +52,7 @@ function Loan() {
       case "pending":
         return "badge-warning";
       case "failed":
+        1;
         return "badge-error";
       default:
         return "badge-ghost";
@@ -90,10 +103,10 @@ function Loan() {
                   <h1 className=" text-2xl font-semibold">Loan Overview</h1>
                   <div className="text-stone-600">
                     <span>Application number: </span>
-                    {"#" + app_Number}
+                    {app_Number}
                   </div>
                 </div>
-                <span className="bg-sky-100 p-1 rounded-md ">
+                <span className="bg-sky-100 p-1 rounded-md text-sky-500">
                   <Download />
                 </span>
               </div>
@@ -105,9 +118,10 @@ function Loan() {
             </div>
             <div>
               <div className="flex justify-between">
-                <span>Payment progress</span>
+                <span>{formatCurrency(data?.payload?.totalAmountPaid)}</span>
                 <span>
-                  {data?.payload?.paymentProgress?.toLocaleString() + "%"}
+                  {formatCurrency(totalRepayable)}
+                  {/* {data?.payload?.paymentProgress?.toLocaleString() + "%"} */}
                 </span>
               </div>
               <div>
@@ -119,28 +133,30 @@ function Loan() {
               </div>
             </div>
           </div>
-          <div className="flex flex-col border-t  border-slate-200 px-5 bg-gray-50">
-            <div className="flex justify-between items-center py-5 ">
-              <span className="text-slate-500 text-md">Loan Amount</span>
+          <div className="flex flex-col border-t  border-slate-200 px-5 bg-gray-50 rounded-b-2xl">
+            <div className="flex justify-between items-center  py-5">
+              <span className="text-slate-500 text-md">Date range</span>
+              <span className="font-semibold">{`${formatMonthDay(startDate)} - ${formatMonthDay(endDate)} `}</span>
+            </div>
+
+            <div className="flex justify-between items-center border-t border-slate-200 py-5">
+              <span className="text-slate-500 text-md">Weekly pay</span>
+              <span className="font-semibold">{formatCurrency(weeklyPay)}</span>
+            </div>
+
+            <div className="flex justify-between items-center py-5 border-t border-slate-200 ">
+              <span className="text-slate-500 text-md">Loan amount</span>
               <span className="font-semibold">
                 {formatCurrency(loanAmount)}
               </span>
             </div>
 
             <div className="flex justify-between items-center border-t border-slate-200 py-5">
-              <span className="text-slate-500 text-md">Interest Rate</span>
-              <span className="font-semibold">{interestRate + "%"}</span>
+              <span className="text-slate-500 text-md">Interest rate</span>
+              <span className="font-semibold">
+                {formatCurrency(interestRate)}
+              </span>
             </div>
-
-            <div className="flex justify-between items-center border-t border-slate-200 py-5">
-              <span className="text-slate-500 text-md">Loan Term</span>
-              <span className="font-semibold">{formatDate(loanTerm)}</span>
-            </div>
-
-            {/* <div className="flex justify-between items-center border-t border-slate-200 py-5">
-              <span className="text-slate-500 text-md">assd</span>
-              <span className="font-semibold">1111</span>
-            </div> */}
           </div>
         </div>
         <div className="p-5 rounded-xl shadow-md border border-slate-200 ">
@@ -152,7 +168,7 @@ function Loan() {
                 <input
                   type="search"
                   required
-                  placeholder="Search reference"
+                  placeholder="Search ref ID"
                   className="grow"
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />

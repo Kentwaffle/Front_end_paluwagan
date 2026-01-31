@@ -41,6 +41,19 @@ export const ValidateRegister = (formData) => {
   };
 };
 
+export const ValidateOTP = (formData) => {
+  let errors = {};
+  if (!formData.otp) {
+    errors.otp = "OTP is required";
+  } else if (formData.otp.length < 6) {
+    errors.otp = "OTP must be 6 digits";
+  }
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors,
+  };
+};
+
 export const ValidateLogIn = (formData) => {
   let errors = {};
 
@@ -157,8 +170,26 @@ export const ValidateEditProfile = (formData) => {
 
 export const ValidateLoan = (formData) => {
   let errors = {};
-  if (formData.borrow > 20000) {
-    errors.borrow = "20,000 is the maximum loan";
+  if (!formData.loanAmount) {
+    errors.loanAmount = "Please enter the amount you want to borrow";
+  } else if (formData.loanAmount > 20000) {
+    errors.loanAmount = "20,000 is the maximum loan";
+  } else if (formData.loanAmount < 1000) {
+    errors.loanAmount = "1,000 is the minimun loan";
+  }
+
+  if (!formData.endDate.trim()) {
+    errors.endDate = "Select loan end date";
+  } else {
+    const start = new Date(formData.startDate);
+    const end = new Date(formData.endDate);
+
+    const diffInTime = end.getTime() - start.getTime();
+    const diffInDays = diffInTime / (1000 * 3600 * 24);
+
+    if (diffInDays < 7) {
+      errors.endDate = "Loan period must be at least 7 days";
+    }
   }
 
   return {

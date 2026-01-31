@@ -1,17 +1,5 @@
 import React from "react";
-import {
-  ChevronLeft,
-  Pencil,
-  VenusAndMars,
-  MapPinHouse,
-  Cake,
-  Hash,
-  Camera,
-  X,
-  Eye,
-  EyeClosed,
-  Save,
-} from "lucide-react";
+import { Camera, X } from "lucide-react";
 import Default_pic from "../assets/images/default_pic.jpg";
 import { Link, useNavigate } from "react-router-dom";
 import { useFetchData } from "../serviceToApi/fetchData";
@@ -22,10 +10,11 @@ import { usePasswordToggle } from "../reusableComponents/Hooks/ToggleEye";
 import SelectDropdown from "../reusableComponents/selectdropdown";
 import { useForm } from "../reusableComponents/Hooks/HandleChange&Submit";
 import { ValidateEditProfile } from "../validations/CredentialValidation";
-import { usePostData } from "../serviceToApi/PostData";
-import { dataTagErrorSymbol } from "@tanstack/react-query";
+import { usePatchData } from "../serviceToApi/PatchData";
 import { showAlert } from "../reusableComponents/Alerts/SweetAlerts";
 import { useQueryClient } from "@tanstack/react-query";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 function Edit_Profile() {
   const passwordField = usePasswordToggle();
@@ -33,10 +22,14 @@ function Edit_Profile() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const openModal = () => document.getElementById("back_modal").showModal();
+  const back_openModal = () =>
+    document.getElementById("back_modal").showModal();
+  const save_openModal = () =>
+    document.getElementById("save_modal").showModal();
+
   const { data } = useFetchData("/edit_profile", API_ENDPOINTS.PROFILE_GET);
 
-  const { mutate } = usePostData(
+  const { mutate } = usePatchData(
     "api/profile/update",
     API_ENDPOINTS.PROFILE_POST,
   );
@@ -46,7 +39,7 @@ function Edit_Profile() {
       {
         firstName: data?.firstName || "",
         lastName: data?.lastName || "",
-        middlleName: data?.middlleName || "",
+        middleName: data?.middlleName || "",
         suffix: data?.suffix || "",
         email: data?.email || "",
         phoneNumber: data?.phoneNumber || "",
@@ -59,7 +52,6 @@ function Edit_Profile() {
     );
 
   const handleSave = (e) => {
-    console.log("1. Save button clicked");
     showAlert.loading("Loading...", "Please wait");
 
     handleSubmit(e, () => {
@@ -87,7 +79,10 @@ function Edit_Profile() {
     <div className="min-h-screen p-5">
       <div className="flex justify-between items-center mb-3">
         <div className="flex-1">
-          <button onClick={openModal} className=" bg-sky-300 rounded-xl p-1">
+          <button
+            onClick={back_openModal}
+            className=" bg-sky-200 text-sky-500 rounded-lg p-1"
+          >
             <X size={32} />
           </button>
           <Modal
@@ -103,11 +98,20 @@ function Edit_Profile() {
 
         <span className="text-2xl font-bold text-center">Edit profile</span>
         <button
-          onClick={handleSave}
+          onClick={save_openModal}
           className="flex-1 flex text-xl justify-end text-sky-500 "
         >
           Save
         </button>
+        <Modal
+          id="save_modal"
+          title="Save Changes?"
+          actionButton={
+            <button onClick={handleSave} className="btn btn-info text-white">
+              Yes
+            </button>
+          }
+        ></Modal>
       </div>
 
       <div className="flex flex-col justify-center items-center">
@@ -159,8 +163,8 @@ function Edit_Profile() {
             <Inputform
               type="text"
               placeholder="Enter your Middle name"
-              name="middlleName"
-              value={formData.middlleName}
+              name="middleName"
+              value={formData.middleName}
               onChange={handleChange}
             />
           </div>
@@ -172,7 +176,7 @@ function Edit_Profile() {
             </span>
             <Inputform
               type="text"
-              placeholder="Enter your first name"
+              placeholder="Enter your Last name"
               name="lastName"
               value={formData.lastName}
               onChange={handleChange}
@@ -202,35 +206,37 @@ function Edit_Profile() {
           </div>
         </div>
         <div className="flex flex-col relative">
-          <div>
-            <span className="absolute -top-2 left-3 bg-white px-1 text-sm font-bold text-gray-500 z-10 ">
-              Birthday
-            </span>
-            <Inputform
+          <span className="absolute -top-2 left-3 bg-white px-1 text-sm font-bold text-gray-500 z-10 ">
+            Birthday
+          </span>
+          <DatePicker
+            selected={formData.birthDay ? new Date(formData.birthDay) : null}
+            onChange={(date) => {
+              handleChange({
+                target: {
+                  name: "birthDay",
+                  value: date,
+                },
+              });
+            }}
+            showYearDropdown
+            showMonthDropdown
+            dropdownMode="select"
+            scrollableYearDropdown
+            placeholderText="Select Birthday"
+            maxDate={new Date()}
+            className="w-full not-last:focus:outline-none focus:ring-2 focus:ring-blue-500 border border-gray-300 p-2 rounded-md"
+            portalId="root"
+            popperClassName="!z-99"
+          />
+          {/* <Inputform
               type="date"
               placeholder="Enter your first name"
               name="birthDay"
               value={formData.birthDay}
               onChange={handleChange}
-            />
-          </div>
+            /> */}
         </div>
-        {/* <div className="flex flex-col relative">
-          <div>
-            <span className="absolute -top-2 left-3 bg-white px-1 text-sm font-bold text-gray-500 z-10 ">
-              Age
-            </span>
-            <Inputform
-              type="text"
-              placeholder="Enter your first name"
-              name="age"
-              value={formData.age}
-              onChange={handleChange}
-              readOnly={true}
-              className="bg-gray-200 cursor-not-allowed"
-            />
-          </div>
-        </div> */}
         <div className="flex flex-col relative">
           <div>
             <span className="absolute -top-2 left-3 bg-white px-1 text-sm font-bold text-gray-500 z-10 ">

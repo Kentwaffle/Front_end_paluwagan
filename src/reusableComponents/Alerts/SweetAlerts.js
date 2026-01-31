@@ -38,4 +38,7 @@ export const showAlert = {
       },
     });
   },
+  close: () => {
+    Swal.close();
+  },
 };

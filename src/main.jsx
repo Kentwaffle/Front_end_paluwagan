@@ -27,16 +27,55 @@ import Eror404 from "./Eror404/404";
 
 //OTP
 import Otp from "./LandingPage/registrationComponents/Otp";
+import { jwtDecode } from "jwt-decode";
+import { useFetchData } from "./serviceToApi/fetchData";
+import { API_ENDPOINTS } from "./serviceToApi/ApiEndpoint";
 
 const queryClient = new QueryClient();
 
 //Pagwalang token ibabalik nya sa main route
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children, requireLoan = false }) => {
+  const { data, loading } = useFetchData(
+    "/api/loan/status",
+    API_ENDPOINTS.APPLY_STATUS,
+  );
+
   const token = localStorage.getItem("token");
   if (!token) {
     return <Navigate to="/" replace />;
   }
-  return children;
+
+  if (loading || data === undefined) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <span className="loading loading-spinner loading-lg text-sky-500"></span>
+      </div>
+    );
+  }
+
+  const hasApproved = data?.payload?.hasApprovedApplication;
+  const hasPending = data?.payload?.hasPendingApplication;
+  const currentPath = window.location.pathname;
+  const hasActiveLoan = data?.payload?.hasActiveLoan;
+
+  if (currentPath === "/apply_loan") {
+    if (hasActiveLoan) return <Navigate to="/loan" replace />;
+  }
+
+  if (requireLoan) {
+    if (hasApproved || hasActiveLoan) {
+      return children;
+    }
+    return <Navigate to="/apply_loan" replace />;
+  }
+
+  // if (requireLoan) {
+  //   if (hasApproved) return <div className="route-wrapper">{children}</div>;
+  //   if (hasPending) return <Navigate to="/apply_loan" replace />;
+  //   return <Navigate to="/apply_loan" replace />;
+  // }
+
+  return <div className="route-wrapper">{children}</div>;
 };
 
 //Pag meron token psok para smooth ang tete
@@ -45,7 +84,7 @@ const PublicRoute = ({ children }) => {
   if (token) {
     return <Navigate to="/loan" replace />;
   }
-  return children;
+  return <div className="route-wrapper">{children}</div>;
 };
 
 const router = createBrowserRouter([
@@ -75,7 +114,7 @@ const router = createBrowserRouter([
   {
     path: "/loan",
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute requireLoan={true}>
         <Loan />
       </ProtectedRoute>
     ),
@@ -83,7 +122,7 @@ const router = createBrowserRouter([
   {
     path: "/savings",
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute requireLoan={false}>
         <Savings />
       </ProtectedRoute>
     ),
@@ -91,7 +130,7 @@ const router = createBrowserRouter([
   {
     path: "/profile",
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute requireLoan={false}>
         <Profile />
       </ProtectedRoute>
     ),
@@ -99,7 +138,7 @@ const router = createBrowserRouter([
   {
     path: "/profile/edit_profile",
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute requireLoan={false}>
         <Edit_Profile />
       </ProtectedRoute>
     ),
@@ -107,7 +146,7 @@ const router = createBrowserRouter([
   {
     path: "apply_loan",
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute requireLoan={false}>
         <ApplyLoan />
       </ProtectedRoute>
     ),
