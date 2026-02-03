@@ -8,6 +8,7 @@ function Sidebar({ isOpen, setIsOpen }) {
   return (
     <>
       <div
+        key={"sidebar"}
         className={`fixed w-45 top-0 left-0 bottom-0 p-3 z-50 shadow-2xl bg-sky-200 transition-all duration-300 ease-in-out ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}

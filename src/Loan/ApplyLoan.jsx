@@ -44,18 +44,22 @@ function ApplyLoan() {
   );
 
   //APIs
-  const { mutate: calculateMutate } = usePostData(
+
+  const {
+    data,
+    loading: isStatusLoading,
+    isError: isStatusError,
+    refetch,
+  } = useFetchData("/api/loan/status", API_ENDPOINTS.APPLY_STATUS);
+
+  const { mutate: calculateMutate, isLoading: isCalculating } = usePostData(
     "api/loan/calculate-loan",
     API_ENDPOINTS.APPLY_LOAN,
   );
 
-  const { mutate: postApplyMutate } = usePostData(
+  const { mutate: postApplyMutate, isLoading: isSubmitting } = usePostData(
     "/api/loan/apply-loan",
     API_ENDPOINTS.APPLY_LOAN_POST,
-  );
-  const { data, loading, refetch, isError } = useFetchData(
-    "/api/loan/status",
-    API_ENDPOINTS.APPLY_STATUS,
   );
 
   useEffect(() => {
@@ -122,23 +126,6 @@ function ApplyLoan() {
     });
   };
 
-  if (loading) {
-    return (
-      <div key="loading-view">
-        <LoadingApply />
-      </div>
-    );
-  }
-
-  if (isError) {
-    return (
-      <div key="error-view">
-        {" "}
-        <Error />
-      </div>
-    );
-  }
-
   if (
     data?.payload?.hasPendingApplication ||
     data?.payload?.hasApprovedApplication ||
@@ -159,133 +146,141 @@ function ApplyLoan() {
     <div key="apply-form-container">
       <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
       <Header openSideBar={() => setIsOpen(!isOpen)} />
-      <div className="min-h-screen p-3 flex  flex-col gap-5">
-        <form
-          onSubmit={handleOpenApplyMoodal}
-          className=" shadow-md border border-slate-200 p-3 rounded-xl"
-        >
-          <div className="flex items-center justify-center mb-5">
-            <span className="p-2 bg-sky-200 rounded-xl text-sky-500">
-              <FileText />
-            </span>
-            <h1 className="text-2xl p-2 font-extrabold text-center">
-              Apply for loan
-            </h1>
-          </div>
-          <div className="bg-white p-2 mb-3 rounded-lg border border-slate-100 shadow">
-            <h3 className="text-md font-semibold mb-2 text-stone-600 text-center">
-              Enter the amount you want to borrow
-            </h3>
-            <div
-              className={`flex p-1 px-3 rounded-md items-center border transition-all duration-300 ${
-                formErrors.loanAmount
-                  ? "border-red-200 bg-red-50"
-                  : Number(formData.loanAmount) === 20000
-                    ? "border-orange-400 bg-orange-50"
-                    : "border-gray-300 bg-gray-50"
-              }`}
-            >
-              <Inputform
-                type="text"
-                name="loanAmount"
-                value={formData.loanAmount}
-                onChange={handleChange}
-                placeholder={formatCurrency("0")}
-                className="!border-none !outline-none !ring-0 !focus:ring-0 !focus:outline-none w-full px-0 shadow-none bg-transparent"
-              />
-              <span className="text-stone-400">|</span>
-              <button
-                onClick={() => setFormData({ ...formData, loanAmount: 20000 })}
-                className="text-xs"
-              >
-                Max 20k
-              </button>
-            </div>
-            {formErrors.loanAmount && (
-              <span className="text-red-500 text-xs mt-1">
-                {formErrors.loanAmount}
+      {isStatusLoading ? (
+        <LoadingApply key="loading-view" />
+      ) : isStatusError ? (
+        <Error key="error-view" error={isStatusError} />
+      ) : (
+        <div className="min-h-screen p-3 flex  flex-col gap-5">
+          <form
+            onSubmit={handleOpenApplyMoodal}
+            className=" shadow-md border border-slate-200 p-3 rounded-xl"
+          >
+            <div className="flex items-center justify-center mb-5">
+              <span className="p-2 bg-sky-200 rounded-xl text-sky-500">
+                <FileText />
               </span>
-            )}
-          </div>
-
-          <div className="flex justify-between gap-2">
-            <div className="cursor-pointer flex flex-col w-full border border-slate-100 gap-1 justify-center items-center  bg-white   p-3 shadow rounded-xl">
-              <div className="flex items-center justify-center gap-1">
-                <CalendarRange size={20} className="text-sky-500" />
-                <span>Start date</span>
-              </div>
-              <div className="relative w-full flex flex-col">
-                <DatePicker
-                  selected={
-                    formData.startDate ? new Date(formData.startDate) : null
-                  }
-                  onChange={(date) => {
-                    if (date) {
-                      const formatted = date.toISOString().split("T")[0];
-                      handleChange({
-                        target: { name: "startDate", value: formatted },
-                      });
-                    }
-                  }}
-                  onKeyDown={(e) => e.preventDefault()}
-                  dropdownMode="select"
-                  dateFormat="MMMM dd yyyy"
-                  minDate={new Date()}
-                  className="w-full border  border-gray-300 bg-gray-50 py-2 text-sm  rounded-md font-semibold text-center outline-none focus:border-sky-500"
-                  calendarClassName="custom-calendar-style"
-                  popperClassName="z-50"
-                />
-              </div>
+              <h1 className="text-2xl p-2 font-extrabold text-center">
+                Apply for loan
+              </h1>
             </div>
-
-            <div className="cursor-pointer flex flex-col gap-1 border border-slate-100  w-full justify-center items-center  bg-white  p-3 shadow rounded-xl">
-              <div className="flex items-center  justify-center  gap-1 ">
-                <CalendarRange size={20} className="text-red-400" />
-                <span>End date</span>
-              </div>
-              <div className="relative w-full flex flex-col ">
-                <DatePicker
-                  selected={
-                    formData.endDate ? new Date(formData.endDate) : null
-                  }
-                  onChange={(date) => {
-                    if (date) {
-                      const formatted = date.toISOString().split("T")[0];
-                      handleChange({
-                        target: { name: "endDate", value: formatted },
-                      });
-                    }
-                  }}
-                  onKeyDown={(e) => e.preventDefault()}
-                  dropdownMode="select"
-                  dateFormat="MMMM dd yyyy"
-                  placeholderText="Select End Date"
-                  minDate={
-                    formData.startDate
-                      ? new Date(formData.startDate)
-                      : new Date()
-                  }
-                  className={`w-full border py-2 text-sm rounded-md font-semibold text-center outline-none  ${formErrors.endDate ? "border-red-300 bg-red-50" : "border-gray-300 bg-gray-50"}`}
-                  calendarClassName="custom-calendar-style"
-                  popperClassName="z-50"
+            <div className="bg-white p-2 mb-3 rounded-lg border border-slate-100 shadow">
+              <h3 className="text-md font-semibold mb-2 text-stone-600 text-center">
+                Enter the amount you want to borrow
+              </h3>
+              <div
+                className={`flex p-1 px-3 rounded-md items-center border transition-all duration-300 ${
+                  formErrors.loanAmount
+                    ? "border-red-200 bg-red-50"
+                    : Number(formData.loanAmount) === 20000
+                      ? "border-orange-400 bg-orange-50"
+                      : "border-gray-300 bg-gray-50"
+                }`}
+              >
+                <Inputform
+                  type="text"
+                  name="loanAmount"
+                  value={formData.loanAmount}
+                  onChange={handleChange}
+                  placeholder={formatCurrency("0")}
+                  className="!border-none !outline-none !ring-0 !focus:ring-0 !focus:outline-none w-full px-0 shadow-none bg-transparent"
                 />
+                <span className="text-stone-400">|</span>
+                <button
+                  onClick={() =>
+                    setFormData({ ...formData, loanAmount: 20000 })
+                  }
+                  className="text-xs"
+                >
+                  Max 20k
+                </button>
               </div>
-              {formErrors.endDate && (
+              {formErrors.loanAmount && (
                 <span className="text-red-500 text-xs mt-1">
-                  {formErrors.endDate}
+                  {formErrors.loanAmount}
                 </span>
               )}
             </div>
-          </div>
 
-          <button
-            type="submit"
-            className="bg-sky-200 text-sky-600 font-semibold w-full p-2 mt-5 rounded-xl text-xl shadow-sm"
-          >
-            Submit
-          </button>
-        </form>
-      </div>
+            <div className="flex justify-between gap-2">
+              <div className="cursor-pointer flex flex-col w-full border border-slate-100 gap-1 justify-center items-center  bg-white   p-3 shadow rounded-xl">
+                <div className="flex items-center justify-center gap-1">
+                  <CalendarRange size={20} className="text-sky-500" />
+                  <span>Start date</span>
+                </div>
+                <div className="relative w-full flex flex-col">
+                  <DatePicker
+                    selected={
+                      formData.startDate ? new Date(formData.startDate) : null
+                    }
+                    onChange={(date) => {
+                      if (date) {
+                        const formatted = date.toISOString().split("T")[0];
+                        handleChange({
+                          target: { name: "startDate", value: formatted },
+                        });
+                      }
+                    }}
+                    onKeyDown={(e) => e.preventDefault()}
+                    dropdownMode="select"
+                    dateFormat="MMMM dd yyyy"
+                    minDate={new Date()}
+                    className="w-full border  border-gray-300 bg-gray-50 py-2 text-sm  rounded-md font-semibold text-center outline-none focus:border-sky-500"
+                    calendarClassName="custom-calendar-style"
+                    popperClassName="z-50"
+                  />
+                </div>
+              </div>
+
+              <div className="cursor-pointer flex flex-col gap-1 border border-slate-100  w-full justify-center items-center  bg-white  p-3 shadow rounded-xl">
+                <div className="flex items-center  justify-center  gap-1 ">
+                  <CalendarRange size={20} className="text-red-400" />
+                  <span>End date</span>
+                </div>
+                <div className="relative w-full flex flex-col ">
+                  <DatePicker
+                    selected={
+                      formData.endDate ? new Date(formData.endDate) : null
+                    }
+                    onChange={(date) => {
+                      if (date) {
+                        const formatted = date.toISOString().split("T")[0];
+                        handleChange({
+                          target: { name: "endDate", value: formatted },
+                        });
+                      }
+                    }}
+                    onKeyDown={(e) => e.preventDefault()}
+                    dropdownMode="select"
+                    dateFormat="MMMM dd yyyy"
+                    placeholderText="Select End Date"
+                    minDate={
+                      formData.startDate
+                        ? new Date(formData.startDate)
+                        : new Date()
+                    }
+                    className={`w-full border py-2 text-sm rounded-md font-semibold text-center outline-none  ${formErrors.endDate ? "border-red-300 bg-red-50" : "border-gray-300 bg-gray-50"}`}
+                    calendarClassName="custom-calendar-style"
+                    popperClassName="z-50"
+                  />
+                </div>
+                {formErrors.endDate && (
+                  <span className="text-red-500 text-xs mt-1">
+                    {formErrors.endDate}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="bg-sky-200 text-sky-600 font-semibold w-full p-2 mt-5 rounded-xl text-xl shadow-sm"
+            >
+              Submit
+            </button>
+          </form>
+        </div>
+      )}
       <SummaryLoan
         isOpen={isCompOpen}
         isClose={() => setIsCompOpen(false)}

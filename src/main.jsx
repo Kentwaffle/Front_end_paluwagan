@@ -27,30 +27,33 @@ import Eror404 from "./Eror404/404";
 
 //OTP
 import Otp from "./LandingPage/registrationComponents/Otp";
+
+//API
 import { jwtDecode } from "jwt-decode";
 import { useFetchData } from "./serviceToApi/fetchData";
 import { API_ENDPOINTS } from "./serviceToApi/ApiEndpoint";
+
+//Loading
+import { LoadingServer } from "./reusableComponents/loading";
+import Error from "./reusableComponents/Error";
 
 const queryClient = new QueryClient();
 
 //Pagwalang token ibabalik nya sa main route
 const ProtectedRoute = ({ children, requireLoan = false }) => {
-  const { data, loading } = useFetchData(
+  const { data, loading, error } = useFetchData(
     "/api/loan/status",
     API_ENDPOINTS.APPLY_STATUS,
   );
 
   const token = localStorage.getItem("token");
-  if (!token) {
-    return <Navigate to="/" replace />;
-  }
 
-  if (loading || data === undefined) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <span className="loading loading-spinner loading-lg text-sky-500"></span>
-      </div>
-    );
+  //Mga guard na ayaw mag papasok pag walang ID kala mo taga-pag mana ng school
+  if (!token) return <Navigate to="/" replace />;
+  if (loading) return <LoadingServer />;
+  if (error) return <Error error={error} />;
+  if (!data || !data.payload) {
+    return <LoadingServer />;
   }
 
   const hasApproved = data?.payload?.hasApprovedApplication;
@@ -68,12 +71,6 @@ const ProtectedRoute = ({ children, requireLoan = false }) => {
     }
     return <Navigate to="/apply_loan" replace />;
   }
-
-  // if (requireLoan) {
-  //   if (hasApproved) return <div className="route-wrapper">{children}</div>;
-  //   if (hasPending) return <Navigate to="/apply_loan" replace />;
-  //   return <Navigate to="/apply_loan" replace />;
-  // }
 
   return <div className="route-wrapper">{children}</div>;
 };
