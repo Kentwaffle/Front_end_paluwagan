@@ -13,6 +13,7 @@ import api from "../../serviceToApi/ApiInstance";
 import { API_ENDPOINTS } from "../../serviceToApi/ApiEndpoint";
 import { jwtDecode } from "jwt-decode";
 import { usePostData } from "../../serviceToApi/PostData";
+import { useFetchData } from "../../serviceToApi/fetchData";
 
 function SignIn() {
   const { formData, formErrors, handleChange, setFormErrors, handleSubmit } =
@@ -29,14 +30,16 @@ function SignIn() {
   const { timer, isCounting, sendOtp } = useOtpTimer(30);
   const passwordField = usePasswordToggle();
   const [hasSent, setHasSent] = useState(false);
-  const { userId } = location.state || {};
+
   const { mutate: loginMutate } = usePostData(API_ENDPOINTS.LOGIN);
+
   const handleSendOtpTrigger = async () => {
     showAlert.loading("Sending", "Please wait");
 
     try {
       await api.post(API_ENDPOINTS.SEND_OTP, {
         email: formData.email,
+        password: formData.password,
       });
       sendOtp(formData.email, formData.password);
       setHasSent(true);
@@ -46,24 +49,38 @@ function SignIn() {
     }
   };
 
-  const onSigninSuccess = () => {
-    showAlert.loading("Loading...", "Please wait");
+  const { data: isStatusLogin, refetch: fetchStatus } = useFetchData(
+    "/api/loan/status",
+    API_ENDPOINTS.APPLY_STATUS,
+    { enabled: false },
+  );
 
+  const onSigninSuccess = async () => {
+    showAlert.loading("Loading...", "Please wait");
     if (!formData.otp) {
       showAlert.warning("Wait!", "Please enter the OTP sent to your email.");
       return;
     }
 
     loginMutate(formData, {
-      onSuccess: (data) => {
+      onSuccess: async (data) => {
         if (data.token) {
           localStorage.setItem("token", data.token);
+          const { data: statusData } = await fetchStatus();
+
           showAlert.success("Success!", "Logged in successfully!").then(() => {
             const decodedToken = jwtDecode(data.token);
-            if (decodedToken.hasLoan) {
-              navigate("/loan");
-            } else {
-              navigate("/apply_loan");
+            const role = decodedToken.role;
+
+            if (role === "ROLE_USER") {
+              const hasActiveLoanLogin = statusData?.payload?.hasActiveLoan;
+              if (hasActiveLoanLogin) {
+                navigate("/loan");
+              } else {
+                navigate("/apply_loan");
+              }
+            } else if (role === "ROLE_ADMIN") {
+              navigate("/admin");
             }
           });
         }
@@ -78,31 +95,6 @@ function SignIn() {
         }
       },
     });
-
-    // try {
-    //   if (response.data.token) {
-    //     const token = response.data.token;
-    //     localStorage.setItem("token", token);
-
-    //     showAlert.success("Success!", "Logged in successfully!").then(() => {
-    //       console.log("Navigating to Dashboard...");
-    //       navigate("/loan");
-    //     });
-    //   }
-    // } catch (error) {
-    //   console.error("Login failed", error);
-    //   const errorMessage =
-    //     error.response?.data?.message || "Invalid email or password";
-    //   showAlert.error("Login Failed", errorMessage);
-
-    //   if (error.response) {
-    //     const statusMessage = error.response.data.status;
-
-    //     if (statusMessage === "failed - OTP expired") {
-    //       showAlert.error("Failed", "OTP expired");
-    //     }
-    //   }
-    // }
   };
 
   return (

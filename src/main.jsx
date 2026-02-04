@@ -3,7 +3,6 @@ import React from "react";
 import "./index.css";
 import ReactDOM from "react-dom/client";
 import { Navigate } from "react-router-dom";
-
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -37,29 +36,34 @@ import { API_ENDPOINTS } from "./serviceToApi/ApiEndpoint";
 import { LoadingServer } from "./reusableComponents/loading";
 import Error from "./reusableComponents/Error";
 
+//Admin
+import AdminPanel from "./Admin/AdminPanel";
+
 const queryClient = new QueryClient();
 
-//Pagwalang token ibabalik nya sa main route
+//Pagwalang token ibabalik nya sa main
 const ProtectedRoute = ({ children, requireLoan = false }) => {
-  const { data, loading, error } = useFetchData(
-    "/api/loan/status",
-    API_ENDPOINTS.APPLY_STATUS,
-  );
-
   const token = localStorage.getItem("token");
+  const {
+    data: isStatus,
+    loading: isLoading,
+    error: isError,
+  } = useFetchData("/api/loan/status", API_ENDPOINTS.APPLY_STATUS, {
+    enabled: !!token,
+  });
 
   //Mga guard na ayaw mag papasok pag walang ID kala mo taga-pag mana ng school
   if (!token) return <Navigate to="/" replace />;
-  if (loading) return <LoadingServer />;
-  if (error) return <Error error={error} />;
-  if (!data || !data.payload) {
+  if (isLoading) return <LoadingServer />;
+  if (isError) return <Error error={isError} />;
+  if (!isStatus || !isStatus.payload) {
     return <LoadingServer />;
   }
 
-  const hasApproved = data?.payload?.hasApprovedApplication;
-  const hasPending = data?.payload?.hasPendingApplication;
+  const hasActiveLoan = isStatus?.payload?.hasActiveLoan;
+  const hasApproved = isStatus?.payload?.hasApprovedApplication;
+  const hasPending = isStatus?.payload?.hasPendingApplication;
   const currentPath = window.location.pathname;
-  const hasActiveLoan = data?.payload?.hasActiveLoan;
 
   if (currentPath === "/apply_loan") {
     if (hasActiveLoan) return <Navigate to="/loan" replace />;
@@ -145,6 +149,14 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute requireLoan={false}>
         <ApplyLoan />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "admin",
+    element: (
+      <ProtectedRoute requireLoan={false}>
+        <AdminPanel />
       </ProtectedRoute>
     ),
   },
