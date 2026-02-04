@@ -23,6 +23,7 @@ import Error from "../reusableComponents/Error";
 import Inputform from "../reusableComponents/Inputform";
 import Filter from "./Filter";
 import { useDebounce } from "../reusableComponents/Hooks/useBounce";
+import { LoadingFilter } from "../reusableComponents/loading";
 
 function Loan() {
   const [isOpen, setIsOpen] = useState(false);
@@ -41,23 +42,21 @@ function Loan() {
     refetch: refetchLoan,
   } = useFetchData("/loan", API_ENDPOINTS.LOAN_GET);
 
-  const activeEndpoint =
-    status && method && startDateFilter && endDateFilter
-      ? `${API_ENDPOINTS.GET_PAYMENT}status=${status}&paymentMethod=${method}&startDate=${startDateFilter}&endtDate=${endDateFilter}`
-      : status
-        ? `${API_ENDPOINTS.GET_PAYMENT}status=${status}`
-        : method
-          ? `${API_ENDPOINTS.GET_PAYMENT}paymentMethod=${method}`
-          : debouncedSearch
-            ? `${API_ENDPOINTS.GET_PAYMENT}reference=${debouncedSearch}`
-            : startDateFilter
-              ? `${API_ENDPOINTS.GET_PAYMENT}startDate=${startDateFilter}`
-              : endDateFilter
-                ? `${API_ENDPOINTS.GET_PAYMENT}endtDate=${endDateFilter}`
-                : API_ENDPOINTS.GET_PAYMENT;
+  const params = new URLSearchParams();
+  if (status) params.append("status", status);
+  if (method) params.append("paymentMethod", method);
+  if (debouncedSearch) params.append("reference", debouncedSearch);
+  if (startDateFilter) params.append("startDate", startDateFilter);
+  if (endDateFilter) params.append("endDate", endDateFilter);
+
+  const queryString = params.toString();
+
+  const activeEndpoint = queryString
+    ? `${API_ENDPOINTS.GET_PAYMENT}?${queryString}`
+    : API_ENDPOINTS.GET_PAYMENT;
 
   const { data: paymentData, refetch: refetchPayment } = useFetchData(
-    `/loan/payment/filter?status=${status}&paymentMethod=${method}&reference=${debouncedSearch}&startDate=${startDateFilter}&endtDate=${endDateFilter}`,
+    `/api/loan/payment/filter?status=${status}&paymentMethod=${method}&reference=${debouncedSearch}&startDate=${startDateFilter}&endDate=${endDateFilter}`,
     activeEndpoint,
   );
 
@@ -257,7 +256,7 @@ function Loan() {
             </div>
 
             {paymentData?.payment?.length > 0 ? (
-              paymentData?.payment.map((payment, index) => (
+              paymentData?.payment?.map((payment, index) => (
                 <div
                   key={`${payment.paymentId}-${index}`}
                   className="card border my-3 border-slate-200 shadow"

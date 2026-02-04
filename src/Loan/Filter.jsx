@@ -25,7 +25,15 @@ function Filter({
     setmethod(methodFilter);
     setStartdateFilter(startDate);
     setEnddateFilter(endDate);
-    setFilterOpen(false);
+    setFilterOpen();
+  };
+
+  const closeModal = () => {
+    setStatus("");
+    setmethod("");
+    setStartdateFilter("");
+    setEnddateFilter("");
+    setFilterOpen();
   };
 
   const statusfilterOptions = ["PAID", "FAILED"];
@@ -39,7 +47,7 @@ function Filter({
           <div className="">
             <button
               className="bg-sky-200 text-sky-500 text-sm rounded-full px-2 py-1"
-              onClick={setFilterOpen}
+              onClick={closeModal}
             >
               <span className="text-md font-semibold">X</span>
             </button>
