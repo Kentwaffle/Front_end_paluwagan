@@ -42,38 +42,47 @@ import AdminPanel from "./Admin/AdminPanel";
 const queryClient = new QueryClient();
 
 //Pagwalang token ibabalik nya sa main
-const ProtectedRoute = ({ children, requireLoan = false }) => {
+const ProtectedRoute = ({
+  children,
+  requireLoan = false,
+  allowedRoles = ["ROLE_ADMIN"],
+}) => {
   const token = localStorage.getItem("token");
+  //Mga guard na ayaw mag papasok pag walang ID kala mo taga-pag mana ng school
+  if (!token) return <Navigate to="/" replace />;
+
+  const decodedTokenMain = jwtDecode(token);
+  const roles = decodedTokenMain.role;
+  if (!allowedRoles.includes(roles)) return <Navigate to="/" replace />;
+
   const {
     data: isStatus,
     loading: isLoading,
     error: isError,
   } = useFetchData("/api/loan/status", API_ENDPOINTS.APPLY_STATUS, {
-    enabled: !!token,
+    enabled: !!token && roles === "ROLE_USER",
   });
 
-  //Mga guard na ayaw mag papasok pag walang ID kala mo taga-pag mana ng school
-  if (!token) return <Navigate to="/" replace />;
-  if (isLoading) return <LoadingServer />;
-  if (isError) return <Error error={isError} />;
-  if (!isStatus || !isStatus.payload) {
-    return <LoadingServer />;
-  }
-
-  const hasActiveLoan = isStatus?.payload?.hasActiveLoan;
-  const hasApproved = isStatus?.payload?.hasApprovedApplication;
-  const hasPending = isStatus?.payload?.hasPendingApplication;
-  const currentPath = window.location.pathname;
-
-  if (currentPath === "/apply_loan") {
-    if (hasActiveLoan) return <Navigate to="/loan" replace />;
-  }
-
-  if (requireLoan) {
-    if (hasApproved || hasActiveLoan) {
-      return children;
+  if (roles === "ROLE_USER") {
+    if (!isStatus || !isStatus.payload) {
+      return <LoadingServer />;
     }
-    return <Navigate to="/apply_loan" replace />;
+    if (isLoading) return <LoadingServer />;
+    if (isError) return <Error error={isError} />;
+    const hasActiveLoan = isStatus?.payload?.hasActiveLoan;
+    const hasApproved = isStatus?.payload?.hasApprovedApplication;
+    const currentPath = window.location.pathname;
+
+    if (currentPath === "/apply_loan") {
+      if (hasActiveLoan) return <Navigate to="/loan" replace />;
+    }
+
+    if (requireLoan) {
+      if (hasApproved || hasActiveLoan) {
+        return children;
+      }
+      return <Navigate to="/apply_loan" replace />;
+    }
   }
 
   return <div className="route-wrapper">{children}</div>;
@@ -115,7 +124,7 @@ const router = createBrowserRouter([
   {
     path: "/loan",
     element: (
-      <ProtectedRoute requireLoan={true}>
+      <ProtectedRoute requireLoan={true} allowedRoles={["ROLE_USER"]}>
         <Loan />
       </ProtectedRoute>
     ),
@@ -123,7 +132,7 @@ const router = createBrowserRouter([
   {
     path: "/savings",
     element: (
-      <ProtectedRoute requireLoan={false}>
+      <ProtectedRoute requireLoan={false} allowedRoles={["ROLE_USER"]}>
         <Savings />
       </ProtectedRoute>
     ),
@@ -131,7 +140,7 @@ const router = createBrowserRouter([
   {
     path: "/profile",
     element: (
-      <ProtectedRoute requireLoan={false}>
+      <ProtectedRoute requireLoan={false} allowedRoles={["ROLE_USER"]}>
         <Profile />
       </ProtectedRoute>
     ),
@@ -139,7 +148,7 @@ const router = createBrowserRouter([
   {
     path: "/profile/edit_profile",
     element: (
-      <ProtectedRoute requireLoan={false}>
+      <ProtectedRoute requireLoan={false} allowedRoles={["ROLE_USER"]}>
         <Edit_Profile />
       </ProtectedRoute>
     ),
@@ -147,7 +156,7 @@ const router = createBrowserRouter([
   {
     path: "apply_loan",
     element: (
-      <ProtectedRoute requireLoan={false}>
+      <ProtectedRoute requireLoan={false} allowedRoles={["ROLE_USER"]}>
         <ApplyLoan />
       </ProtectedRoute>
     ),
@@ -155,7 +164,7 @@ const router = createBrowserRouter([
   {
     path: "admin",
     element: (
-      <ProtectedRoute requireLoan={false}>
+      <ProtectedRoute allowedRoles={["ROLE_ADMIN"]}>
         <AdminPanel />
       </ProtectedRoute>
     ),
