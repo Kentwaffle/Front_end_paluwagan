@@ -8,12 +8,15 @@ function MainLayout() {
   const [isOpen, setIsOpen] = useState(false);
   const token = localStorage.getItem("token");
   let roles = "";
+  if (!token) {
+    return null;
+  }
   try {
     const decoded = jwtDecode(token);
     roles = decoded.role;
   } catch (error) {
-    console.error("Invalid token");
-    return <Navigate to="/auth" replace />;
+    localStorage.removeItem("token");
+    return null;
   }
 
   return (
