@@ -84,69 +84,7 @@ const ProtectedRoute = ({ children, userRole, isStatus, isStatusLoading }) => {
   }
   return children;
 };
-// const ProtectedRoute = ({
-//   children,
-//   requireLoan = false,
-//   allowedRoles = [],
-// }) => {
-//   const token = localStorage.getItem("token");
-//   //Mga guard na ayaw mag papasok pag walang ID kala mo taga-pag mana ng school
-//   if (!token) return <Navigate to="/auth" replace />;
 
-//   const decodedTokenMain = jwtDecode(token);
-//   const roles = decodedTokenMain.role;
-//   // if (!allowedRoles.includes(roles)) return <Navigate to="/auth" replace />;
-//   if (allowedRoles.length > 0 && !allowedRoles.includes(roles)) {
-//     return <Navigate to="/auth" replace />;
-//   }
-//   const isUser = roles === "ROLE_USER";
-//   const {
-//     data: isStatus,
-//     loading: isLoading,
-//     error: isError,
-//   } = useFetchData("/api/loan/status", API_ENDPOINTS.APPLY_STATUS, {
-//     enabled: !!token && isUser, // DITO LANG DAPAT
-//   });
-
-//   if (!isUser) {
-//     if (!isStatus || !isStatus.payload) {
-//       return <LoadingServer />;
-//     }
-//     if (isLoading) return <LoadingServer />;
-//     if (isError) return <Error error={isError} />;
-//     const hasActiveLoan = isStatus?.payload?.hasActiveLoan;
-//     const hasApproved = isStatus?.payload?.hasApprovedApplication;
-//     const currentPath = window.location.pathname;
-
-//     if (currentPath === "/apply_loan") {
-//       if (hasActiveLoan) return <Navigate to="/loan" replace />;
-//     }
-
-//     if (requireLoan) {
-//       if (hasApproved || hasActiveLoan) {
-//         return children;
-//       }
-//       return <Navigate to="/apply_loan" replace />;
-//     }
-//   }
-
-//   return <div className="route-wrapper">{children}</div>;
-// };
-
-//Pag meron token psok para smooth ang tete
-// const PublicRoute = ({ children }) => {
-//   const token = localStorage.getItem("token");
-
-//   if (token) {
-//     const decoded = jwtDecode(token);
-//     // Diretsong redirect na dito, huwag nang dumaan sa ibang component
-//     const target =
-//       decoded.role === "ROLE_ADMIN" ? "/admin/loan_management" : "/loan";
-//     return <Navigate to={target} replace />;
-//   }
-
-//   return <div className="route-wrapper">{children}</div>;
-// };
 const PublicRoute = ({ children, userRole }) => {
   if (userRole) {
     // Kung naka-login na at pilit pumasok sa Login page, i-redirect base sa role
@@ -156,6 +94,7 @@ const PublicRoute = ({ children, userRole }) => {
   }
   return children;
 };
+
 const App = () => {
   const token = localStorage.getItem("token");
   let roles = null;

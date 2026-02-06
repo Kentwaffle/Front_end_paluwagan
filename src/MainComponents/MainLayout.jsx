@@ -7,10 +7,10 @@ import Header from "./Header";
 function MainLayout() {
   const [isOpen, setIsOpen] = useState(false);
   const token = localStorage.getItem("token");
-  let role = "";
+  let roles = "";
   try {
     const decoded = jwtDecode(token);
-    role = decoded.role;
+    roles = decoded.role;
   } catch (error) {
     console.error("Invalid token");
     return <Navigate to="/auth" replace />;
@@ -18,10 +18,10 @@ function MainLayout() {
 
   return (
     <div className="min-h-screen">
-      <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} role={role} />
+      <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} role={roles} />
       <Header openSideBar={() => setIsOpen(!isOpen)} />
       <main>
-        <Outlet context={{ role }} />
+        <Outlet context={{ roles }} />
       </main>
     </div>
   );
