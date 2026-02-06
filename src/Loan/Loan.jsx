@@ -1,4 +1,3 @@
-import React from "react";
 import { useEffect, useState } from "react";
 import { useFetchData } from "../serviceToApi/fetchData";
 import { API_ENDPOINTS } from "../serviceToApi/ApiEndpoint";
@@ -11,8 +10,6 @@ import {
   CircleEllipsis,
   ListCheck,
 } from "lucide-react";
-import Sidebar from "../MainComponents/sidebar";
-import Header from "../MainComponents/Header";
 import {
   formatDate,
   formatCurrency,
@@ -20,10 +17,9 @@ import {
 } from "../reusableComponents/formatter";
 import { LoadingLoan } from "../reusableComponents/loading";
 import Error from "../reusableComponents/Error";
-import Inputform from "../reusableComponents/Inputform";
 import Filter from "./Filter";
 import { useDebounce } from "../reusableComponents/Hooks/useBounce";
-import { LoadingFilter } from "../reusableComponents/loading";
+import { statusColor, statusIcon } from "../reusableComponents/StatusHelper";
 
 function Loan() {
   const [isOpen, setIsOpen] = useState(false);
@@ -59,16 +55,20 @@ function Loan() {
     `/api/loan/payment/filter?status=${status}&paymentMethod=${method}&reference=${debouncedSearch}&startDate=${startDateFilter}&endDate=${endDateFilter}`,
     activeEndpoint,
   );
-
   useEffect(() => {
-    if (refetchLoan) {
-      refetchLoan();
-    }
-    if (refetchPayment) {
-      refetchPayment();
-    }
-  }, []);
+    // Siguraduhin na hindi ito magti-trigger kung nag-re-render lang dahil sa state change
+    const reloadData = async () => {
+      try {
+        if (typeof refetchLoan === "function") await refetchLoan();
+        if (typeof refetchPayment === "function") await refetchPayment();
+      } catch (err) {
+        console.error("Reload failed", err);
+      }
+    };
 
+    reloadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   //Get the json derulo
   const loanAmount = loanData?.payload?.loans?.[0]?.totalLoan || 0;
   const interestRate = loanData?.payload?.loans?.[0]?.interest || 0;
@@ -79,37 +79,10 @@ function Loan() {
   const weeklyPay = loanData?.payload?.loans?.[0]?.weeklyPay || 0;
   const totalRepayable = loanData?.payload?.loans?.[0]?.totalRepayable || 0;
 
-  const statusColor = (status) => {
-    switch (status?.toLowerCase()) {
-      case "paid":
-        return "badge-success";
-      case "pending":
-        return "badge-warning";
-      case "failed":
-        1;
-        return "badge-error";
-      default:
-        return "badge-ghost";
-    }
-  };
-
-  const statusIcon = (status) => {
-    switch (status?.toLowerCase()) {
-      case "paid":
-        return <CircleCheck size={15} />;
-      case "pending":
-        return <CircleEllipsis size={15} />;
-      case "failed":
-        return <CircleX size={15} />;
-      default:
-        return null;
-    }
-  };
-
   return (
     <>
-      <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
-      <Header openSideBar={() => setIsOpen(!isOpen)} />
+      {/* <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
+      <Header openSideBar={() => setIsOpen(!isOpen)} /> */}
       {isLoanLoading ? (
         <LoadingLoan key="loading-spinner" />
       ) : isLoanError ? (

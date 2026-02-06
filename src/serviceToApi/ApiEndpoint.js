@@ -21,4 +21,8 @@ export const API_ENDPOINTS = {
   APPLICATION_DETAILS: `${BASE_URL}/api/loan/status/details`,
 
   GET_PAYMENT: `${BASE_URL}/api/loan/payment/filter`,
+
+  ADMIN_PENDING: `${BASE_URL}/api/admin/loan/pending`,
+  ADMIN_CHANGE_STATUS: `${BASE_URL}/api/admin/loan/change-status`,
+  SSE: `${BASE_URL}/loan/updates`,
 };

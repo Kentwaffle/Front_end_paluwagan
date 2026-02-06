@@ -11,7 +11,7 @@ function Header({ openSideBar }) {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    navigate("/");
+    navigate("/auth");
   };
 
   const { data, isLoading } = useFetchData(

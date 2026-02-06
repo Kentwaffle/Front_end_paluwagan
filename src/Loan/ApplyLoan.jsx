@@ -63,10 +63,12 @@ function ApplyLoan() {
   );
 
   useEffect(() => {
-    if (refetch) {
+    // Mag-refetch lang kung hindi pa "fetched" o kung kailangan talaga
+    // Pero siguraduhin na hindi ito magti-trigger ng panibagong render cycle
+    if (refetch && !isStatusLoading) {
       refetch();
     }
-  }, [refetch]);
+  }, []);
 
   const handleOpenApplyMoodal = (e) => {
     e.preventDefault();
@@ -144,8 +146,8 @@ function ApplyLoan() {
 
   return (
     <div key="apply-form-container">
-      <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
-      <Header openSideBar={() => setIsOpen(!isOpen)} />
+      {/* <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
+      <Header openSideBar={() => setIsOpen(!isOpen)} /> */}
       {isStatusLoading ? (
         <LoadingApply key="loading-view" />
       ) : isStatusError ? (

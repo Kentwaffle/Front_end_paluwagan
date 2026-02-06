@@ -214,7 +214,7 @@ function SignIn() {
       <span className="text-sm text-center">
         Dont have an account?{" "}
         <Link
-          to="/register"
+          to="/auth/register"
           className="text-sky-600 font-semibold hover:underline cursor-pointer underline"
         >
           Register here

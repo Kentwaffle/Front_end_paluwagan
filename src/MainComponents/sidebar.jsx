@@ -1,10 +1,36 @@
 import React from "react";
-import { BadgeCent, UserRoundPen, HandCoins, PiggyBank } from "lucide-react";
+import {
+  BadgeCent,
+  UserRoundPen,
+  HandCoins,
+  PiggyBank,
+  LayoutDashboard,
+} from "lucide-react";
 import { useState } from "react";
 import PaluwaganLogo from "../assets/images/mainLogoPaluwagan.jpg";
 import { Link, Outlet, useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
-function Sidebar({ isOpen, setIsOpen }) {
+const LINKS = {
+  ROLE_ADMIN: [
+    { label: "Loan Management", path: "/admin", icon: <BadgeCent size={25} /> },
+    {
+      label: "Member Savings",
+      path: "",
+      icon: <PiggyBank size={25} />,
+    },
+    { label: "Transactions", path: "", icon: <HandCoins size={25} /> },
+  ],
+  ROLE_USER: [
+    { label: "Loan", path: "loan", icon: <BadgeCent size={25} /> },
+    { label: "Savings", path: "savings", icon: <PiggyBank size={25} /> },
+    { label: "Payment", path: "", icon: <HandCoins size={25} /> },
+  ],
+};
+
+function Sidebar({ isOpen, setIsOpen, role }) {
+  const sideBarlinks = LINKS[role] || [];
+
   return (
     <>
       <div
@@ -15,20 +41,19 @@ function Sidebar({ isOpen, setIsOpen }) {
       >
         <img src={PaluwaganLogo} alt="Error! No image" className="pb-5" />
 
-        <div className="flex flex-col gap-3 text-xl  text-stone-700 pl-2">
-          <Link to={"/loan"} className="flex gap-3  ">
-            <BadgeCent size={25} />
-            <span>Loan</span>
-          </Link>
-          <Link to={"/savings"} className="flex gap-3">
-            <PiggyBank size={25} />
-            <span>Savings</span>
-          </Link>
-          <Link className="flex gap-3">
-            <HandCoins size={25} />
-            <span>Payment</span>
-          </Link>
-        </div>
+        <aside className="flex flex-col gap-3 text-xl  text-stone-700 pl-2">
+          {sideBarlinks.map((link) => (
+            <Link
+              key={link.label}
+              to={link.path}
+              className="flex gap-3 items-center"
+              onClick={() => setIsOpen(false)}
+            >
+              {link.icon}
+              {link.label}
+            </Link>
+          ))}
+        </aside>
       </div>
       {isOpen && (
         <div

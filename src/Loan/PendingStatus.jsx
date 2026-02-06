@@ -63,8 +63,8 @@ Total repay: ${formatCurrency(detailsData?.totalRepayable)}
 
   return (
     <div key="apply-form-container">
-      <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
-      <Header openSideBar={() => setIsOpen(!isOpen)} />
+      {/* <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
+      <Header openSideBar={() => setIsOpen(!isOpen)} /> */}
 
       {showToast && (
         <div className="toast toast-top toast-center mt-10 z-99 shadow-2xl">
