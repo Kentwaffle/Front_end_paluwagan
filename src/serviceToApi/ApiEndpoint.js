@@ -23,6 +23,8 @@ export const API_ENDPOINTS = {
   GET_PAYMENT: `${BASE_URL}/api/loan/payment/filter`,
 
   ADMIN_PENDING: `${BASE_URL}/api/admin/loan/pending`,
+  ADMIN_APPROVED: `${BASE_URL}/api/admin/loan/approve`,
+  ADMIN_REJECTED: `${BASE_URL}/api/admin/loan/rejected`,
   ADMIN_CHANGE_STATUS: `${BASE_URL}/api/admin/loan/change-status`,
-  SSE: `${BASE_URL}/loan/updates`,
+  SSE: `${BASE_URL}/api/loan/updates`,
 };

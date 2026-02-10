@@ -1,11 +1,11 @@
 import { CircleCheck, CircleEllipsis, CircleX } from "lucide-react";
 export const statusColor = (status) => {
-  switch (status?.toLowerCase()) {
-    case "paid":
+  switch (status) {
+    case "APPROVED":
       return "badge-success";
-    case "pending":
+    case "PENDING":
       return "badge-warning";
-    case "failed":
+    case "REJECTED":
       return "badge-error";
     default:
       return "badge-ghost";
@@ -13,14 +13,40 @@ export const statusColor = (status) => {
 };
 
 export const statusIcon = (status) => {
-  switch (status?.toLowerCase()) {
-    case "paid":
+  switch (status) {
+    case "APPROVED":
       return <CircleCheck size={15} />;
-    case "pending":
+    case "PENDING":
       return <CircleEllipsis size={15} />;
-    case "failed":
+    case "REJECTED":
       return <CircleX size={15} />;
     default:
       return null;
+  }
+};
+
+export const tabsColor = (status) => {
+  switch (status) {
+    case "APPROVED":
+      return "bg-green-100 text-green-600";
+    case "PENDING":
+      return "bg-orange-100 text-orange-400";
+    case "REJECTED":
+      return "bg-red-200 text-red-500";
+    default:
+      return "badge-ghost";
+  }
+};
+
+export const tabsBorder = (status) => {
+  switch (status) {
+    case "APPROVED":
+      return "border-green-500 bg-green-100 text-green-600";
+    case "PENDING":
+      return "border-orange-500 bg-orange-100 text-orange-400";
+    case "REJECTED":
+      return "border-red-500 bg-red-200 text-red-500";
+    default:
+      return "badge-ghost";
   }
 };

@@ -116,6 +116,7 @@ function ApplyLoan() {
               () => setIsSubmitted(true),
               setIsCompOpen(false),
               console.log("Pumasok ang data", payLoadData),
+              refetch(),
             );
         },
         onError: () => {

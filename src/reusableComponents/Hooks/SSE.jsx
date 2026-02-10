@@ -3,26 +3,50 @@ import { useQueryClient } from "@tanstack/react-query";
 import { API_ENDPOINTS } from "../../serviceToApi/ApiEndpoint";
 
 // Hooks/SSE.js
-export const useLoanSSE = (queryKeyToInvalidate) => {
+export const useLoanSSE = () => {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    const eventSource = new EventSource(API_ENDPOINTS.SSE);
-    if (!queryKeyToInvalidate) return;
+    let eventSource;
+    let reconnectTimeout;
 
-    const handleUpdate = (event) => {
-      queryClient.invalidateQueries({ queryKey: [queryKeyToInvalidate] });
+    const connect = () => {
+      eventSource = new EventSource(API_ENDPOINTS.SSE);
+
+      const handleUpdate = (event) => {
+        console.log("Realtime update received!");
+        queryClient.invalidateQueries({
+          predicate: (query) => query.queryKey[0].includes("api/admin/loan"),
+        });
+      };
+
+      eventSource.addEventListener("loan-update", handleUpdate);
+
+      eventSource.onopen = () => {
+        console.log("SSE Connected successfully");
+      };
+
+      eventSource.onerror = (err) => {
+        console.error("SSE Connection failed:", err);
+        eventSource.close();
+
+        // Reconnect after 3 seconds
+        console.log("Reconnecting in 3 seconds...");
+        reconnectTimeout = setTimeout(() => {
+          connect();
+        }, 3000);
+      };
     };
 
-    eventSource.addEventListener("loan-update", handleUpdate);
-
-    eventSource.onerror = (err) => {
-      console.error("SSE Connection failed:", err);
-    };
+    connect(); // Initial connection
 
     return () => {
-      eventSource.removeEventListener("loan-update", handleUpdate);
-      eventSource.close();
+      if (reconnectTimeout) {
+        clearTimeout(reconnectTimeout);
+      }
+      if (eventSource) {
+        eventSource.close();
+      }
     };
-  }, [queryClient, queryKeyToInvalidate]);
+  }, [queryClient]);
 };
