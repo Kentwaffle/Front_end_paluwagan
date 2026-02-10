@@ -22,8 +22,8 @@ const LINKS = {
     { label: "Transactions", path: "", icon: <HandCoins size={25} /> },
   ],
   ROLE_USER: [
-    { label: "Loan", path: "loan", icon: <BadgeCent size={25} /> },
-    { label: "Savings", path: "savings", icon: <PiggyBank size={25} /> },
+    { label: "Loan", path: "/loan", icon: <BadgeCent size={25} /> },
+    { label: "Savings", path: "/savings", icon: <PiggyBank size={25} /> },
     { label: "Payment", path: "", icon: <HandCoins size={25} /> },
   ],
 };

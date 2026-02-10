@@ -24,9 +24,14 @@ function SummaryLoan({
   applicationId,
   onSubmit,
 }) {
-  const continue_openModal = () =>
-    document.getElementById("continue").showModal();
   if (!isOpen) return null;
+  const handleFinalAction = (e) => {
+    const modalElement = document.getElementById("continue");
+    if (modalElement) {
+      modalElement.close(); // Isara ang native dialog
+    }
+    onSubmit(e); // Tawagin ang handleSubmitLoan mula sa ApplyLoan
+  };
 
   return (
     <div className="p-5 fixed inset-0 overflow-y-auto z-[99] flex items-center justify-center bg-black/50 backdrop-blur">
@@ -116,7 +121,10 @@ function SummaryLoan({
           title="Submit Loan summary"
           children="Are you sure you want to submit?"
           actionButton={
-            <button onClick={onSubmit} className="btn btn-info text-white">
+            <button
+              onClick={handleFinalAction}
+              className="btn btn-info text-white"
+            >
               Yes
             </button>
           }
@@ -129,7 +137,10 @@ function SummaryLoan({
             Cancel
           </button>
           <button
-            onClick={continue_openModal}
+            onClick={() => {
+              const modal = document.getElementById("continue");
+              if (modal) modal.showModal();
+            }}
             className="bg-sky-500 text-white w-full py-2 rounded-lg"
           >
             I agree

@@ -1,15 +1,7 @@
 import { useEffect, useState } from "react";
 import { useFetchData } from "../serviceToApi/fetchData";
 import { API_ENDPOINTS } from "../serviceToApi/ApiEndpoint";
-import {
-  Download,
-  Search,
-  SlidersHorizontal,
-  CircleCheck,
-  CircleX,
-  CircleEllipsis,
-  ListCheck,
-} from "lucide-react";
+import { Download, Search, SlidersHorizontal, ListCheck } from "lucide-react";
 import {
   formatDate,
   formatCurrency,
@@ -35,7 +27,6 @@ function Loan() {
     data: loanData,
     isLoading: isLoanLoading,
     isError: isLoanError,
-    refetch: refetchLoan,
   } = useFetchData("/loan", API_ENDPOINTS.LOAN_GET);
 
   const params = new URLSearchParams();
@@ -52,23 +43,17 @@ function Loan() {
     : API_ENDPOINTS.GET_PAYMENT;
 
   const { data: paymentData, refetch: refetchPayment } = useFetchData(
-    `/api/loan/payment/filter?status=${status}&paymentMethod=${method}&reference=${debouncedSearch}&startDate=${startDateFilter}&endDate=${endDateFilter}`,
+    [
+      "payments",
+      status,
+      method,
+      debouncedSearch,
+      startDateFilter,
+      endDateFilter,
+    ],
     activeEndpoint,
   );
-  useEffect(() => {
-    // Siguraduhin na hindi ito magti-trigger kung nag-re-render lang dahil sa state change
-    const reloadData = async () => {
-      try {
-        if (typeof refetchLoan === "function") await refetchLoan();
-        if (typeof refetchPayment === "function") await refetchPayment();
-      } catch (err) {
-        console.error("Reload failed", err);
-      }
-    };
 
-    reloadData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
   //Get the json derulo
   const loanAmount = loanData?.payload?.loans?.[0]?.totalLoan || 0;
   const interestRate = loanData?.payload?.loans?.[0]?.interest || 0;

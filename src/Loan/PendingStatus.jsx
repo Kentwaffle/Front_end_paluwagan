@@ -28,28 +28,19 @@ function PendingStatus({ applicationId }) {
     API_ENDPOINTS.APPLICATION_DETAILS,
   );
 
-  if (statusLoading || !statusData) {
-    return (
-      <div key="loading-view">
-        <LoadingApply />
-      </div>
-    );
-  }
-
   const handleCopy = (textCopy) => {
     if (!textCopy) return;
-    navigator.clipboard.writeText(
-      `
-Application ID: ${finalId}
+    const content = `
+Application ID: ${String(finalId)}
 Date range: ${formatMonthDay(isStartDate)} - ${formatMonthDay(isEndDate)}
 Weekly pay: ${formatCurrency(detailsData?.weeklyPay)}
 --------------------------
-Loan Amount:	${formatCurrency(detailsData?.requestedAmount)}
-Interest:	  ${formatCurrency(detailsData?.interest)}
+Loan Amount: ${formatCurrency(detailsData?.requestedAmount)}
+Interest: ${formatCurrency(detailsData?.interest)}
 --------------------------
 Total repay: ${formatCurrency(detailsData?.totalRepayable)}
-      `,
-    );
+  `.trim();
+    navigator.clipboard.writeText(content);
     setShowToast(false);
     setTimeout(() => {
       setShowToast(true);

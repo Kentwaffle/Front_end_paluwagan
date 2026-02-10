@@ -116,6 +116,7 @@ function CardStatus({
                         className={`${currentStatus === "APPROVED" ? "hidden" : "block"} rounded-full bg-green-100 p-1 text-green-500`}
                       >
                         <Check size={20} />
+                        {currentStatus === "APPROVED" ? "" : ""}
                       </button>
                     </span>
                   </div>

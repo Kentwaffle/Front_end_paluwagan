@@ -1,11 +1,9 @@
-import Sidebar from "../MainComponents/sidebar";
-import Header from "../MainComponents/Header";
 import {
   formatCurrency,
   formatMonthDay,
 } from "../reusableComponents/formatter";
 import Error from "../reusableComponents/Error";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { API_ENDPOINTS } from "../serviceToApi/ApiEndpoint";
 import Inputform from "../reusableComponents/Inputform";
 import { CalendarRange, FileText } from "lucide-react";
@@ -17,16 +15,18 @@ import SummaryLoan from "./SummaryLoan";
 import { usePostData } from "../serviceToApi/PostData";
 import { showAlert } from "../reusableComponents/Alerts/SweetAlerts";
 import { useNavigate } from "react-router-dom";
-import PendingStatus from "./PendingStatus";
 import { useFetchData } from "../serviceToApi/fetchData";
 import { LoadingApply } from "../reusableComponents/loading";
+import { useQueryClient } from "@tanstack/react-query";
 
 function ApplyLoan() {
+  console.log("ApplyLoan Component Rendered!");
   const [isOpen, setIsOpen] = useState(false);
   const today = new Date().toISOString().split("T")[0];
   const [isCompOpen, setIsCompOpen] = useState(false);
   const [loanResult, setLoanResult] = useState(null);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const {
     formData,
     setFormData,
@@ -44,12 +44,10 @@ function ApplyLoan() {
   );
 
   //APIs
-
   const {
-    data,
+    data: statusData,
     loading: isStatusLoading,
     isError: isStatusError,
-    refetch,
   } = useFetchData("/api/loan/status", API_ENDPOINTS.APPLY_STATUS);
 
   const { mutate: calculateMutate, isLoading: isCalculating } = usePostData(
@@ -61,14 +59,27 @@ function ApplyLoan() {
     "/api/loan/apply-loan",
     API_ENDPOINTS.APPLY_LOAN_POST,
   );
-
   useEffect(() => {
-    // Mag-refetch lang kung hindi pa "fetched" o kung kailangan talaga
-    // Pero siguraduhin na hindi ito magti-trigger ng panibagong render cycle
-    if (refetch && !isStatusLoading) {
-      refetch();
+    console.log("Status Data Check:", statusData); // Tingnan natin ang actual structure sa console
+
+    // Minsan ang response ay statusData.data.payload depende sa axios wrapper mo
+    const payload = statusData?.payload || statusData?.data?.payload;
+
+    if (payload) {
+      const isPending =
+        payload.hasPendingApplication === true ||
+        payload.latestApplicationStatus === "PENDING";
+
+      if (isPending) {
+        console.log("MATCH! Redirecting now...");
+        navigate("/pending_status", { replace: true });
+      } else {
+        console.log("NOT PENDING. Status is:", payload.latestApplicationStatus);
+      }
+    } else {
+      console.log("NO PAYLOAD FOUND YET");
     }
-  }, []);
+  }, [statusData, navigate]);
 
   const handleOpenApplyMoodal = (e) => {
     e.preventDefault();
@@ -76,6 +87,7 @@ function ApplyLoan() {
     setFormErrors(validation.errors);
     if (!validation.isValid) return;
     showAlert.loading("Calculating...", "Please wait");
+
     calculateMutate(formData, {
       onSuccess: (response) => {
         showAlert.close();
@@ -91,64 +103,53 @@ function ApplyLoan() {
   };
 
   const handleSubmitLoan = (e) => {
+    setIsCompOpen(false);
     showAlert.loading("Submitting", "Please wait");
-    handleSubmit(e, () => {
-      const payLoadData = {
-        totalLoan: Number(loanResult?.totalLoan),
-        startDate: loanResult?.startDate,
-        endDate: loanResult?.endDate,
-        repayPeriodDays: loanResult?.repayPeriodDays,
-        repayPeriodWeeks: loanResult?.repayPeriodWeeks,
-        interest: loanResult?.interest,
-        weeklyPay: loanResult?.weeklyPay,
-        totalRepayable: loanResult?.totalRepayable,
-        applicationId: loanResult?.applicationId,
-      };
+    const continueModal = document.getElementById("continue");
+    if (continueModal) continueModal.close();
 
-      postApplyMutate(payLoadData, {
-        onSuccess: () => {
-          showAlert
-            .success(
-              "Success!",
-              "Application submitted successfully. Please wait for administrative approval.",
-            )
-            .then(
-              () => setIsSubmitted(true),
-              setIsCompOpen(false),
-              console.log("Pumasok ang data", payLoadData),
-              refetch(),
+    setTimeout(() => {
+      showAlert.loading("Submitting", "Please wait");
+
+      handleSubmit(e, () => {
+        const payLoadData = {
+          totalLoan: Number(loanResult?.totalLoan),
+          startDate: loanResult?.startDate,
+          endDate: loanResult?.endDate,
+          repayPeriodDays: loanResult?.repayPeriodDays,
+          repayPeriodWeeks: loanResult?.repayPeriodWeeks,
+          interest: loanResult?.interest,
+          weeklyPay: loanResult?.weeklyPay,
+          totalRepayable: loanResult?.totalRepayable,
+          applicationId: loanResult?.applicationId,
+        };
+
+        postApplyMutate(payLoadData, {
+          onSuccess: () => {
+            showAlert
+              .success("Success!", "Application submitted successfully.")
+              .then(() => {
+                queryClient.invalidateQueries({
+                  queryKey: ["/api/loan/status"],
+                });
+                navigate("/pending_status");
+              });
+          },
+          onError: (error) => {
+            // Ibalik ang modal state para makita ng user ang error message
+            setIsCompOpen(true);
+            showAlert.error(
+              "Failed",
+              "Something happened, please try again." + error,
             );
-        },
-        onError: () => {
-          showAlert.error(
-            "Failed",
-            "Something happen please try again or contact our support",
-          );
-        },
+          },
+        });
       });
-    });
+    }, 100);
   };
-
-  if (
-    data?.payload?.hasPendingApplication ||
-    data?.payload?.hasApprovedApplication ||
-    isSubmitted
-  ) {
-    return (
-      <div key="status-container">
-        <PendingStatus
-          applicationId={
-            loanResult?.applicationId || data?.payload.applicationId
-          }
-        />
-      </div>
-    );
-  }
 
   return (
     <div key="apply-form-container">
-      {/* <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
-      <Header openSideBar={() => setIsOpen(!isOpen)} /> */}
       {isStatusLoading ? (
         <LoadingApply key="loading-view" />
       ) : isStatusError ? (
@@ -190,6 +191,7 @@ function ApplyLoan() {
                 />
                 <span className="text-stone-400">|</span>
                 <button
+                  type="button"
                   onClick={() =>
                     setFormData({ ...formData, loanAmount: 20000 })
                   }
@@ -284,20 +286,22 @@ function ApplyLoan() {
           </form>
         </div>
       )}
-      <SummaryLoan
-        isOpen={isCompOpen}
-        isClose={() => setIsCompOpen(false)}
-        loanAmount={loanResult?.totalLoan}
-        repayPeriodDays={loanResult?.repayPeriodDays}
-        repayPeriodWeeks={loanResult?.repayPeriodWeeks}
-        startDate={formatMonthDay(loanResult?.startDate)}
-        endDate={formatMonthDay(loanResult?.endDate)}
-        interest={loanResult?.interest}
-        weeklyPay={loanResult?.weeklyPay}
-        totalRepayable={loanResult?.totalRepayable}
-        applicationId={loanResult?.applicationId}
-        onSubmit={handleSubmitLoan}
-      />
+      {isCompOpen && (
+        <SummaryLoan
+          isOpen={isCompOpen}
+          isClose={() => setIsCompOpen(false)}
+          loanAmount={loanResult?.totalLoan}
+          repayPeriodDays={loanResult?.repayPeriodDays}
+          repayPeriodWeeks={loanResult?.repayPeriodWeeks}
+          startDate={formatMonthDay(loanResult?.startDate)}
+          endDate={formatMonthDay(loanResult?.endDate)}
+          interest={loanResult?.interest}
+          weeklyPay={loanResult?.weeklyPay}
+          totalRepayable={loanResult?.totalRepayable}
+          applicationId={loanResult?.applicationId}
+          onSubmit={handleSubmitLoan}
+        />
+      )}
     </div>
   );
 }

@@ -21,7 +21,6 @@ export const useLoanSSE = () => {
       };
 
       eventSource.addEventListener("loan-update", handleUpdate);
-
       eventSource.onopen = () => {
         console.log("SSE Connected successfully");
       };
@@ -30,15 +29,13 @@ export const useLoanSSE = () => {
         console.error("SSE Connection failed:", err);
         eventSource.close();
 
-        // Reconnect after 3 seconds
         console.log("Reconnecting in 3 seconds...");
         reconnectTimeout = setTimeout(() => {
           connect();
         }, 3000);
       };
     };
-
-    connect(); // Initial connection
+    connect();
 
     return () => {
       if (reconnectTimeout) {

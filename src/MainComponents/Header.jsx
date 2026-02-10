@@ -1,17 +1,17 @@
 import React from "react";
 import { Menu } from "lucide-react";
 import Default_pic from "../assets/images/default_pic.jpg";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useFetchData } from "../serviceToApi/fetchData";
 import { API_ENDPOINTS } from "../serviceToApi/ApiEndpoint";
 import { LoadingHeader } from "../reusableComponents/loading";
+import { useQueryClient } from "@tanstack/react-query";
 
 function Header({ openSideBar }) {
-  const navigate = useNavigate();
-
+  const queryClient = useQueryClient();
   const handleLogout = () => {
     // localStorage.removeItem("token");
-
+    queryClient.clear();
     localStorage.clear();
     window.location.assign("/auth");
     // navigate("/auth");

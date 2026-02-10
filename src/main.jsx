@@ -2,7 +2,7 @@ import { StrictMode } from "react";
 import React from "react";
 import "./index.css";
 import ReactDOM from "react-dom/client";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -22,6 +22,7 @@ import Profile from "./Profile/Profile";
 import Edit_Profile from "./Profile/Edit_Profile";
 import ApplyLoan from "./Loan/ApplyLoan";
 import MainLayout from "./MainComponents/MainLayout";
+import PendingStatus from "./Loan/PendingStatus";
 //404
 import Eror404 from "./Eror404/404";
 
@@ -39,49 +40,55 @@ import Error from "./reusableComponents/Error";
 
 //Admin
 import Loan_management from "./Admin/Loan_management";
-
+//SSE
+import { useLoanSSE } from "./reusableComponents/Hooks/SSE";
 const queryClient = new QueryClient();
 
-// 1. RoleBasedRedirect (Keep your updated version)
-const RoleBasedRedirect = () => {
-  const token = localStorage.getItem("token");
-  if (!token) return <Navigate to="/auth" replace />;
+const UserIndexRedirect = ({ isStatus }) => {
+  const payload = isStatus?.payload;
+  if (!payload) return <LoadingServer />;
 
-  try {
-    const decoded = jwtDecode(token);
-    const userRole = decoded.role;
-    const currentPath = window.location.pathname;
-
-    if (userRole === "ROLE_ADMIN") {
-      if (!currentPath.startsWith("/admin"))
-        return <Navigate to="/admin/loan_management" replace />;
-    } else if (userRole === "ROLE_USER") {
-      if (currentPath === "/" || currentPath === "/auth")
-        return <Navigate to="/loan" replace />;
-    }
-  } catch (err) {
-    return <Navigate to="/auth" replace />;
-  }
-  return null;
+  if (payload.hasApprovedApplication) return <Navigate to="/loan" replace />;
+  if (payload.hasPendingApplication)
+    return <Navigate to="/pending_status" replace />;
+  return <Navigate to="/apply_loan" replace />;
 };
 
 //Pagwalang token ibabalik nya sa main
 const ProtectedRoute = ({ children, userRole, isStatus, isStatusLoading }) => {
+  const location = useLocation();
+  console.log("Gatekeeper checking path:", window.location.pathname);
   if (isStatusLoading) return <LoadingServer />;
   if (!userRole) return <Navigate to="/auth" replace />;
   if (userRole === "ROLE_ADMIN") return children;
 
-  if (userRole === "ROLE_USER") {
-    const hasActiveLoan =
-      isStatus?.payload?.hasApprovedApplication ||
-      isStatus?.payload?.hasPendingApplication;
-    const currentPath = window.location.pathname;
+  const payload = isStatus?.payload;
+  const currentPath = location.pathname;
 
-    if (hasActiveLoan && currentPath.includes("/apply_loan"))
-      return <Navigate to="/loan" replace />;
-    if (!hasActiveLoan && currentPath.includes("/loan"))
-      return <Navigate to="/apply_loan" replace />;
+  // Kung wala pang payload data, wag munang papasukin sa kahit anong path
+  if (!payload && userRole === "ROLE_USER") return <LoadingServer />;
+
+  if (userRole === "ROLE_USER") {
+    // Approved User logic
+    if (payload.hasApprovedApplication) {
+      if (["/apply_loan", "/pending_status"].includes(currentPath)) {
+        return <Navigate to="/loan" replace />;
+      }
+    }
+    // Pending User logic
+    else if (payload.hasPendingApplication) {
+      if (["/apply_loan", "/loan", "/"].includes(currentPath)) {
+        return <Navigate to="/pending_status" replace />; // <--- DITO PALANG, SIPA NA AGAD!
+      }
+    }
+    // New User logic
+    else {
+      if (["/loan", "/pending_status"].includes(currentPath)) {
+        return <Navigate to="/apply_loan" replace />;
+      }
+    }
   }
+
   return children;
 };
 
@@ -97,6 +104,7 @@ const PublicRoute = ({ children, userRole }) => {
 
 const App = () => {
   const token = localStorage.getItem("token");
+  useLoanSSE();
   let roles = null;
 
   if (token) {
@@ -115,10 +123,6 @@ const App = () => {
   );
 
   const router = createBrowserRouter([
-    {
-      path: "/",
-      element: <RoleBasedRedirect />,
-    },
     {
       path: "/auth",
       element: (
@@ -139,19 +143,6 @@ const App = () => {
         { path: "changepassword", element: <ChangePassword /> },
       ],
     },
-    // ADMIN ROUTES
-    {
-      path: "/admin",
-      element: (
-        <ProtectedRoute userRole={roles} isStatusLoading={false}>
-          <MainLayout />
-        </ProtectedRoute>
-      ),
-      children: [
-        { index: true, element: <Navigate to="loan_management" replace /> },
-        { path: "loan_management", element: <Loan_management /> },
-      ],
-    },
     // USER ROUTES
     {
       path: "/",
@@ -165,11 +156,34 @@ const App = () => {
         </ProtectedRoute>
       ),
       children: [
+        {
+          index: true,
+          element:
+            roles === "ROLE_ADMIN" ? (
+              <Navigate to="/admin/loan_management" replace />
+            ) : (
+              <UserIndexRedirect isStatus={isStatus} />
+            ),
+        },
         { path: "loan", element: <Loan /> },
         { path: "savings", element: <Savings /> },
         { path: "profile", element: <Profile /> },
         { path: "profile/edit_profile", element: <Edit_Profile /> },
         { path: "apply_loan", element: <ApplyLoan /> },
+        { path: "pending_status", element: <PendingStatus /> },
+      ],
+    },
+    // ADMIN ROUTES
+    {
+      path: "/admin",
+      element: (
+        <ProtectedRoute userRole={roles} isStatusLoading={false}>
+          <MainLayout />
+        </ProtectedRoute>
+      ),
+      children: [
+        { index: true, element: <Navigate to="loan_management" replace /> },
+        { path: "loan_management", element: <Loan_management /> },
       ],
     },
     { path: "*", element: <Eror404 /> },

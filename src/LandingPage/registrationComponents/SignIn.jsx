@@ -49,11 +49,11 @@ function SignIn() {
     }
   };
 
-  const { data: isStatusLogin, refetch: fetchStatus } = useFetchData(
-    "/api/loan/status",
-    API_ENDPOINTS.APPLY_STATUS,
-    { enabled: false },
-  );
+  // const { data: isStatusLogin, refetch: fetchStatus } = useFetchData(
+  //   "/api/loan/status",
+  //   API_ENDPOINTS.APPLY_STATUS,
+  //   { enabled: false },
+  // );
 
   const onSigninSuccess = async () => {
     showAlert.loading("Loading...", "Please wait");
@@ -66,22 +66,9 @@ function SignIn() {
       onSuccess: async (data) => {
         if (data.token) {
           localStorage.setItem("token", data.token);
-          const { data: statusData } = await fetchStatus();
-
           showAlert.success("Success!", "Logged in successfully!").then(() => {
-            const decodedToken = jwtDecode(data.token);
-            const role = decodedToken.role;
-
-            if (role === "ROLE_USER") {
-              const hasActiveLoanLogin = statusData?.payload?.hasActiveLoan;
-              if (hasActiveLoanLogin) {
-                navigate("/loan");
-              } else {
-                navigate("/apply_loan");
-              }
-            } else if (role === "ROLE_ADMIN") {
-              navigate("/admin");
-            }
+            // Refresh at balik sa root. Hayaan ang App.js ang mag-redirect.
+            window.location.href = "/";
           });
         }
       },

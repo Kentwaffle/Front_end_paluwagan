@@ -20,7 +20,6 @@ const Modal = ({ id, title, children, actionButton }) => {
       </form> */}
     </dialog>
   );
-  return createPortal(modalContent, document.body);
 };
 
 export default Modal;
