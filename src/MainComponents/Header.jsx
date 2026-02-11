@@ -6,21 +6,26 @@ import { useFetchData } from "../serviceToApi/fetchData";
 import { API_ENDPOINTS } from "../serviceToApi/ApiEndpoint";
 import { LoadingHeader } from "../reusableComponents/loading";
 import { useQueryClient } from "@tanstack/react-query";
-
+import api from "../serviceToApi/ApiInstance";
 function Header({ openSideBar }) {
   const queryClient = useQueryClient();
-  const handleLogout = () => {
-    // localStorage.removeItem("token");
-    queryClient.clear();
-    localStorage.clear();
-    window.location.assign("/auth");
-    // navigate("/auth");
-  };
 
-  const { data, isLoading } = useFetchData(
+  const { data: headerData, isLoading } = useFetchData(
     "/header",
     API_ENDPOINTS.PROFILE_GET,
   );
+
+  const handleLogout = async () => {
+    try {
+      await api.get(API_ENDPOINTS.LOGOUT);
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      localStorage.removeItem("token");
+      queryClient.clear();
+      window.location.assign("/auth");
+    }
+  };
 
   return (
     <div key={"main_header"}>
@@ -33,10 +38,10 @@ function Header({ openSideBar }) {
         >
           <Menu onClick={openSideBar} />
           <div className="flex items-center">
-            <span className="font-semibold pr-1">{data?.firstName}</span>
+            <span className="font-semibold pr-1">{headerData?.firstName}</span>
             <div className="dropdown dropdown-end">
               <div
-                tabIndex={0}
+                tabIndex="-1"
                 role="button"
                 className="btn btn-ghost btn-circle avatar"
               >

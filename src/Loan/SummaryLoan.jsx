@@ -10,6 +10,7 @@ import {
   IdCard,
 } from "lucide-react";
 import Modal from "../reusableComponents/Modal";
+import { swalModal } from "../reusableComponents/Alerts/SweetAlerts";
 function SummaryLoan({
   isOpen,
   isClose,
@@ -31,6 +32,16 @@ function SummaryLoan({
       modalElement.close(); // Isara ang native dialog
     }
     onSubmit(e); // Tawagin ang handleSubmitLoan mula sa ApplyLoan
+  };
+
+  const agreeSummary = async (e) => {
+    const agreeSum = await swalModal({
+      title: "Are you sure?",
+      text: "Do you want to submit your application?",
+      confirmButtonText: "Yes",
+      icon: "question",
+    });
+    if (agreeSum) onSubmit(e);
   };
 
   return (
@@ -137,10 +148,7 @@ function SummaryLoan({
             Cancel
           </button>
           <button
-            onClick={() => {
-              const modal = document.getElementById("continue");
-              if (modal) modal.showModal();
-            }}
+            onClick={agreeSummary}
             className="bg-sky-500 text-white w-full py-2 rounded-lg"
           >
             I agree

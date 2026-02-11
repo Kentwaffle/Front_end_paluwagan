@@ -11,11 +11,11 @@ import { showAlert } from "../reusableComponents/Alerts/SweetAlerts";
 import { useLoanSSE } from "../reusableComponents/Hooks/SSE";
 import CardStatus from "./CardStatus";
 import { Search } from "lucide-react";
+import { swalModal } from "../reusableComponents/Alerts/SweetAlerts";
 
 function Loan_management() {
   const [searchrefPending, setSearchrefPending] = useState("");
   const [currentStatus, setCurrentStatus] = useState("PENDING");
-
   //SSE ni juls na di ko magets
   useLoanSSE();
 
@@ -33,17 +33,27 @@ function Loan_management() {
     "api/admin/loan/change-status",
     API_ENDPOINTS.ADMIN_CHANGE_STATUS,
   );
+  const { data: application_count } = useFetchData(
+    "api/admin/loan/status-counts",
+    API_ENDPOINTS.ADMIN_COUNT,
+  );
 
-  const approveStatus = (e, id) => {
+  const approveStatus = async (e, id) => {
     e.preventDefault();
     e.stopPropagation();
+    const confirm = await swalModal({
+      title: "Approve this application?",
+      text: `You are about to approved this application ID: ${id}`,
+      confirmButtonText: "Approve",
+    });
+    if (!confirm) return;
 
     showAlert.loading("Submitting please wait");
     admin_change_status(
       { status: "APPROVED", applicationID: id },
       {
         onSuccess: () => {
-          showAlert.success("Successfully approved", "User has been approved");
+          showAlert.success("Successfully approve", "User has been approved");
         },
         onError: (error) => {
           showAlert.warning("Error", error);
@@ -51,9 +61,16 @@ function Loan_management() {
       },
     );
   };
-  const rejectStatus = (e, id) => {
+
+  const rejectStatus = async (e, id) => {
     e.preventDefault();
     e.stopPropagation();
+    const confirm = await swalModal({
+      title: "Reject this application?",
+      text: `You are about to reject this application ID: ${id}`,
+      confirmButtonText: "Reject",
+    });
+    if (!confirm) return;
 
     showAlert.loading("Submitting please wait");
     admin_change_status(
@@ -104,13 +121,12 @@ function Loan_management() {
               {statusIcon(tab.value)}
               {tab.label}
             </div>
-            {currentStatus === tab.value && (
-              <span
-                className={`border ${tabsBorder(tab.value)} px-1 py-0 rounded-full text-xs font-bold `}
-              >
-                {count}
-              </span>
-            )}
+
+            <span
+              className={`border ${tabsBorder(tab.value)} px-1 py-0 rounded-full text-xs font-bold `}
+            >
+              {application_count?.[tab.value] || 0}
+            </span>
           </div>
         </button>
       ))}

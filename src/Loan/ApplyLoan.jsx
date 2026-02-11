@@ -21,7 +21,6 @@ import { useQueryClient } from "@tanstack/react-query";
 
 function ApplyLoan() {
   console.log("ApplyLoan Component Rendered!");
-  const [isOpen, setIsOpen] = useState(false);
   const today = new Date().toISOString().split("T")[0];
   const [isCompOpen, setIsCompOpen] = useState(false);
   const [loanResult, setLoanResult] = useState(null);

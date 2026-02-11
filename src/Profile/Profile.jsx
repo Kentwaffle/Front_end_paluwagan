@@ -8,19 +8,37 @@ import {
   Hash,
 } from "lucide-react";
 import Default_pic from "../assets/images/default_pic.jpg";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useFetchData } from "../serviceToApi/fetchData";
 import { API_ENDPOINTS } from "../serviceToApi/ApiEndpoint";
-import Modal from "../reusableComponents/Modal";
 import { formatDate } from "../reusableComponents/formatter";
-
+import { jwtDecode } from "jwt-decode";
+import { swalModal } from "../reusableComponents/Alerts/SweetAlerts";
+import api from "../serviceToApi/ApiInstance";
 function Profile() {
   const { data } = useFetchData("/profile", API_ENDPOINTS.PROFILE_GET);
-  const openModal = () => document.getElementById("edit_modal").showModal();
+  const token = localStorage.getItem("token");
+  const navigate = useNavigate();
+  let userRole = null;
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/");
+  if (token) {
+    const decoded = jwtDecode(token);
+    userRole = decoded.role;
+  }
+
+  const backPath =
+    userRole === "ROLE_ADMIN" ? "/admin/loan_management" : "/loan";
+
+  const handleLogout = async () => {
+    try {
+      await api.get(API_ENDPOINTS.LOGOUT);
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      localStorage.removeItem("token");
+      queryClient.clear();
+      window.location.assign("/auth");
+    }
   };
 
   const calculateAge = (birthday) => {
@@ -39,34 +57,34 @@ function Profile() {
     return age >= 0 ? age.toString() : "0";
   };
 
+  const editAlert = async () => {
+    const alert = await swalModal({
+      title: "Edit Profile?",
+      text: "You will be redirected to the edit page.",
+      icon: "question",
+      confirmButtonText: "Edit",
+    });
+    if (alert) {
+      navigate("/profile/edit_profile");
+    }
+  };
+
   const displayAge = data?.birthday ? calculateAge(data.birthday) : "No Age";
   return (
     <div className="min-h-screen p-5">
       <div className="flex justify-between items-center mb-3">
         <button className=" bg-sky-200 text-sky-500 rounded-lg p-1">
-          <Link to={"/loan"}>
+          <Link to={backPath}>
             <ChevronLeft size={32} />
           </Link>
         </button>
         <span className="text-2xl font-bold text-center">Profile</span>
         <button
-          onClick={openModal}
+          onClick={editAlert}
           className="flex items-center gap-1 text-xl "
         >
           <span className="text-sky-500">Edit</span>
         </button>
-        <Modal
-          id="edit_modal"
-          title="Want to edit your profile?"
-          actionButton={
-            <Link
-              to={"/profile/edit_profile"}
-              className="btn btn-info text-white"
-            >
-              Yes
-            </Link>
-          }
-        ></Modal>
       </div>
 
       <div className="flex flex-col justify-center items-center">
@@ -77,7 +95,7 @@ function Profile() {
         />
 
         <div className="flex flex-col py-3 ">
-          <div className="flex uppercase gap-1 font-extrabold justify-center items-center">
+          <div className="flex  flex-wrap uppercase gap-1 font-extrabold justify-center items-center">
             <span>{data?.firstName}</span>
             <span>{data?.middlleName}</span>
             <span>{data?.lastName}</span>

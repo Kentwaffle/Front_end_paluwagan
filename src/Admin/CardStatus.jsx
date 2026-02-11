@@ -102,21 +102,22 @@ function CardStatus({
                       </span>
                       <span>View all details</span>
                     </div>
-                    <span className="flex gap-2">
+                    <span className="flex gap-2 ">
                       <button
                         onClick={(e) => rejectStatus(e, userdata.applicationId)}
-                        className={`${currentStatus === "REJECTED" ? "hidden" : "block"} rounded-full bg-red-100 p-1 text-red-500`}
+                        className={`${currentStatus === "REJECTED" ? "hidden" : "text-xs py-0 px-2 items-center flex gap-1 "} rounded-full bg-red-100 p-1 text-red-500`}
                       >
                         <X size={20} />
+                        {currentStatus === "APPROVED" ? "Reject" : ""}
                       </button>
                       <button
                         onClick={(e) =>
                           approveStatus(e, userdata.applicationId)
                         }
-                        className={`${currentStatus === "APPROVED" ? "hidden" : "block"} rounded-full bg-green-100 p-1 text-green-500`}
+                        className={`${currentStatus === "APPROVED" ? "hidden" : "text-xs py-0 px-2 items-center flex gap-1 "} rounded-full bg-green-100 p-1 text-green-500`}
                       >
                         <Check size={20} />
-                        {currentStatus === "APPROVED" ? "" : ""}
+                        {currentStatus === "REJECTED" ? "Approve" : ""}
                       </button>
                     </span>
                   </div>
@@ -182,7 +183,7 @@ function CardStatus({
                               <Wallet size={15} />
                             </span>
                             <span className="text-stone-500 text-sm">
-                              Totap repay
+                              Total repay
                             </span>
                           </div>
                           <span className="font-semibold text-center">
@@ -199,7 +200,7 @@ function CardStatus({
         ))
       ) : (
         <div key={"norecord"} className="text-center p-10 opacity-50 italic">
-          No records found.
+          {`No ${currentStatus.toLowerCase()} applications`}
         </div>
       )}
     </div>

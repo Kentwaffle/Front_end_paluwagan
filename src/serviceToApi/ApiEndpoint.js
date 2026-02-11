@@ -26,5 +26,8 @@ export const API_ENDPOINTS = {
   ADMIN_APPROVED: `${BASE_URL}/api/admin/loan/approve`,
   ADMIN_REJECTED: `${BASE_URL}/api/admin/loan/rejected`,
   ADMIN_CHANGE_STATUS: `${BASE_URL}/api/admin/loan/change-status`,
+  ADMIN_COUNT: `${BASE_URL}/api/admin/loan/status-counts`,
   SSE: `${BASE_URL}/api/loan/updates`,
+
+  LOGOUT: `${BASE_URL}/api/auth/logout`,
 };

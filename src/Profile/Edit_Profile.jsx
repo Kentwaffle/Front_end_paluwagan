@@ -4,14 +4,13 @@ import Default_pic from "../assets/images/default_pic.jpg";
 import { Link, useNavigate } from "react-router-dom";
 import { useFetchData } from "../serviceToApi/fetchData";
 import { API_ENDPOINTS } from "../serviceToApi/ApiEndpoint";
-import Modal from "../reusableComponents/Modal";
 import Inputform from "../reusableComponents/Inputform";
 import { usePasswordToggle } from "../reusableComponents/Hooks/ToggleEye";
 import SelectDropdown from "../reusableComponents/selectdropdown";
 import { useForm } from "../reusableComponents/Hooks/HandleChange&Submit";
 import { ValidateEditProfile } from "../validations/CredentialValidation";
 import { usePatchData } from "../serviceToApi/PatchData";
-import { showAlert } from "../reusableComponents/Alerts/SweetAlerts";
+import { showAlert, swalModal } from "../reusableComponents/Alerts/SweetAlerts";
 import { useQueryClient } from "@tanstack/react-query";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -21,11 +20,6 @@ function Edit_Profile() {
   const confirmPasswordField = usePasswordToggle();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-
-  const back_openModal = () =>
-    document.getElementById("back_modal").showModal();
-  const save_openModal = () =>
-    document.getElementById("save_modal").showModal();
 
   const { data } = useFetchData("/edit_profile", API_ENDPOINTS.PROFILE_GET);
 
@@ -53,7 +47,7 @@ function Edit_Profile() {
 
   const handleSave = (e) => {
     showAlert.loading("Loading...", "Please wait");
-
+    if (e && e.preventDefault) e.preventDefault();
     handleSubmit(e, () => {
       mutate(formData, {
         onSuccess: (data) => {
@@ -74,44 +68,47 @@ function Edit_Profile() {
       });
     });
   };
-
+  const save = async (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    const saveChanges = await swalModal({
+      title: "Save changes?",
+      text: "This will update your profile information.",
+      icon: "question",
+      confirmButtonText: "Save",
+    });
+    if (saveChanges) handleSave(e);
+  };
+  const discard = async () => {
+    const discardChanges = await swalModal({
+      title: "Discard changes?",
+      text: "Ridirecting to profile",
+      icon: "question",
+      confirmButtonText: "Discard",
+    });
+    if (discardChanges) navigate("/profile");
+  };
   return (
     <div className="min-h-screen p-5">
       <div className="flex justify-between items-center mb-3">
         <div className="flex-1">
           <button
-            onClick={back_openModal}
+            onClick={discard}
             className=" bg-sky-200 text-sky-500 rounded-lg p-1"
           >
             <X size={32} />
           </button>
-          <Modal
-            id="back_modal"
-            title="Discard Changes?"
-            actionButton={
-              <Link to={"/profile"} className="btn btn-info text-white">
-                Yes
-              </Link>
-            }
-          ></Modal>
         </div>
 
         <span className="text-2xl font-bold text-center">Edit profile</span>
         <button
-          onClick={save_openModal}
+          onClick={save}
           className="flex-1 flex text-xl justify-end text-sky-500 "
         >
           Save
         </button>
-        <Modal
-          id="save_modal"
-          title="Save Changes?"
-          actionButton={
-            <button onClick={handleSave} className="btn btn-info text-white">
-              Yes
-            </button>
-          }
-        ></Modal>
       </div>
 
       <div className="flex flex-col justify-center items-center">

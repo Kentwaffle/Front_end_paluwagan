@@ -42,3 +42,26 @@ export const showAlert = {
     Swal.close();
   },
 };
+
+export const swalModal = async ({
+  title = "Are you sure?",
+  text = "You won't be able to revert this!",
+  icon = "warning",
+  confirmButtonText = "Yes, proceed!",
+  confirmButtonColor = "#0ea5e9",
+  cancelButtonColor = "#ef4444",
+}) => {
+  const result = await Swal.fire({
+    title,
+    text,
+    icon,
+    showCancelButton: true,
+    confirmButtonColor,
+    cancelButtonColor,
+    confirmButtonText,
+    cancelButtonText: "Cancel",
+    reverseButtons: true, // Para nasa kanan ang Confirm button
+  });
+
+  return result.isConfirmed; // Ibabalik nito ay true o false
+};
