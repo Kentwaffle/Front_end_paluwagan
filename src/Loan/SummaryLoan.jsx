@@ -9,7 +9,6 @@ import {
   Receipt,
   IdCard,
 } from "lucide-react";
-import Modal from "../reusableComponents/Modal";
 import { swalModal } from "../reusableComponents/Alerts/SweetAlerts";
 function SummaryLoan({
   isOpen,
@@ -26,14 +25,6 @@ function SummaryLoan({
   onSubmit,
 }) {
   if (!isOpen) return null;
-  const handleFinalAction = (e) => {
-    const modalElement = document.getElementById("continue");
-    if (modalElement) {
-      modalElement.close(); // Isara ang native dialog
-    }
-    onSubmit(e); // Tawagin ang handleSubmitLoan mula sa ApplyLoan
-  };
-
   const agreeSummary = async (e) => {
     const agreeSum = await swalModal({
       title: "Are you sure?",
@@ -127,19 +118,7 @@ function SummaryLoan({
             <span className="text-lg font-semibold">{totalRepayable}</span>
           </div>
         </div>
-        <Modal
-          id="continue"
-          title="Submit Loan summary"
-          children="Are you sure you want to submit?"
-          actionButton={
-            <button
-              onClick={handleFinalAction}
-              className="btn btn-info text-white"
-            >
-              Yes
-            </button>
-          }
-        ></Modal>
+
         <div className="flex gap-1 mt-5">
           <button
             onClick={isClose}
