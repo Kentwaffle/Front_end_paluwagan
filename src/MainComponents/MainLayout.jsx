@@ -28,7 +28,7 @@ function MainLayout() {
   }
 
   return (
-    <div className="min-h-screen" key="main-app-layout">
+    <div key={"main-app-layout"} className="min-h-screen">
       {!hideLayout && (
         <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} role={roles} />
       )}

@@ -4,3 +4,7 @@
 :root {
   font-family: sans-serif, "Inter";
 }
+
+body {
+  @apply bg-slate-50;
+}

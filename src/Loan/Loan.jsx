@@ -11,7 +11,10 @@ import { LoadingLoan } from "../reusableComponents/loading";
 import Error from "../reusableComponents/Error";
 import Filter from "./Filter";
 import { useDebounce } from "../reusableComponents/Hooks/useBounce";
-import { statusColor, statusIcon } from "../reusableComponents/StatusHelper";
+import {
+  statusColorPayments,
+  statusIconPayments,
+} from "../reusableComponents/StatusHelper";
 
 function Loan() {
   const [isOpen, setIsOpen] = useState(false);
@@ -77,12 +80,12 @@ function Loan() {
           key="loan-content"
           className="min-h-screen p-5 flex flex-col gap-5"
         >
-          <div className="card w-full card-border shadow  rounded-xl border-slate-200">
+          <div className="card w-full card-border shadow-sm  rounded-xl bg-white border-slate-200">
             <div className="flex flex-col gap-1 justify-center items-center mt-6 w-full">
-              <h2 className="text-stone-500 text-sm font-semibold">
+              <h2 className="text-slate-500 text-sm font-semibold">
                 Total remaining balance
               </h2>
-              <h1 className="text-5xl font-semibold">
+              <h1 className="text-5xl font-semibold text-slate-800">
                 {formatCurrency(loanData?.payload?.remainingBalance)}
               </h1>
             </div>
@@ -129,35 +132,35 @@ function Loan() {
                   <div className="flex flex-col">
                     <div className="flex flex-col gap-3 px-5 py-3 rounded-b-3xl border-t border-gray-200">
                       <div className="flex justify-between items-start ">
-                        <span className="text-slate-400 text-sm text-md">
+                        <span className="text-slate-500 text-sm text-md">
                           Date range
                         </span>
-                        <span className="font-semibold text-sm">{`${formatMonthDay(startDate)} - ${formatMonthDay(endDate)} `}</span>
+                        <span className="font-semibold text-sm text-slate-700">{`${formatMonthDay(startDate)} - ${formatMonthDay(endDate)} `}</span>
                       </div>
 
                       <div className="flex justify-between items-start ">
-                        <span className="text-slate-400 text-sm text-md">
+                        <span className="text-slate-500 text-sm text-md">
                           Weekly pay
                         </span>
-                        <span className="font-semibold text-sm">
+                        <span className="font-semibold text-sm text-slate-700">
                           {formatCurrency(weeklyPay)}
                         </span>
                       </div>
 
                       <div className="flex justify-between items-start ">
-                        <span className="text-slate-400 text-sm text-md">
+                        <span className="text-slate-500 text-sm text-md">
                           Loan amount
                         </span>
-                        <span className="font-semibold text-sm">
+                        <span className="font-semibold text-sm text-slate-700">
                           {formatCurrency(loanAmount)}
                         </span>
                       </div>
 
                       <div className="flex justify-between items-start">
-                        <span className="text-slate-400 text-sm text-md">
-                          Interest rate
+                        <span className="text-slate-500 text-sm text-md">
+                          Interest
                         </span>
-                        <span className="font-semibold text-sm">
+                        <span className="font-semibold text-sm text-slate-700">
                           {formatCurrency(interestRate)}
                         </span>
                       </div>
@@ -217,33 +220,33 @@ function Loan() {
               paymentData?.payment?.map((payment, index) => (
                 <div
                   key={`${payment.paymentId}-${index}`}
-                  className="card border my-3 border-slate-200 shadow"
+                  className="card border my-3 rounded-xl bg-white border-slate-200 shadow-sm"
                 >
                   <div className="px-5 py-3 flex flex-col gap-1">
                     <div className="flex flex-col">
                       <div className="flex justify-between items-center text-[18px]">
-                        <span className="font-semibold text-xl">
+                        <span className="font-semibold text-xl text-slate-800">
                           {formatCurrency(payment.amountPaid)}
                         </span>
                         <span
-                          className={`badge badge-sm badge-soft rounded-xl ${statusColor(
+                          className={`badge badge-sm badge-soft rounded-xl ${statusColorPayments(
                             payment.paymentStatus,
                           )} `}
                         >
-                          {statusIcon(payment.paymentStatus)}
+                          {statusIconPayments(payment.paymentStatus)}
                           {payment.paymentStatus}
                         </span>
                       </div>
                       <div className="flex justify-between items-center text-[12px]">
-                        <span className="font-semibold text-stone-600 ">
+                        <span className="font-semibold text-slate-500 ">
                           {formatDate(payment.paymentDate)}
                         </span>
-                        <span className="font-semibold text-[12px] text-stone-600">
+                        <span className="font-semibold text-[12px] text-slate-700">
                           {payment.paymentMethod}
                         </span>
                       </div>
                     </div>
-                    <span className="block w-full text-right text-stone-400 font-mono uppercase text-[14px]">
+                    <span className="block w-full text-right text-slate-400 font-mono uppercase text-[14px]">
                       {payment.referenceNumber}
                     </span>
                   </div>

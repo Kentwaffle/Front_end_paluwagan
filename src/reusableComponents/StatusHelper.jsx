@@ -12,6 +12,27 @@ export const statusColor = (status) => {
   }
 };
 
+export const statusColorPayments = (status) => {
+  switch (status) {
+    case "PAID":
+      return "badge-success";
+    case "FAILED":
+      return "badge-error";
+    default:
+      return "badge-ghost";
+  }
+};
+export const statusIconPayments = (status) => {
+  switch (status) {
+    case "PAID":
+      return <CircleCheck size={15} />;
+    case "FAILED":
+      return <CircleX size={15} />;
+    default:
+      return null;
+  }
+};
+
 export const statusIcon = (status) => {
   switch (status) {
     case "APPROVED":
@@ -34,7 +55,7 @@ export const tabsColor = (status) => {
     case "REJECTED":
       return "bg-red-200 text-red-500";
     default:
-      return "badge-ghost";
+      return null;
   }
 };
 
@@ -47,6 +68,6 @@ export const tabsBorder = (status) => {
     case "REJECTED":
       return "border-red-500 bg-red-200 text-red-500";
     default:
-      return "badge-ghost";
+      return null;
   }
 };

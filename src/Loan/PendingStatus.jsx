@@ -71,23 +71,25 @@ Total repay: ${formatCurrency(detailsData?.totalRepayable)}
         <Error key="status_error" error={statusError} />
       ) : (
         <div className="min-h-screen p-3 flex flex-col gap-5">
-          <div className="shadow-md border border-slate-200 p-5 rounded-2xl">
+          <div className="bg-white shadow-sm border border-slate-200 p-5 rounded-2xl">
             <div className="flex justify-center items-center gap-1 pt-5">
               <span className="bg-sky-200 p-2  rounded-full text-sky-500">
                 <CircleAlert size={20} />
               </span>
-              <h1 className="text-2xl font-extrabold  text-stone-700">
+              <h1 className="text-2xl font-extrabold text-slate-700">
                 Application status
               </h1>
             </div>
-            <h3 className="text-stone-600 text-center">Reviewing status</h3>
+            <h3 className="text-slate-600 text-center">Reviewing status</h3>
             <div className="bg-slate-50 border border-slate-100 p-3 shadow rounded-lg mt-5 flex flex-col ">
               <div className="flex justify-between items-center">
                 <div className="flex flex-col">
-                  <span className="text-stone-500 text-sm">
+                  <span className="text-slate-500 text-sm">
                     Application ID:
                   </span>
-                  <span className="font-semibold">{finalId}</span>
+                  <span className="font-semibold text-slate-800">
+                    {finalId}
+                  </span>
                 </div>
                 <div
                   className="tooltip tooltip-info"
@@ -105,47 +107,43 @@ Total repay: ${formatCurrency(detailsData?.totalRepayable)}
 
               <div className="mt-1">
                 <div tabIndex={0} className="collapse group focus:outline-none">
-                  <div className="collapse-title font-semibold px-1 pb-0 pt-0 text-sm text-gray-500">
+                  <div className="collapse-title font-semibold px-1 pb-0 pt-0 text-sm text-slate-500">
                     View details
                   </div>
                   <div className="collapse-content text-sm p-0">
                     <div className="border-t border-slate-200 py-2 px-1 grid grid-cols-2 gap-2">
                       <div className="flex flex-col">
-                        <span className="text-gray-400 text-xs">
-                          Loan Amount:
+                        <span className="text-sky-600 text-xs">
+                          Loan Amount
                         </span>
-                        <span className="font-semibold">
+                        <span className="font-semibold text-slate-700">
                           {formatCurrency(detailsData?.requestedAmount)}
                         </span>
                       </div>
 
                       <div className="flex flex-col">
-                        <span className="text-gray-400 text-xs">
-                          Date range:
-                        </span>
-                        <span className="font-semibold">{`${formatMonthDay(isStartDate)} - ${formatMonthDay(isEndDate)}`}</span>
+                        <span className="text-sky-600 text-xs">Date range</span>
+                        <span className="font-semibold text-slate-700">{`${formatMonthDay(isStartDate)} - ${formatMonthDay(isEndDate)}`}</span>
                       </div>
 
                       <div className="flex flex-col">
-                        <span className="text-gray-400 text-xs">
-                          Weekly pay:
-                        </span>
-                        <span className="font-semibold">
+                        <span className="text-sky-600 text-xs">Weekly pay</span>
+                        <span className="font-semibold text-slate-700">
                           {formatCurrency(detailsData?.weeklyPay)}
                         </span>
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-gray-400 text-xs">Interest:</span>
-                        <span className="font-semibold">
+                        <span className="text-sky-600 text-xs">Interest</span>
+                        <span className="font-semibold text-slate-700">
                           {formatCurrency(detailsData?.interest)}
                         </span>
                       </div>
 
                       <div className="flex flex-col">
-                        <span className="text-gray-400 text-xs">
-                          Total repay:
+                        <span className="text-sky-600 text-xs">
+                          Total repay
                         </span>
-                        <span className="font-semibold">
+                        <span className="font-semibold text-slate-700">
                           {formatCurrency(detailsData?.totalRepayable)}
                         </span>
                       </div>

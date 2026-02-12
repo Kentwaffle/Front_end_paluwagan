@@ -28,13 +28,13 @@ function Header({ openSideBar }) {
   };
 
   return (
-    <div key={"main_header"}>
+    <div key={"main_header"} className="sticky top-0 z-5">
       {isLoading ? (
         <LoadingHeader key={"LoadingHeaders"} openSideBar={openSideBar} />
       ) : (
         <div
           key={"header"}
-          className="navbar shadow-sm flex justify-between  bg-sky-300 min-h-12 h-12 py-0 px-4"
+          className="navbar  bg-white border-b border-gray-100 flex justify-between text-sky-800   min-h-12 h-12 py-0 px-4"
         >
           <Menu onClick={openSideBar} />
           <div className="flex items-center">
@@ -54,7 +54,7 @@ function Header({ openSideBar }) {
                 className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-25 items-center p-2 shadow"
               >
                 <li>
-                  <Link to={"/profile"} className="text-sky800 font-semibold">
+                  <Link to={"/profile"} className="text-sky-800 font-semibold">
                     Profile
                   </Link>
                 </li>

@@ -54,16 +54,13 @@ function ApplyLoan() {
     API_ENDPOINTS.APPLY_LOAN,
   );
 
-  const { mutate: postApplyMutate, isLoading: isSubmitting } = usePostData(
+  const { mutate: postApplyMutate } = usePostData(
     "/api/loan/apply-loan",
     API_ENDPOINTS.APPLY_LOAN_POST,
   );
   useEffect(() => {
-    console.log("Status Data Check:", statusData); // Tingnan natin ang actual structure sa console
-
-    // Minsan ang response ay statusData.data.payload depende sa axios wrapper mo
+    console.log("Status Data Check:", statusData);
     const payload = statusData?.payload || statusData?.data?.payload;
-
     if (payload) {
       const isPending =
         payload.hasPendingApplication === true ||
@@ -135,7 +132,6 @@ function ApplyLoan() {
               });
           },
           onError: (error) => {
-            // Ibalik ang modal state para makita ng user ang error message
             setIsCompOpen(true);
             showAlert.error(
               "Failed",
@@ -157,22 +153,19 @@ function ApplyLoan() {
         <div className="min-h-screen p-3 flex  flex-col gap-5">
           <form
             onSubmit={handleOpenApplyMoodal}
-            className=" shadow-md border border-slate-200 p-3 rounded-xl"
+            className=" bg-white shadow-sm p-3 rounded-xl"
           >
-            <div className="flex items-center justify-center mb-5">
-              <span className="p-2 bg-sky-200 rounded-xl text-sky-500">
-                <FileText />
-              </span>
-              <h1 className="text-2xl p-2 font-extrabold text-center">
+            <div className="flex items-center justify-start mb-2">
+              <h1 className="text-3xl p-2 font-extrabold  text-slate-800">
                 Apply for loan
               </h1>
             </div>
-            <div className="bg-white p-2 mb-3 rounded-lg border border-slate-100 shadow">
-              <h3 className="text-md font-semibold mb-2 text-stone-600 text-center">
+            <div className="bg-white p-2 mb-4 rounded-lg border border-slate-100 shadow">
+              <h3 className="text-sm font-semibold mb-3 text-slate-500 ">
                 Enter the amount you want to borrow
               </h3>
               <div
-                className={`flex p-1 px-3 rounded-md items-center border transition-all duration-300 ${
+                className={`flex p-1 px-3 rounded-md items-center border border-slate-200 transition-all duration-300 ${
                   formErrors.loanAmount
                     ? "border-red-200 bg-red-50"
                     : Number(formData.loanAmount) === 20000
@@ -185,16 +178,16 @@ function ApplyLoan() {
                   name="loanAmount"
                   value={formData.loanAmount}
                   onChange={handleChange}
-                  placeholder={formatCurrency("0")}
-                  className="!border-none !outline-none !ring-0 !focus:ring-0 !focus:outline-none w-full px-0 shadow-none bg-transparent"
+                  placeholder={"How much do you need?"}
+                  className="h-8 !border-none !outline-none !ring-0 !focus:ring-0 !focus:outline-none w-full px-0 shadow-none bg-transparent"
                 />
-                <span className="text-stone-400">|</span>
+                <span className="divider divider-horizontal m-0"></span>
                 <button
                   type="button"
                   onClick={() =>
                     setFormData({ ...formData, loanAmount: 20000 })
                   }
-                  className="text-xs"
+                  className="text-xs w-15 text-slate-500"
                 >
                   Max 20k
                 </button>
@@ -206,8 +199,8 @@ function ApplyLoan() {
               )}
             </div>
 
-            <div className="flex justify-between gap-2">
-              <div className="cursor-pointer flex flex-col w-full border border-slate-100 gap-1 justify-center items-center  bg-white   p-3 shadow rounded-xl">
+            <div className="flex bg-slate-100 p-3 rounded-xl shadow-sm">
+              <div className=" flex flex-col w-full  gap-1 justify-center items-center ">
                 <div className="flex items-center justify-center gap-1">
                   <CalendarRange size={20} className="text-sky-500" />
                   <span>Start date</span>
@@ -235,8 +228,8 @@ function ApplyLoan() {
                   />
                 </div>
               </div>
-
-              <div className="cursor-pointer flex flex-col gap-1 border border-slate-100  w-full justify-center items-center  bg-white  p-3 shadow rounded-xl">
+              <div className="divider divider-horizontal "></div>
+              <div className="flex flex-col gap-1 w-full justify-center items-center">
                 <div className="flex items-center  justify-center  gap-1 ">
                   <CalendarRange size={20} className="text-red-400" />
                   <span>End date</span>
@@ -263,7 +256,7 @@ function ApplyLoan() {
                         ? new Date(formData.startDate)
                         : new Date()
                     }
-                    className={`w-full border py-2 text-sm rounded-md font-semibold text-center outline-none  ${formErrors.endDate ? "border-red-300 bg-red-50" : "border-gray-300 bg-gray-50"}`}
+                    className={`w-full border py-2 text-sm rounded-md font-semibold text-center placeholder:text-slate-400 placeholder:font-normal outline-none  ${formErrors.endDate ? "border-red-300 bg-red-50" : "border-gray-300 bg-gray-50"}`}
                     calendarClassName="custom-calendar-style"
                     popperClassName="z-50"
                   />
@@ -278,7 +271,7 @@ function ApplyLoan() {
 
             <button
               type="submit"
-              className="bg-sky-200 text-sky-600 font-semibold w-full p-2 mt-5 rounded-xl text-xl shadow-sm"
+              className="bg-sky-500 text-white font-semibold w-full p-2 mt-5 rounded-xl text-xl shadow-sm"
             >
               Submit
             </button>

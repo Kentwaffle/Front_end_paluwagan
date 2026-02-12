@@ -44,7 +44,7 @@ function SummaryLoan({
           </span> */}
           <h3 className="font-extrabold text-2xl text-center">Loan Summary</h3>
         </div>
-        <h4 className="text-stone-500 text-sm font-semibold italic text-center">
+        <h4 className="text-slate-500 text-sm font-semibold italic text-center">
           <span className="text-red-600">*</span>
           Please review the repayment details before proceeding.
         </h4>
@@ -83,7 +83,7 @@ function SummaryLoan({
               </span>
               <span className="text-stone-500">Weekly pay</span>
             </div>
-            <span className="font-semibold">{weeklyPay}</span>
+            <span className="font-semibold">{formatCurrency(weeklyPay)}</span>
           </div>
         </div>
 
@@ -106,7 +106,7 @@ function SummaryLoan({
               </span>
               <span className="text-stone-500">Interest</span>
             </div>
-            <span>{interest}</span>
+            <span>{formatCurrency(interest)}</span>
           </div>
           <div className="flex justify-between border-t-2 border-gray-300 pt-3">
             <div className="flex items-center gap-2 text-stone-600">
@@ -115,7 +115,9 @@ function SummaryLoan({
               </span>
               <span className="text-lg font-semibold">Total repayable</span>
             </div>
-            <span className="text-lg font-semibold">{totalRepayable}</span>
+            <span className="text-lg font-semibold">
+              {formatCurrency(totalRepayable)}
+            </span>
           </div>
         </div>
 
@@ -130,7 +132,7 @@ function SummaryLoan({
             onClick={agreeSummary}
             className="bg-sky-500 text-white w-full py-2 rounded-lg"
           >
-            I agree
+            Confirm & Apply
           </button>
         </div>
       </div>
