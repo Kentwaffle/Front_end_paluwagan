@@ -3,23 +3,17 @@ import { Outlet, Navigate, useLocation } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import Sidebar from "./sidebar";
 import Header from "./Header";
+import { useAuth } from "../auth/Auth";
 
 function MainLayout() {
   const [isOpen, setIsOpen] = useState(false);
-  const token = localStorage.getItem("token");
+  const { user, token } = useAuth();
+
   const location = useLocation();
   const isProfilePage = location.pathname === "/profile";
   const isEditProfilePage = location.pathname === "/profile/edit_profile";
   const hideLayout = isProfilePage || isEditProfilePage;
-  const roles = useMemo(() => {
-    if (!token) return null;
-    try {
-      const decoded = jwtDecode(token);
-      return decoded.role;
-    } catch (error) {
-      return null;
-    }
-  }, [token]);
+  const roles = user?.role;
 
   // Redirect kung walang token o invalid
   if (!token || !roles) {

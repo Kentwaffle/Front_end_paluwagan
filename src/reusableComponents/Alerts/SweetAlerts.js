@@ -13,11 +13,13 @@ export const showAlert = {
       html: content,
     });
   },
-  error: (title, text) => {
+  error: (title, text, buttonText = "OK") => {
+    // Nagdagdag tayo ng buttonText parameter
     return toast.fire({
       icon: "error",
       title: title || "Oops...",
       text: text || "Something went wrong!",
+      confirmButtonText: buttonText, // Dito natin ilalagay ang custom text
     });
   },
   warning: (title, text) => {
@@ -50,11 +52,13 @@ export const swalModal = async ({
   confirmButtonText = "Yes, proceed!",
   confirmButtonColor = "#0ea5e9",
   cancelButtonColor = "#ef4444",
+  html,
 }) => {
   const result = await Swal.fire({
     title,
     text,
     icon,
+    html: html || text,
     showCancelButton: true,
     confirmButtonColor,
     cancelButtonColor,

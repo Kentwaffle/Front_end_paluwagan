@@ -1,15 +1,7 @@
 import React from "react";
-import {
-  BadgeCent,
-  UserRoundPen,
-  HandCoins,
-  PiggyBank,
-  LayoutDashboard,
-} from "lucide-react";
-import { useState } from "react";
-import PaluwaganLogo from "../assets/images/mainLogoPaluwagan.jpg";
-import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
+import { BadgeCent, HandCoins, PiggyBank } from "lucide-react";
+import White_PaluwaganLogo from "../assets/images/white_outline_SLP.png";
+import { Link, useLocation } from "react-router-dom";
 
 const LINKS = {
   ROLE_ADMIN: [
@@ -39,7 +31,9 @@ function Sidebar({ isOpen, setIsOpen, role }) {
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <img src={PaluwaganLogo} alt="Error! No image" className="pb-5" />
+        <div className="flex justify-center items-center w-full  pb-5">
+          <img src={White_PaluwaganLogo} alt="Logo" className=" w-24 h-auto" />
+        </div>
 
         <aside className="flex flex-col gap-3 text-xl  text-white pl-2">
           {sideBarlinks.map((link) => {
@@ -48,15 +42,19 @@ function Sidebar({ isOpen, setIsOpen, role }) {
             const isLoanActive =
               link.label === "Loan" &&
               ["/loan", "/pending_status", "/apply_loan"].includes(currentPath);
-
+            const isSavingsActive =
+              link.label === "Savings" &&
+              ["/savings", "/apply_savings"].includes(currentPath);
             const isOtherActive = currentPath === link.path;
 
-            const isActive = isLoanActive || isOtherActive;
+            const isActive = isLoanActive || isOtherActive || isSavingsActive;
             return (
               <Link
                 key={link.label}
                 to={link.path}
-                className="flex gap-3 items-center"
+                className={`flex gap-3 items-center p-3 rounded-lg transition-colors ${
+                  isActive ? "bg-sky-500/10" : "hover:bg-white/5"
+                }`}
                 onClick={() => setIsOpen(false)}
               >
                 <div className={isActive ? "text-sky-400" : "text-slate-400"}>

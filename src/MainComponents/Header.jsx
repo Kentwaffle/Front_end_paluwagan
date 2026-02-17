@@ -7,25 +7,15 @@ import { API_ENDPOINTS } from "../serviceToApi/ApiEndpoint";
 import { LoadingHeader } from "../reusableComponents/loading";
 import { useQueryClient } from "@tanstack/react-query";
 import api from "../serviceToApi/ApiInstance";
+import { useAuth } from "../auth/Auth";
+
 function Header({ openSideBar }) {
-  const queryClient = useQueryClient();
+  const { logout } = useAuth();
 
   const { data: headerData, isLoading } = useFetchData(
     "/header",
     API_ENDPOINTS.PROFILE_GET,
   );
-
-  const handleLogout = async () => {
-    try {
-      await api.get(API_ENDPOINTS.LOGOUT);
-    } catch (error) {
-      console.error("Logout error:", error);
-    } finally {
-      localStorage.removeItem("token");
-      queryClient.clear();
-      window.location.assign("/auth");
-    }
-  };
 
   return (
     <div key={"main_header"} className="sticky top-0 z-5">
@@ -60,7 +50,7 @@ function Header({ openSideBar }) {
                 </li>
                 <li>
                   <button
-                    onClick={handleLogout}
+                    onClick={logout}
                     className="text-red-400 font-semibold"
                   >
                     Log out

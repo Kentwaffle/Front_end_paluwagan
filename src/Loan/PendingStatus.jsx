@@ -11,7 +11,6 @@ import {
   formatCurrency,
   formatMonthDay,
 } from "../reusableComponents/formatter";
-import Error from "../reusableComponents/Error";
 
 function PendingStatus({ applicationId }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -54,9 +53,6 @@ Total repay: ${formatCurrency(detailsData?.totalRepayable)}
 
   return (
     <div key="apply-form-container">
-      {/* <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
-      <Header openSideBar={() => setIsOpen(!isOpen)} /> */}
-
       {showToast && (
         <div className="toast toast-top toast-center mt-10 z-99 shadow-2xl">
           <div className="alert bg-sky-200 py-2 px-4 font-semibold text-xs text-sky-600 border-none min-w-fit">
@@ -67,8 +63,6 @@ Total repay: ${formatCurrency(detailsData?.totalRepayable)}
 
       {statusLoading || !statusData ? (
         <LoadingApply key="loading-view" />
-      ) : statusError ? (
-        <Error key="status_error" error={statusError} />
       ) : (
         <div className="min-h-screen p-3 flex flex-col gap-5">
           <div className="bg-white shadow-sm border border-slate-200 p-5 rounded-2xl">

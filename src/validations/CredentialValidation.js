@@ -1,3 +1,5 @@
+import { showAlert } from "../reusableComponents/Alerts/SweetAlerts";
+
 export const ValidateRegister = (formData) => {
   let errors = {};
 
@@ -121,6 +123,7 @@ export const ValidateChangePassword = (formData) => {
 
 export const ValidateEditProfile = (formData) => {
   let errors = {};
+
   if (!formData.firstName.trim()) {
     errors.firstName = "First name is required";
   }
@@ -136,31 +139,22 @@ export const ValidateEditProfile = (formData) => {
   } else if (!phoneRegex.test(formData.phoneNumber)) {
     errors.phoneNumber = "Enter a valid 11-digit number";
   }
+  if (formData.newPassword && !formData.oldPassword) {
+    errors.oldPassword = "Current password is required.";
+  }
+  if (!formData.newPassword && formData.oldPassword) {
+    errors.newPassword = "New password is required.";
+  }
+  if (formData.newPassword && formData.newPassword.length < 8) {
+    errors.newPassword = "New password must be at least 8 characters.";
+  }
 
-  // if (!formData.password) {
-  //   errors.password = "Password is required";
-  // } else if (formData.password.length < 8) {
-  //   errors.password = "Must be at least 8 characters";
-  // } else if (!/[A-Z]/.test(formData.password)) {
-  //   errors.password = "Must contain at least one uppercase letter";
-  // } else if (!/[0-9]/.test(formData.password)) {
-  //   errors.password = "Must contain at least one number";
-  // }
-
-  // if (!formData.confirmPassword) {
-  //   errors.confirmPassword = "Confirmpassword is required";
-  // }
-
-  // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  // if (!formData.email) {
-  //   errors.email = "Email is required";
-  // } else if (!emailRegex.test(formData.email)) {
-  //   errors.email = "Invalid email format";
-  // }
-
-  // if (!formData.otp) {
-  //   errors.otp = "OTP is required";
-  // }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!formData.email) {
+    errors.email = "Email is required";
+  } else if (!emailRegex.test(formData.email)) {
+    errors.email = "Invalid email format";
+  }
 
   return {
     isValid: Object.keys(errors).length === 0,
@@ -190,6 +184,36 @@ export const ValidateLoan = (formData) => {
     if (diffInDays < 7) {
       errors.endDate = "Loan period must be at least 7 days";
     }
+  }
+
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors,
+  };
+};
+
+export const ValidateSavings = (formData) => {
+  let errors = {};
+  if (!formData.targetAmount) {
+    errors.targetAmount = "Please enter a target amount";
+  } else if (formData.targetAmount < 5000) {
+    errors.targetAmount = "Minimun target is 5000";
+  }
+
+  if (!formData.sourceOfFunds) {
+    errors.sourceOfFunds = "Please select source of fund";
+  }
+
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors,
+  };
+};
+
+export const ValidateSavingsDeposit = (formData) => {
+  let errors = {};
+  if (!formData.amountDeposit) {
+    errors.amountDeposit = "Please enter a deposit amount";
   }
 
   return {

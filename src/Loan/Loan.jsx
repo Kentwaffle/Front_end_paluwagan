@@ -8,7 +8,6 @@ import {
   formatMonthDay,
 } from "../reusableComponents/formatter";
 import { LoadingLoan } from "../reusableComponents/loading";
-import Error from "../reusableComponents/Error";
 import Filter from "./Filter";
 import { useDebounce } from "../reusableComponents/Hooks/useBounce";
 import {
@@ -73,8 +72,6 @@ function Loan() {
       <Header openSideBar={() => setIsOpen(!isOpen)} /> */}
       {isLoanLoading ? (
         <LoadingLoan key="loading-spinner" />
-      ) : isLoanError ? (
-        <Error key="error-display" />
       ) : (
         <div
           key="loan-content"

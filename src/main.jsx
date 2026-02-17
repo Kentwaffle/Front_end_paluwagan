@@ -16,13 +16,20 @@ import ForgotPassword from "./LandingPage/registrationComponents/ForgotPassword"
 import ChangePassword from "./LandingPage/registrationComponents/ChangePassword";
 
 //Main
+import MainLayout from "./MainComponents/MainLayout";
+//Loan
 import Loan from "./Loan/Loan";
-import Savings from "./Savings/Savings";
+import ApplyLoan from "./Loan/ApplyLoan";
+import PendingStatus from "./Loan/PendingStatus";
+
+//Profile
 import Profile from "./Profile/Profile";
 import Edit_Profile from "./Profile/Edit_Profile";
-import ApplyLoan from "./Loan/ApplyLoan";
-import MainLayout from "./MainComponents/MainLayout";
-import PendingStatus from "./Loan/PendingStatus";
+
+//Savings
+import Savings from "./Savings/Savings";
+import Apply_savings from "./Savings/Apply_savings";
+
 //404
 import Eror404 from "./Eror404/404";
 
@@ -30,7 +37,6 @@ import Eror404 from "./Eror404/404";
 import Otp from "./LandingPage/registrationComponents/Otp";
 
 //API
-import { jwtDecode } from "jwt-decode";
 import { useFetchData } from "./serviceToApi/fetchData";
 import { API_ENDPOINTS } from "./serviceToApi/ApiEndpoint";
 
@@ -42,6 +48,9 @@ import Error from "./reusableComponents/Error";
 import Loan_management from "./Admin/Loan_management";
 //SSE
 import { useLoanSSE } from "./reusableComponents/Hooks/SSE";
+//Auth
+import { useAuth } from "./auth/Auth";
+import Auth from "./auth/Auth";
 const queryClient = new QueryClient();
 
 const UserIndexRedirect = ({ isStatus }) => {
@@ -57,13 +66,13 @@ const UserIndexRedirect = ({ isStatus }) => {
 //Pagwalang token ibabalik nya sa main
 const ProtectedRoute = ({ children, userRole, isStatus, isStatusLoading }) => {
   const location = useLocation();
-  console.log("Gatekeeper checking path:", window.location.pathname);
   if (isStatusLoading) return <LoadingServer />;
   if (!userRole) return <Navigate to="/auth" replace />;
   if (userRole === "ROLE_ADMIN") return children;
 
   const payload = isStatus?.payload;
   const currentPath = location.pathname;
+  console.log("Gatekeeper checking path:", currentPath);
 
   // Kung wala pang payload data, wag munang papasukin sa kahit anong path
   if (!payload && userRole === "ROLE_USER") return <LoadingServer />;
@@ -87,6 +96,17 @@ const ProtectedRoute = ({ children, userRole, isStatus, isStatusLoading }) => {
         return <Navigate to="/apply_loan" replace />;
       }
     }
+
+    //Savings\
+    if (currentPath === "/savings" || currentPath === "/apply_savings") {
+      if (payload.hasSavingsAccount) {
+        if (currentPath === "/apply_savings")
+          return <Navigate to="/savings" replace />;
+      } else {
+        if (currentPath === "/savings")
+          return <Navigate to="/apply_savings" replace />;
+      }
+    }
   }
 
   return children;
@@ -102,23 +122,14 @@ const PublicRoute = ({ children, userRole }) => {
   return children;
 };
 
-const App = () => {
-  const token = localStorage.getItem("token");
-  useLoanSSE();
-  let roles = null;
-
-  if (token) {
-    try {
-      const decoded = jwtDecode(token);
-      roles = decoded.role;
-    } catch (e) {
-      localStorage.removeItem("token");
-    }
-  }
+const Main = () => {
+  const { user, isTokenExpired, token } = useAuth();
+  const roles = user?.role;
+  useLoanSSE(!!token);
 
   const { data: isStatus, loading: isStatusLoading } = useFetchData(
-    "/api/loan/status",
-    API_ENDPOINTS.APPLY_STATUS,
+    "/api/user/status",
+    API_ENDPOINTS.STATUS,
     { enabled: !!token && roles === "ROLE_USER" },
   );
 
@@ -171,6 +182,8 @@ const App = () => {
         { path: "profile/edit_profile", element: <Edit_Profile /> },
         { path: "apply_loan", element: <ApplyLoan /> },
         { path: "pending_status", element: <PendingStatus /> },
+        { path: "apply_savings", element: <Apply_savings /> },
+        // { path: "pending_status", element: <PendingStatus /> },
       ],
     },
     // ADMIN ROUTES
@@ -189,13 +202,24 @@ const App = () => {
     { path: "*", element: <Eror404 /> },
   ]);
 
-  return <RouterProvider router={router} />;
+  return (
+    <div className="relative">
+      <RouterProvider router={router} />
+
+      {/* Dito papasok yung blurred pop-up */}
+      {isTokenExpired && (
+        <Error error={{ response: { data: { error: "EXPIRED_TOKEN" } } }} />
+      )}
+    </div>
+  );
 };
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <App />
+      <Auth>
+        <Main />
+      </Auth>
     </QueryClientProvider>
   </StrictMode>,
 );

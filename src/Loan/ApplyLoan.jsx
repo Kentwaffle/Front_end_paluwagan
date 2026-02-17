@@ -2,7 +2,6 @@ import {
   formatCurrency,
   formatMonthDay,
 } from "../reusableComponents/formatter";
-import Error from "../reusableComponents/Error";
 import { useState, useEffect } from "react";
 import { API_ENDPOINTS } from "../serviceToApi/ApiEndpoint";
 import Inputform from "../reusableComponents/Inputform";
@@ -147,8 +146,6 @@ function ApplyLoan() {
     <div key="apply-form-container">
       {isStatusLoading ? (
         <LoadingApply key="loading-view" />
-      ) : isStatusError ? (
-        <Error key="error-view" error={isStatusError} />
       ) : (
         <div className="min-h-screen p-3 flex  flex-col gap-5">
           <form
