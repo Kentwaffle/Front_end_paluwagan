@@ -5,7 +5,7 @@ import Sidebar from "./sidebar";
 import Header from "./Header";
 import { useAuth } from "../auth/Auth";
 
-function MainLayout() {
+function MainLayout({ isStatus, isStatusLoading }) {
   const [isOpen, setIsOpen] = useState(false);
   const { user, token } = useAuth();
 
@@ -29,7 +29,7 @@ function MainLayout() {
 
       {!hideLayout && <Header openSideBar={() => setIsOpen(!isOpen)} />}
       <main className={`${!hideLayout ? "w-full min-h-screen" : "p-4"}`}>
-        <Outlet context={{ roles }} />
+        <Outlet context={{ roles, isStatus, isStatusLoading }} />
       </main>
     </div>
   );

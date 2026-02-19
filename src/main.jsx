@@ -29,6 +29,7 @@ import Edit_Profile from "./Profile/Edit_Profile";
 //Savings
 import Savings from "./Savings/Savings";
 import Apply_savings from "./Savings/Apply_savings";
+import SavingsPayment from "./Savings/SavingsPayment";
 
 //404
 import Eror404 from "./Eror404/404";
@@ -51,6 +52,7 @@ import { useLoanSSE } from "./reusableComponents/Hooks/SSE";
 //Auth
 import { useAuth } from "./auth/Auth";
 import Auth from "./auth/Auth";
+
 const queryClient = new QueryClient();
 
 const UserIndexRedirect = ({ isStatus }) => {
@@ -163,7 +165,7 @@ const Main = () => {
           isStatus={isStatus}
           isStatusLoading={isStatusLoading}
         >
-          <MainLayout />
+          <MainLayout isStatus={isStatus} isStatusLoading={isStatusLoading} />
         </ProtectedRoute>
       ),
       children: [
@@ -176,13 +178,16 @@ const Main = () => {
               <UserIndexRedirect isStatus={isStatus} />
             ),
         },
+
         { path: "loan", element: <Loan /> },
-        { path: "savings", element: <Savings /> },
         { path: "profile", element: <Profile /> },
         { path: "profile/edit_profile", element: <Edit_Profile /> },
         { path: "apply_loan", element: <ApplyLoan /> },
         { path: "pending_status", element: <PendingStatus /> },
+        //Savings
+        { path: "savings", element: <Savings /> },
         { path: "apply_savings", element: <Apply_savings /> },
+        { path: "savings/savings_payments", element: <SavingsPayment /> },
         // { path: "pending_status", element: <PendingStatus /> },
       ],
     },

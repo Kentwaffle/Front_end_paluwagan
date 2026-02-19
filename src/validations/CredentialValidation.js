@@ -221,3 +221,15 @@ export const ValidateSavingsDeposit = (formData) => {
     errors,
   };
 };
+
+export const ValidateOffset = (formData) => {
+  let errors = {};
+  if (!formData.agreementText) {
+    errors.agreementText = "Type I AGREE if you want to offset";
+  }
+
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors,
+  };
+};

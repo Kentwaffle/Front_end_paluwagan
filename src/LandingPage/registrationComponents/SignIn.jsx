@@ -73,10 +73,17 @@ function SignIn() {
         }
       },
       onError: (error) => {
-        const errorMessage = error.response?.data?.message;
+        const errorData = error.response?.data;
+        const errorMessage = errorData?.message || "Something went wrong";
+        const errorStatus = errorData?.status;
 
-        if (error.response?.data?.status === "failed - OTP expired") {
-          showAlert.error("Failed", "OTP expired");
+        if (errorStatus === "failed - OTP expired") {
+          showAlert.error("Expired", "Your One Time Password has expired.");
+        } else if (errorStatus === "failed - invalid OTP") {
+          showAlert.error(
+            "Invalid OTP",
+            "Wrong One Time Password. Please try again.",
+          );
         } else {
           showAlert.error("Login Failed", errorMessage);
         }

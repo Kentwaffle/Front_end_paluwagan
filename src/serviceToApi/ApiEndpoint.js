@@ -32,6 +32,7 @@ export const API_ENDPOINTS = {
   APPLY_SAVINGS: `${BASE_URL}/api/savings/apply`,
   SAVINGS_DEPOSIT: `${BASE_URL}/api/savings/remit`,
   SAVINGS_DETAILS: `${BASE_URL}/api/savings/summary`,
+  SAVINGS_OFFSET: `${BASE_URL}/api/savings/withdraw`,
 
   LOGOUT: `${BASE_URL}/api/auth/logout`,
 };
