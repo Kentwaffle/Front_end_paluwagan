@@ -41,7 +41,7 @@ export const LoadingFilter = () => (
 
 export const LoadingApply = () => (
   <>
-    <div key={"LoadingApply"} className="min-h-screen p-3 flex  flex-col gap-5">
+    <div key={"LoadingApply"} className="min-h-screen p-5 flex  flex-col gap-5">
       <div className="skeleton h-70 shadow-md border border-slate-200 p-3 rounded-xl"></div>
     </div>
   </>
@@ -62,7 +62,7 @@ export const LoadingHeader = ({ openSideBar }) => (
 
 export const LoadingLoan = () => (
   <>
-    <div key={"LoadingLoan"} className="min-h-screen p-3 flex flex-col gap-5">
+    <div key={"LoadingLoan"} className="min-h-screen p-5 flex flex-col gap-5">
       <div className=" shadow-sm  w-full rounded-xl skeleton h-80 flex flex-col items-center justify-center"></div>
       <div className=" shadow-sm  w-30 rounded-xl skeleton h-6 flex flex-col items-center justify-center"></div>
       <div className="flex gap-4">
@@ -82,12 +82,16 @@ export const SavingsLoading = () => (
   <>
     <div
       key={"SavingsLoading"}
-      className="min-h-screen p-3 flex  flex-col gap-5"
+      className="min-h-screen p-5 flex  flex-col gap-5"
     >
-      <div className="skeleton h-70 shadow-sm border border-slate-200 p-3 rounded-xl"></div>
+      <div className="skeleton h-40 shadow-sm border border-slate-200 p-3 rounded-xl"></div>
       <div className="skeleton h-2 w-30 shadow-sm border border-slate-200 p-3 rounded-lg"></div>
-      <div className="skeleton h-60 shadow-sm border border-slate-200 p-3 rounded-lg"></div>
-      <div className="skeleton h-2 w-30 shadow-sm border border-slate-200 p-3 rounded-lg"></div>
+      <div className="skeleton h-50 shadow-sm border border-slate-200 p-3 rounded-lg"></div>
+      <div className="flex justify-between">
+        <div className="skeleton h-2 w-25 shadow-sm border border-slate-200 p-3 rounded-lg"></div>
+        <div className="skeleton h-2 w-15 shadow-sm border border-slate-200 p-3 rounded-lg"></div>
+      </div>
+
       <div className="skeleton h-15 shadow-sm border border-slate-200 p-3 rounded-lg"></div>
       <div className="skeleton h-15 shadow-sm border border-slate-200 p-3 rounded-lg"></div>
     </div>
@@ -98,7 +102,7 @@ export const ProfileLoading = () => (
   <>
     <div
       key={"ProfileLoading"}
-      className="min-h-screen p-3 flex  flex-col gap-5"
+      className="min-h-screen p-5 flex  flex-col gap-5"
     >
       <div className="flex justify-between">
         <div className="skeleton h-10 w-10 shadow-sm border border-slate-200 p-3 rounded-xl"></div>

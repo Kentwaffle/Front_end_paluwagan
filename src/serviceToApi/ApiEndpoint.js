@@ -33,6 +33,6 @@ export const API_ENDPOINTS = {
   SAVINGS_DEPOSIT: `${BASE_URL}/api/savings/remit`,
   SAVINGS_DETAILS: `${BASE_URL}/api/savings/summary`,
   SAVINGS_OFFSET: `${BASE_URL}/api/savings/withdraw`,
-
+  SAVINGS_PAYMENT_FILTER: `${BASE_URL}/api/savings/payment/filter`,
   LOGOUT: `${BASE_URL}/api/auth/logout`,
 };
