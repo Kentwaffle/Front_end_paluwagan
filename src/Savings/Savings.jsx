@@ -25,6 +25,7 @@ import { showAlert, swalModal } from "../reusableComponents/Alerts/SweetAlerts";
 import { formatDistanceToNow } from "date-fns";
 import { useQueryClient } from "@tanstack/react-query";
 import { SavingsLoading } from "../reusableComponents/loading";
+import TransactionList from "./CardPayment.jsx/TransactionList";
 function Savings() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("deposit");
@@ -59,7 +60,7 @@ function Savings() {
     API_ENDPOINTS.SAVINGS_DEPOSIT,
   );
 
-  const { data: savingData } = useFetchData(
+  const { data: savingData, isLoading: loadingSummary } = useFetchData(
     "/api/savings/summary",
     API_ENDPOINTS.SAVINGS_DETAILS,
     {
@@ -226,21 +227,28 @@ function Savings() {
                   </button>
                 </span>
               </div>
+
               <div className="flex flex-col justify-center items-start mt-5 pt-2 border-t border-slate-100">
-                <div className="flex justify-between w-full text-xs items-center">
-                  <h5 className="text-slate-400 flex gap-1 items-center rounded-lg">
-                    Account number:
-                  </h5>
-                  <h2 className="text-slate-600 font-semibold">
-                    {responseData?.savingsId || "000000000"}
-                  </h2>
-                </div>
                 <div className="flex justify-between w-full text-xs items-center">
                   <h5 className="text-emerald-500 rounded-lg">
                     Estimated Annual Earnings
                   </h5>
                   <h2 className="text-emerald-600 font-semibold">
                     {formatCurrency(responseData?.annualMoney || 0)}
+                  </h2>
+                </div>
+                <div className="flex justify-between w-full text-xs items-center">
+                  <h5 className="text-slate-400 rounded-lg">Target amount</h5>
+                  <h2 className="text-slate-600 font-semibold">
+                    {formatCurrency(responseData?.targetAmount || 0)}
+                  </h2>
+                </div>
+                <div className="flex justify-between w-full text-xs items-center">
+                  <h5 className="text-slate-400 flex gap-1 items-center rounded-lg">
+                    Account number
+                  </h5>
+                  <h2 className="text-slate-600 font-semibold">
+                    {responseData?.savingsId || "000000000"}
                   </h2>
                 </div>
               </div>
@@ -354,47 +362,23 @@ function Savings() {
           </div>
 
           <div className="my-5">
-            <div className="flex justify-between">
+            <div className="flex justify-between mb-3 mx-2">
               <h3 className="text-slate-800 font-bold uppercase">
                 Transaction
               </h3>
               <button
                 type="button"
-                onClick={(e) => navigate("/savings/savings_payments")}
+                onClick={() => navigate("savings_payments")}
                 className="text-sky-500"
               >
                 See all
               </button>
             </div>
-            {depositHistory?.slice(0, 5).map((transac, index) => (
-              <div
-                key={`${transac.reference}-${index}`}
-                className="bg-white shadow-sm p-3 px-5 rounded-xl my-2"
-              >
-                <div className="flex justify-between items-center">
-                  <div className="text-xl font-bold text-emerald-500">
-                    {formatCurrency(transac.amountRemit)}
-                  </div>
-                  <div className="text-sm font-semibold">
-                    {formatDate(transac.remitDate)}
-                  </div>
-                </div>
-                <div className="flex justify-between text-slate-500">
-                  <div className="text-xs text-slate-400">
-                    {formatDistanceToNow(new Date(transac.remitDate), {
-                      addSuffix: true,
-                    }).replace("about ", "")}
-                  </div>
-                  <div className="text-xs">{transac.reference}</div>
-                </div>
-              </div>
-            ))}
-
-            {depositHistory?.length === 0 && (
-              <div className="text-center mt-5 p-10 italic rounded-2xl text-slate-500 bg-white-50 border border-slate-100 shadow-inner">
-                No payment records found.
-              </div>
-            )}
+            <TransactionList
+              transactions={depositHistory?.slice(0, 5)}
+              hasSearched={true}
+              isLoading={loadingSummary}
+            />
           </div>
         </div>
       )}

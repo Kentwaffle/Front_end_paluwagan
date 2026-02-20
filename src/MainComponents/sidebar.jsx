@@ -5,10 +5,14 @@ import { Link, useLocation } from "react-router-dom";
 
 const LINKS = {
   ROLE_ADMIN: [
-    { label: "Loan Management", path: "/admin", icon: <BadgeCent size={25} /> },
     {
-      label: "Member Savings",
-      path: "",
+      label: "Loan Admin",
+      path: "/admin/loan_management",
+      icon: <BadgeCent size={25} />,
+    },
+    {
+      label: "Savings Admin ",
+      path: "/admin/savings_management",
       icon: <PiggyBank size={25} />,
     },
     { label: "Transactions", path: "", icon: <HandCoins size={25} /> },
@@ -38,21 +42,19 @@ function Sidebar({ isOpen, setIsOpen, role }) {
         <aside className="flex flex-col gap-3 text-xl  text-white pl-2">
           {sideBarlinks.map((link) => {
             const currentPath = location.pathname;
+            const isActive =
+              currentPath === link.path ||
+              (link.label === "Loan" &&
+                ["/loan", "/pending_status", "/apply_loan"].includes(
+                  currentPath,
+                )) ||
+              (link.label === "Savings" && currentPath.startsWith("/savings"));
 
-            const isLoanActive =
-              link.label === "Loan" &&
-              ["/loan", "/pending_status", "/apply_loan"].includes(currentPath);
-            const isSavingsActive =
-              link.label === "Savings" &&
-              ["/savings", "/apply_savings"].includes(currentPath);
-            const isOtherActive = currentPath === link.path;
-
-            const isActive = isLoanActive || isOtherActive || isSavingsActive;
             return (
               <Link
                 key={link.label}
                 to={link.path}
-                className={`flex gap-3 items-center p-3 rounded-lg transition-colors ${
+                className={`flex gap-3 items-center p-1 rounded-lg transition-colors ${
                   isActive ? "bg-sky-500/10" : "hover:bg-white/5"
                 }`}
                 onClick={() => setIsOpen(false)}

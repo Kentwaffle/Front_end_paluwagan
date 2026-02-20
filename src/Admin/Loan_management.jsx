@@ -105,31 +105,33 @@ function Loan_management() {
           onChange={(e) => setSearchrefPending(e.target.value)}
         />
       </label>
-      {tabs.map((tab) => (
-        <button
-          key={tab.value}
-          type="button"
-          className={`tab transition-all ${
-            currentStatus === tab.value
-              ? `tab-active ${tabsColor(tab.value)} shadow-md`
-              : "bg-white text-gray-500"
-          } rounded-xl px-2 py-1 mt-5`}
-          onClick={() => setCurrentStatus(tab.value)}
-        >
-          <div className="flex items-center gap-1">
-            <div className="flex gap-1 items-center font-semibold">
-              {statusIcon(tab.value)}
-              {tab.label}
-            </div>
+      <div className="flex w-full  gap-2 mt-3">
+        {tabs.map((tab) => (
+          <button
+            key={tab.value}
+            type="button"
+            className={`flex-1 tab transition-all  shadow-sm ${
+              currentStatus === tab.value
+                ? `tab-active ${tabsColor(tab.value)}  shadow-md`
+                : "bg-white text-gray-500"
+            } rounded-xl px-2 py-1 `}
+            onClick={() => setCurrentStatus(tab.value)}
+          >
+            <div className="flex items-center gap-1">
+              <div className="flex gap-1 items-center font-semibold">
+                {statusIcon(tab.value)}
+                {tab.label}
+              </div>
 
-            <span
-              className={`border ${tabsBorder(tab.value)} px-1 py-0 rounded-full text-xs font-bold `}
-            >
-              {application_count?.[tab.value] || 0}
-            </span>
-          </div>
-        </button>
-      ))}
+              <span
+                className={`border ${tabsBorder(tab.value)} px-1 py-0 rounded-full text-xs font-bold `}
+              >
+                {application_count?.[tab.value] || 0}
+              </span>
+            </div>
+          </button>
+        ))}
+      </div>
       <CardStatus
         searchrefPending={searchrefPending}
         setSearchrefPending={setSearchrefPending}

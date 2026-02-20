@@ -28,7 +28,7 @@ function CardStatus({
       {admin_data?.payload?.length > 0 ? (
         admin_data?.payload?.map((userdata) => (
           <div key={userdata.applicationId}>
-            <div className="shadow border border-slate-200 mt-3 rounded-xl">
+            <div className="shadow-sm bg-white border border-slate-200 mt-3 rounded-xl">
               <div className="flex justify-between  px-5 pt-5">
                 <div className="flex gap-2 items-center">
                   <div className="w-9">
@@ -39,17 +39,17 @@ function CardStatus({
                     />
                   </div>
                   <div className="flex flex-col">
-                    <span className="flex flex-col font-semibold">
+                    <span className="flex flex-wrap gap-1 font-semibold text-slate-800">
                       <div className="leading-tight">{userdata.firstName}</div>
                       <div className="leading-tight">{userdata.lastName}</div>
                     </span>
-                    <div className="text-xs text-gray-400">
+                    <div className="text-xs text-slate-400">
                       ID:{userdata.applicationId}
                     </div>
                   </div>
                 </div>
                 <div
-                  className={`badge badge-sm badge-soft ${statusColor(userdata.status)}`}
+                  className={`badge badge-sm badge-soft text-[10px] px-1 gap-1 ${statusColor(userdata.status)}`}
                 >
                   <span>{statusIcon(userdata.status)}</span>
                   <span>{userdata.status}</span>
@@ -61,11 +61,11 @@ function CardStatus({
                     <span className=" text-sky-500 rounded">
                       <CalendarClock size={15} />
                     </span>
-                    <span className="text-stone-500 text-sm w-full">
+                    <span className="text-slate-500 text-sm w-full  ">
                       Loan Term
                     </span>
                   </div>
-                  <span className="font-semibold text-center">
+                  <span className="font-semibold text-center text-slate-800">
                     {userdata.repayPeriodWeeks + " weeks"}
                   </span>
                 </div>
@@ -74,9 +74,9 @@ function CardStatus({
                     <span className=" text-sky-500 rounded">
                       <HandCoins size={15} />
                     </span>
-                    <span className="text-stone-500 text-sm">Requested</span>
+                    <span className="text-slate-500 text-sm">Requested</span>
                   </div>
-                  <span className="font-semibold text-center">
+                  <span className="font-semibold text-center text-slate-800">
                     {formatCurrency(userdata.requestedAmount)}
                   </span>
                 </div>
@@ -85,9 +85,9 @@ function CardStatus({
                     <span className=" text-sky-500 rounded">
                       <ReceiptText size={15} />
                     </span>
-                    <span className="text-stone-500 text-sm">Weekly</span>
+                    <span className="text-slate-500 text-sm">Weekly</span>
                   </div>
-                  <span className="font-semibold text-center">
+                  <span className="font-semibold text-center text-slate-800">
                     {formatCurrency(userdata.weeklyPay)}
                   </span>
                 </div>
@@ -100,7 +100,7 @@ function CardStatus({
                       <span className="bg-sky-100 text-sky-500 p-1 rounded items-center">
                         <ListCheck size={15} />
                       </span>
-                      <span>View all details</span>
+                      <span className="text-slate-600">View all details</span>
                     </div>
                     <span className="flex gap-2 ">
                       <button
@@ -129,11 +129,11 @@ function CardStatus({
                             <span className=" text-sky-500 rounded">
                               <CalendarRange size={15} />
                             </span>
-                            <span className="text-stone-500 text-sm">
+                            <span className="text-slate-500 text-sm">
                               Date range
                             </span>
                           </div>
-                          <span className="font-semibold text-center">
+                          <span className="font-semibold text-center text-slate-800 ">
                             {`${formatMonthDay(userdata.startDate)}-
                                     ${formatMonthDay(userdata.endDate)}`}
                           </span>
@@ -143,11 +143,11 @@ function CardStatus({
                             <span className=" text-sky-500 rounded">
                               <Wallet size={15} />
                             </span>
-                            <span className="text-stone-500 text-sm">
+                            <span className="text-slate-500 text-sm">
                               Term (Days)
                             </span>
                           </div>
-                          <span className="font-semibold text-center">
+                          <span className="font-semibold text-center text-slate-800 ">
                             {userdata.repayPeriodDays + " days"}
                           </span>
                         </div>
@@ -156,11 +156,11 @@ function CardStatus({
                             <span className=" text-sky-500 rounded">
                               <Percent size={15} />
                             </span>
-                            <span className="text-stone-500 text-sm">
+                            <span className="text-slate-500 text-sm">
                               Interest rate
                             </span>
                           </div>
-                          <span className="font-semibold text-center">
+                          <span className="font-semibold text-center text-slate-800 ">
                             {userdata.interest}
                           </span>
                         </div>
@@ -169,11 +169,11 @@ function CardStatus({
                             <span className=" text-sky-500 rounded">
                               <Percent size={15} />
                             </span>
-                            <span className="text-stone-500 text-sm">
+                            <span className="text-slate-500 text-sm">
                               Interest
                             </span>
                           </div>
-                          <span className="font-semibold text-center">
+                          <span className="font-semibold text-center text-slate-800 ">
                             {userdata.interestRate + " %"}
                           </span>
                         </div>
@@ -182,11 +182,11 @@ function CardStatus({
                             <span className=" text-sky-500 rounded">
                               <Wallet size={15} />
                             </span>
-                            <span className="text-stone-500 text-sm">
+                            <span className="text-slate-500 text-sm">
                               Total repay
                             </span>
                           </div>
-                          <span className="font-semibold text-center">
+                          <span className="font-semibold text-center text-slate-800 ">
                             {userdata.totalRepayable}
                           </span>
                         </div>

@@ -47,6 +47,7 @@ import Error from "./reusableComponents/Error";
 
 //Admin
 import Loan_management from "./Admin/Loan_management";
+import Saving_management from "./Admin/SavingsAdmin/Saving_management";
 //SSE
 import { useLoanSSE } from "./reusableComponents/Hooks/SSE";
 //Auth
@@ -179,16 +180,26 @@ const Main = () => {
             ),
         },
 
-        { path: "loan", element: <Loan /> },
         { path: "profile", element: <Profile /> },
         { path: "profile/edit_profile", element: <Edit_Profile /> },
+
+        { path: "loan", element: <Loan /> },
         { path: "apply_loan", element: <ApplyLoan /> },
         { path: "pending_status", element: <PendingStatus /> },
         //Savings
-        { path: "savings", element: <Savings /> },
-        { path: "apply_savings", element: <Apply_savings /> },
-        { path: "savings/savings_payments", element: <SavingsPayment /> },
-        // { path: "pending_status", element: <PendingStatus /> },
+        {
+          path: "savings",
+          // Pwede mong lagyan ng Layout dito kung gusto mo may common header ang savings pages
+          children: [
+            { index: true, element: <Savings /> }, // Ito yung /savings
+            { path: "apply_savings", element: <Apply_savings /> }, // Ito yung /savings/apply
+            { path: "savings_payments", element: <SavingsPayment /> }, // Ito yung /savings/payments
+          ],
+        },
+
+        // { path: "savings", element: <Savings /> },
+        // { path: "apply_savings", element: <Apply_savings /> },
+        // { path: "savings/savings_payments", element: <SavingsPayment /> },
       ],
     },
     // ADMIN ROUTES
@@ -202,6 +213,7 @@ const Main = () => {
       children: [
         { index: true, element: <Navigate to="loan_management" replace /> },
         { path: "loan_management", element: <Loan_management /> },
+        { path: "savings_management", element: <Saving_management /> },
       ],
     },
     { path: "*", element: <Eror404 /> },
