@@ -48,6 +48,7 @@ import Error from "./reusableComponents/Error";
 //Admin
 import Loan_management from "./Admin/Loan_management";
 import Saving_management from "./Admin/SavingsAdmin/Saving_management";
+import PaymentList from "./Admin/SavingsAdmin/PaymentList";
 //SSE
 import { useLoanSSE } from "./reusableComponents/Hooks/SSE";
 //Auth
@@ -67,9 +68,15 @@ const UserIndexRedirect = ({ isStatus }) => {
 };
 
 //Pagwalang token ibabalik nya sa main
-const ProtectedRoute = ({ children, userRole, isStatus, isStatusLoading }) => {
+const ProtectedRoute = ({
+  children,
+  userRole,
+  isStatus,
+  isStatusLoading,
+  isLoadingAuth,
+}) => {
   const location = useLocation();
-  if (isStatusLoading) return <LoadingServer />;
+  if (isLoadingAuth || isStatusLoading) return <LoadingServer />;
   if (!userRole) return <Navigate to="/auth" replace />;
   if (userRole === "ROLE_ADMIN") return children;
 
@@ -126,9 +133,9 @@ const PublicRoute = ({ children, userRole }) => {
 };
 
 const Main = () => {
-  const { user, isTokenExpired, token } = useAuth();
+  const { user, isTokenExpired, token, isLoadingAuth } = useAuth();
   const roles = user?.role;
-  useLoanSSE(!!token);
+  useLoanSSE(!!token && !isLoadingAuth);
 
   const { data: isStatus, loading: isStatusLoading } = useFetchData(
     "/api/user/status",
@@ -165,6 +172,7 @@ const Main = () => {
           userRole={roles}
           isStatus={isStatus}
           isStatusLoading={isStatusLoading}
+          isLoadingAuth={isLoadingAuth}
         >
           <MainLayout isStatus={isStatus} isStatusLoading={isStatusLoading} />
         </ProtectedRoute>
@@ -206,14 +214,24 @@ const Main = () => {
     {
       path: "/admin",
       element: (
-        <ProtectedRoute userRole={roles} isStatusLoading={false}>
+        <ProtectedRoute
+          userRole={roles}
+          isLoadingAuth={isLoadingAuth}
+          isStatusLoading={false}
+        >
           <MainLayout />
         </ProtectedRoute>
       ),
       children: [
         { index: true, element: <Navigate to="loan_management" replace /> },
         { path: "loan_management", element: <Loan_management /> },
-        { path: "savings_management", element: <Saving_management /> },
+        {
+          path: "savings_management",
+          children: [
+            { index: true, element: <Saving_management /> },
+            { path: "paymentList/:savingsId", element: <PaymentList /> },
+          ],
+        },
       ],
     },
     { path: "*", element: <Eror404 /> },

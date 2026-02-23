@@ -8,7 +8,7 @@ import { formatDistanceToNow } from "date-fns";
 import { formatCurrency, formatDate } from "../reusableComponents/formatter";
 import { ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import TransactionList from "./CardPayment.jsx/TransactionList";
+import TransactionList from "./CardPayment/TransactionList";
 function SavingsPayment() {
   const navigate = useNavigate();
   const [startDateFilter, setStartdateFilter] = useState("");

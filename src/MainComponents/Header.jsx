@@ -1,5 +1,5 @@
 import React from "react";
-import { Menu } from "lucide-react";
+import { Menu, ChevronLeft } from "lucide-react";
 import Default_pic from "../assets/images/default_pic.jpg";
 import { Link, useLocation } from "react-router-dom";
 import { useFetchData } from "../serviceToApi/fetchData";
@@ -8,15 +8,21 @@ import { LoadingHeader } from "../reusableComponents/loading";
 import { useQueryClient } from "@tanstack/react-query";
 import api from "../serviceToApi/ApiInstance";
 import { useAuth } from "../auth/Auth";
+import { useNavigate } from "react-router-dom";
 
 function Header({ openSideBar }) {
+  const location = useLocation();
+  const navigate = useNavigate();
   const { logout } = useAuth();
 
   const { data: headerData, isLoading } = useFetchData(
     "/header",
     API_ENDPOINTS.PROFILE_GET,
   );
+  const pathSegments = location.pathname.split("/").filter(Boolean);
+  const isChildRoute = pathSegments.length > 2;
 
+  console.log("Current Segments:", pathSegments.length);
   return (
     <div key={"main_header"} className="sticky top-0 z-5">
       {isLoading ? (
@@ -26,7 +32,26 @@ function Header({ openSideBar }) {
           key={"header"}
           className="navbar  bg-white border-b border-gray-100 flex justify-between text-sky-800   min-h-12 h-12 py-0 px-4"
         >
-          <Menu onClick={openSideBar} />
+          <div className="flex items-center cursor-pointer">
+            {isChildRoute ? (
+              <button
+                type="button"
+                onClick={(e) => {
+                  if (location.pathname.includes("savings_management")) {
+                    navigate("/admin/savings_management", { replace: true });
+                  } else {
+                    navigate(-1);
+                  }
+                }}
+                className="p-1 rounded-full"
+              >
+                <ChevronLeft size={30} />
+              </button>
+            ) : (
+              <Menu onClick={openSideBar} className="cursor-pointer" />
+            )}
+          </div>
+
           <div className="flex items-center">
             <span className="font-semibold pr-1">{headerData?.firstName}</span>
             <div className="dropdown dropdown-end">

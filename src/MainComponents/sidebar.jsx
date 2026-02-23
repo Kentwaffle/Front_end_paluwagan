@@ -15,18 +15,21 @@ const LINKS = {
       path: "/admin/savings_management",
       icon: <PiggyBank size={25} />,
     },
-    { label: "Transactions", path: "", icon: <HandCoins size={25} /> },
+    { label: "Transactions", path: "/", icon: <HandCoins size={25} /> },
   ],
   ROLE_USER: [
     { label: "Loan", path: "/loan", icon: <BadgeCent size={25} /> },
     { label: "Savings", path: "/savings", icon: <PiggyBank size={25} /> },
-    { label: "Payment", path: "", icon: <HandCoins size={25} /> },
+    { label: "Payment", path: "/", icon: <HandCoins size={25} /> },
   ],
 };
 
 function Sidebar({ isOpen, setIsOpen, role }) {
   const location = useLocation();
   const sideBarlinks = LINKS[role] || [];
+  const pathSegments = location.pathname.split("/").filter(Boolean);
+  const isChildRoute = pathSegments.length > 2;
+
   return (
     <>
       <div
@@ -44,11 +47,7 @@ function Sidebar({ isOpen, setIsOpen, role }) {
             const currentPath = location.pathname;
             const isActive =
               currentPath === link.path ||
-              (link.label === "Loan" &&
-                ["/loan", "/pending_status", "/apply_loan"].includes(
-                  currentPath,
-                )) ||
-              (link.label === "Savings" && currentPath.startsWith("/savings"));
+              (currentPath.startsWith(link.path) && link.path !== "/");
 
             return (
               <Link
@@ -76,7 +75,7 @@ function Sidebar({ isOpen, setIsOpen, role }) {
           })}
         </aside>
       </div>
-      {isOpen && (
+      {isOpen && !isChildRoute && (
         <div
           className="fixed inset-0 bg-black/20 z-40 backdrop-blur-[0.5px]"
           onClick={() => setIsOpen(false)}

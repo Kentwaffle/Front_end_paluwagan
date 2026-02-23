@@ -1,7 +1,16 @@
 import { formatDistanceToNow } from "date-fns";
 import { Search } from "lucide-react";
 import { formatCurrency, formatDate } from "../../reusableComponents/formatter";
-const TransactionList = ({ transactions, hasSearched, isLoading }) => {
+import { X, Check } from "lucide-react";
+const TransactionList = ({
+  transactions,
+  hasSearched = false,
+  isLoading,
+  showActions = false,
+  NoRecord = false,
+  isAccepted,
+  isDeclined,
+}) => {
   // Kung wala pang search na nagaganap
   if (!hasSearched) {
     return (
@@ -46,14 +55,31 @@ const TransactionList = ({ transactions, hasSearched, isLoading }) => {
                 </div>
                 <div className="text-xs">{transac.reference}</div>
               </div>
+              {showActions && (
+                <div className="flex gap-1 justify-end border-t  border-t-slate-200 mt-2 py-2">
+                  <button
+                    type="button"
+                    onClick={isAccepted}
+                    className="flex items-center rounded-full px-2 py-0.5 text-sm bg-emerald-50 text-emerald-500"
+                  >
+                    <Check size={20} />
+                    <span>Accept</span>
+                  </button>
+                  <button className="flex items-center rounded-full px-2 py-0.5 text-sm bg-red-50 text-red-500">
+                    <X size={20} />
+                    <span>Declined</span>
+                  </button>
+                </div>
+              )}
             </div>
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center text-center mt-5 p-10 h-auto italic rounded-2xl text-slate-500 bg-white-50 border border-slate-100 shadow-inner">
-          <Search size={40} className="mb-2" />
-          <span>No payment records found.</span>
-        </div>
+        NoRecord && (
+          <div className="flex flex-col items-center text-center mt-5 p-5 h-auto italic rounded-2xl text-slate-500 bg-white-50 border border-slate-100 shadow-inner">
+            <span>"No payment records found."</span>
+          </div>
+        )
       )}
     </div>
   );

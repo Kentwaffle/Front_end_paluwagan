@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { API_ENDPOINTS } from "../../serviceToApi/ApiEndpoint";
 
-export const useLoanSSE = (shouldConnect) => {
+export const useLoanSSE = (shouldConnect, savingsId) => {
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -19,7 +19,11 @@ export const useLoanSSE = (shouldConnect) => {
         predicate: (query) =>
           query.queryKey[0].includes("api/admin/loan") ||
           query.queryKey[0].includes("/api/savings/summary") ||
-          query.queryKey[0].includes("/api/user/status"),
+          query.queryKey[0].includes("/api/user/status") ||
+          (savingsId &&
+            query.queryKey[0].includes(
+              `/api/admin/savings/payment/filter/${savingsId}`,
+            )),
       });
     };
 

@@ -34,5 +34,10 @@ export const API_ENDPOINTS = {
   SAVINGS_DETAILS: `${BASE_URL}/api/savings/summary`,
   SAVINGS_OFFSET: `${BASE_URL}/api/savings/withdraw`,
   SAVINGS_PAYMENT_FILTER: `${BASE_URL}/api/savings/payment/filter`,
+  SAVINGS_ADMIN_MEMBERS: `${BASE_URL}/api/admin/savings/members`,
+  SAVINGS_MEMBER_URL: `${BASE_URL}/api/admin/savings/members/{savingsId}`,
+  SAVINGS_FILTER_APPROVED: `${BASE_URL}/api/admin/savings/payment/filter/{savingsId}`,
+  SAVINGS_ACCEPT_PAYMENT: `${BASE_URL}/api/admin/savings/payment`,
+
   LOGOUT: `${BASE_URL}/api/auth/logout`,
 };

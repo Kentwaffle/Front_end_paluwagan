@@ -9,7 +9,7 @@ function Auth({ children }) {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [isTokenExpired, setIsTokenExpired] = useState(false);
-
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const getDecodedToken = (t) => {
     try {
       return jwtDecode(t);
@@ -19,24 +19,35 @@ function Auth({ children }) {
   };
 
   useEffect(() => {
-    if (token) {
-      const decoded = getDecodedToken(token);
-      if (decoded) {
-        setUser(decoded);
-
-        // Expiry Check Logic
-        const currentTime = Date.now() / 1000;
-        if (decoded.exp < currentTime) {
-          setIsTokenExpired(true);
+    const initializeAuth = () => {
+      try {
+        if (token) {
+          const decoded = getDecodedToken(token);
+          if (decoded) {
+            setUser(decoded);
+            const currentTime = Date.now() / 1000;
+            if (decoded.exp < currentTime) {
+              setIsTokenExpired(true);
+            } else {
+              const delay = (decoded.exp - currentTime) * 1000;
+              const timeout = setTimeout(() => setIsTokenExpired(true), delay);
+              return () => clearTimeout(timeout);
+            }
+          } else {
+            setUser(null);
+          }
         } else {
-          const delay = (decoded.exp - currentTime) * 1000;
-          const timeout = setTimeout(() => setIsTokenExpired(true), delay);
-          return () => clearTimeout(timeout);
+          setUser(null);
         }
+      } catch (error) {
+        console.error("Auth initialization error:", error);
+        setUser(null);
+      } finally {
+        setIsLoadingAuth(false);
       }
-    } else {
-      setUser(null);
-    }
+    };
+
+    initializeAuth();
   }, [token]);
 
   const logout = async () => {
@@ -55,7 +66,7 @@ function Auth({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, token, setToken, isTokenExpired, logout }}
+      value={{ user, token, setToken, isTokenExpired, logout, isLoadingAuth }}
     >
       {children}
     </AuthContext.Provider>
