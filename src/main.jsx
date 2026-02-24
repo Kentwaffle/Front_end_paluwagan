@@ -1,5 +1,5 @@
 import { StrictMode } from "react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./index.css";
 import ReactDOM from "react-dom/client";
 import { Navigate, useLocation } from "react-router-dom";
@@ -108,13 +108,18 @@ const ProtectedRoute = ({
     }
 
     //Savings\
-    if (currentPath === "/savings" || currentPath === "/apply_savings") {
+    if (currentPath.startsWith("/savings")) {
+      // Gamitin ang .startsWith para safe
       if (payload.hasSavingsAccount) {
-        if (currentPath === "/apply_savings")
+        if (currentPath === "/savings/apply_savings") {
+          // Isama ang full path
           return <Navigate to="/savings" replace />;
+        }
       } else {
-        if (currentPath === "/savings")
-          return <Navigate to="/apply_savings" replace />;
+        // Kung walang savings account, dapat lagi siyang nasa apply_savings
+        if (currentPath === "/savings") {
+          return <Navigate to="/savings/apply_savings" replace />;
+        }
       }
     }
   }
@@ -133,6 +138,7 @@ const PublicRoute = ({ children, userRole }) => {
 };
 
 const Main = () => {
+  const [isBackendDown, setIsBackendDown] = useState(false);
   const { user, isTokenExpired, token, isLoadingAuth } = useAuth();
   const roles = user?.role;
   useLoanSSE(!!token && !isLoadingAuth);
@@ -142,6 +148,14 @@ const Main = () => {
     API_ENDPOINTS.STATUS,
     { enabled: !!token && roles === "ROLE_USER" },
   );
+
+  useEffect(() => {
+    const handleServerError = () => setIsBackendDown(true);
+
+    window.addEventListener("SERVER_DOWN_ERROR", handleServerError);
+    return () =>
+      window.removeEventListener("SERVER_DOWN_ERROR", handleServerError);
+  }, []);
 
   const router = createBrowserRouter([
     {
@@ -197,17 +211,13 @@ const Main = () => {
         //Savings
         {
           path: "savings",
-          // Pwede mong lagyan ng Layout dito kung gusto mo may common header ang savings pages
+
           children: [
-            { index: true, element: <Savings /> }, // Ito yung /savings
-            { path: "apply_savings", element: <Apply_savings /> }, // Ito yung /savings/apply
-            { path: "savings_payments", element: <SavingsPayment /> }, // Ito yung /savings/payments
+            { index: true, element: <Savings /> },
+            { path: "apply_savings", element: <Apply_savings /> },
+            { path: "savings_payments", element: <SavingsPayment /> },
           ],
         },
-
-        // { path: "savings", element: <Savings /> },
-        // { path: "apply_savings", element: <Apply_savings /> },
-        // { path: "savings/savings_payments", element: <SavingsPayment /> },
       ],
     },
     // ADMIN ROUTES
@@ -242,9 +252,16 @@ const Main = () => {
       <RouterProvider router={router} />
 
       {/* Dito papasok yung blurred pop-up */}
-      {isTokenExpired && (
+      {isTokenExpired ? (
         <Error error={{ response: { data: { error: "EXPIRED_TOKEN" } } }} />
-      )}
+      ) : isBackendDown ? (
+        <Error
+          error={{
+            message:
+              "Server connection failed. Please contact us for support or return to the login page to refresh your session.",
+          }}
+        />
+      ) : null}
     </div>
   );
 };

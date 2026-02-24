@@ -10,6 +10,7 @@ function Auth({ children }) {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [isTokenExpired, setIsTokenExpired] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
+
   const getDecodedToken = (t) => {
     try {
       return jwtDecode(t);

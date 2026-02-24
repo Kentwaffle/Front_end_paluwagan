@@ -23,7 +23,10 @@ export const useLoanSSE = (shouldConnect, savingsId) => {
           (savingsId &&
             query.queryKey[0].includes(
               `/api/admin/savings/payment/filter/${savingsId}`,
-            )),
+            )) ||
+          query.queryKey[0].includes("/api/profile/info") ||
+          query.queryKey[0].includes("/edit_profile") ||
+          query.queryKey[0].includes("/header"),
       });
     };
 

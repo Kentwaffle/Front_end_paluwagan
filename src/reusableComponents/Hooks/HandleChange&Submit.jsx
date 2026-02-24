@@ -73,7 +73,7 @@ export const useForm = (initialValues, validateFunc) => {
     await callback();
     console.log("Success! Submitting formData...", formData);
   };
-  const noValidation = () => ({ isValid: true, errors: {} });
+
   return {
     formData,
     setFormData,

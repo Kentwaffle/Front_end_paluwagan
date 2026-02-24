@@ -19,7 +19,7 @@ const LINKS = {
   ],
   ROLE_USER: [
     { label: "Loan", path: "/loan", icon: <BadgeCent size={25} /> },
-    { label: "Savings", path: "/savings", icon: <PiggyBank size={25} /> },
+    { label: "Savings", path: "savings", icon: <PiggyBank size={25} /> },
     { label: "Payment", path: "/", icon: <HandCoins size={25} /> },
   ],
 };
@@ -33,7 +33,6 @@ function Sidebar({ isOpen, setIsOpen, role }) {
   return (
     <>
       <div
-        key={"sidebar"}
         className={`fixed w-45 top-0 left-0 bottom-0 p-3 z-50 shadow-2xl bg-slate-900/95 backdrop-blur-md transition-all duration-300 ease-in-out ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
@@ -77,7 +76,7 @@ function Sidebar({ isOpen, setIsOpen, role }) {
       </div>
       {isOpen && !isChildRoute && (
         <div
-          className="fixed inset-0 bg-black/20 z-40 backdrop-blur-[0.5px]"
+          className="fixed inset-0 bg-black/20 z-40"
           onClick={() => setIsOpen(false)}
         />
       )}

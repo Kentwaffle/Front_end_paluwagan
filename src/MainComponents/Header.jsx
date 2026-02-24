@@ -1,6 +1,6 @@
 import React from "react";
 import { Menu, ChevronLeft } from "lucide-react";
-import Default_pic from "../assets/images/default_pic.jpg";
+import { getProfileImage } from "../reusableComponents/Hooks/ImageGet";
 import { Link, useLocation } from "react-router-dom";
 import { useFetchData } from "../serviceToApi/fetchData";
 import { API_ENDPOINTS } from "../serviceToApi/ApiEndpoint";
@@ -60,8 +60,11 @@ function Header({ openSideBar }) {
                 role="button"
                 className="btn btn-ghost btn-circle avatar"
               >
-                <div className="w-9 rounded-full">
-                  <img alt="Profile picture" src={Default_pic} />
+                <div className="w-9 border border-sky-500 rounded-full">
+                  <img
+                    alt="Profile picture"
+                    src={getProfileImage(headerData?.profileImage)}
+                  />
                 </div>
               </div>
               <ul

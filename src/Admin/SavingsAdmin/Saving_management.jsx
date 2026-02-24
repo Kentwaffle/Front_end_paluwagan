@@ -20,7 +20,7 @@ import {
 import { usePasswordToggle } from "../../reusableComponents/Hooks/ToggleEye";
 import { formatCurrency } from "../../reusableComponents/formatter";
 import SearchInput from "../../reusableComponents/SearchInput";
-import Default_pic from "../../assets/images/default_pic.jpg";
+import { getProfileImage } from "../../reusableComponents/Hooks/ImageGet";
 import { useNavigate } from "react-router-dom";
 
 function Saving_management() {
@@ -97,7 +97,7 @@ function Saving_management() {
                   <div className="w-9">
                     <img
                       alt="Profile picture"
-                      src={Default_pic}
+                      src={getProfileImage(member.profileImage)}
                       className="rounded-full"
                     />
                   </div>

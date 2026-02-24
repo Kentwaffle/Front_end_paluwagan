@@ -15,6 +15,8 @@ export const API_ENDPOINTS = {
 
   PROFILE_GET: `${BASE_URL}/api/profile/info`,
   PROFILE_POST: `${BASE_URL}/api/profile/update`,
+  IMAGE_UPLOAD: `${BASE_URL}/api/profile/upload`,
+  // IMAGE_GET:
 
   LOAN_GET: `${BASE_URL}/api/loan/user-details`,
   APPLY_LOAN: `${BASE_URL}/api/loan/calculate-loan`,

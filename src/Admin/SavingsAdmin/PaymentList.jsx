@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Default_pic from "../../assets/images/default_pic.jpg";
 import { formatCurrency, formatDate } from "../../reusableComponents/formatter";
 import SearchInput from "../../reusableComponents/SearchInput";
 import { API_ENDPOINTS } from "../../serviceToApi/ApiEndpoint";
@@ -14,7 +13,7 @@ import { swalModal } from "../../reusableComponents/Alerts/SweetAlerts";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLoanSSE } from "../../reusableComponents/Hooks/SSE";
 import { PaymentListLoading } from "../../reusableComponents/loading";
-
+import { getProfileImage } from "../../reusableComponents/Hooks/ImageGet";
 function PaymentList() {
   const { savingsId } = useParams();
   useLoanSSE(true, savingsId);
@@ -147,7 +146,7 @@ function PaymentList() {
                 <div className="w-9">
                   <img
                     alt="Profile picture"
-                    src={Default_pic}
+                    src={getProfileImage(userCreds.profileImage)}
                     className="rounded-full"
                   />
                 </div>

@@ -31,7 +31,7 @@ function Error({ error }) {
 
         <button
           onClick={handlerelogin}
-          className="w-full bg-red-500 hover:bg-red-600 active:scale-95 text-white font-bold py-4 rounded-2xl shadow-lg shadow-red-200 transition-all duration-200"
+          className="w-full bg-red-500 active:scale-95 text-white font-bold py-4 rounded-2xl shadow-lg shadow-red-200 transition-all duration-200"
         >
           Go to Login
         </button>

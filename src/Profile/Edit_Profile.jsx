@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Camera, X, EyeClosed, Eye } from "lucide-react";
-import Default_pic from "../assets/images/default_pic.jpg";
 import { Link, useNavigate } from "react-router-dom";
+import { getProfileImage } from "../reusableComponents/Hooks/ImageGet";
 import { useFetchData } from "../serviceToApi/fetchData";
 import { API_ENDPOINTS } from "../serviceToApi/ApiEndpoint";
 import Inputform from "../reusableComponents/Inputform";
@@ -15,12 +15,28 @@ import { useQueryClient } from "@tanstack/react-query";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { ProfileLoading } from "../reusableComponents/loading";
+import imageCompression from "browser-image-compression";
+import { usePostData } from "../serviceToApi/PostData";
 
 function Edit_Profile() {
   const passwordField = usePasswordToggle();
   const newPassword = usePasswordToggle();
   const navigate = useNavigate();
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const ua = navigator.userAgent || window.opera;
+    const isMessenger = /FBAN|FBAV|Messenger/i.test(ua);
+
+    if (isMessenger) {
+      showAlert.warning(
+        "You are in Messenger Browser",
+        "Please use Chrome or Safari for better use. The camera might not work. Thank you!",
+      );
+    }
+  }, []);
 
   const { data: editData, isLoading: loadingEdit } = useFetchData(
     "/edit_profile",
@@ -32,6 +48,11 @@ function Edit_Profile() {
     API_ENDPOINTS.PROFILE_POST,
   );
 
+  const { mutate: uploadMutate } = usePostData(
+    "/api/profile/upload",
+    API_ENDPOINTS.IMAGE_UPLOAD,
+  );
+
   const { formData, formErrors, handleChange, setFormErrors, handleSubmit } =
     useForm(
       {
@@ -41,14 +62,65 @@ function Edit_Profile() {
         suffix: editData?.suffix || "",
         email: editData?.email || "",
         phoneNumber: editData?.phoneNumber || "",
-        newPassword: "",
-        oldPassword: "",
+        newPassword: null,
+        oldPassword: null,
         gender: editData?.gender || "",
         address: editData?.address || "",
         birthDay: editData?.birthday || "",
       },
       ValidateEditProfile,
     );
+
+  const handleChangeImage = async (event) => {
+    const imageFile = event.target.files[0];
+    if (!imageFile) return;
+
+    const optionImg = {
+      maxSizeMB: 0.1,
+      maxWidthOrHeight: 500,
+      useWebWorker: true,
+    };
+
+    try {
+      showAlert.loading("Proccesing...", "Please wait");
+      const compressedFile = await imageCompression(imageFile, optionImg);
+      setSelectedFile(compressedFile);
+      setPreviewUrl(URL.createObjectURL(compressedFile));
+      const confirmUpload = await swalModal({
+        title: "Update Profile Picture?",
+        text: "Do you want to upload this new photo?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Yes, Upload it!",
+      });
+
+      console.log(`New size: ${compressedFile.size / 1024 / 1024} MB`);
+      if (confirmUpload) {
+        showAlert.loading("Uploading image...", "Please wait");
+        const photoData = new FormData();
+        photoData.append("file", compressedFile);
+
+        uploadMutate(photoData, {
+          onSuccess: async (response) => {
+            if (response.success) {
+              setTimeout(async () => {
+                await queryClient.refetchQueries(["/edit_profile"]);
+                await queryClient.refetchQueries(["/header"]);
+                await queryClient.refetchQueries(["/api/profile/info"]);
+
+                showAlert.success("Success!", "Profile picture updated.");
+              }, 1000);
+            } else {
+              setPreviewUrl(null); // I-reset pag fail
+              showAlert.error("Upload Failed", response.message);
+            }
+          },
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleSave = (e) => {
     if (e && e.preventDefault) e.preventDefault();
@@ -60,8 +132,9 @@ function Edit_Profile() {
         onSuccess: (response) => {
           if (response.success) {
             console.log("Success!", response);
-            queryClient.invalidateQueries(["/profile"]);
+            queryClient.invalidateQueries(["/api/profile/info"]);
             queryClient.invalidateQueries(["/edit_profile"]);
+            queryClient.invalidateQueries(["/header"]);
             showAlert.success(
               "Successfully updated",
               "Your information has been saved",
@@ -83,6 +156,7 @@ function Edit_Profile() {
       });
     });
   };
+
   const save = async (e) => {
     if (e) {
       e.preventDefault();
@@ -96,6 +170,7 @@ function Edit_Profile() {
     });
     if (saveChanges) handleSave(e);
   };
+
   const discard = async () => {
     const discardChanges = await swalModal({
       title: "Discard changes?",
@@ -105,10 +180,11 @@ function Edit_Profile() {
     });
     if (discardChanges) navigate("/profile");
   };
+
   return (
     <div className="min-h-screen">
       {loadingEdit ? (
-        <ProfileLoading key={"EditLoading"} />
+        <ProfileLoading />
       ) : (
         <>
           <div className="flex justify-between items-center mb-3">
@@ -135,18 +211,39 @@ function Edit_Profile() {
           <div className="flex flex-col justify-center items-center">
             <div className="relative">
               <img
-                src={Default_pic}
+                src={
+                  previewUrl
+                    ? getProfileImage(previewUrl)
+                    : getProfileImage(editData?.profileImage)
+                }
                 alt="Profile_pic"
                 className="rounded-full w-30 h-30 border-2 border-sky-500"
               />
-              <button className="absolute right-1 bottom-1 text-white bg-sky-500 flex items-center p-1 rounded-full">
+              <label
+                htmlFor="fileInput"
+                type="button"
+                className="absolute right-1 bottom-1 text-white bg-sky-500 flex items-center p-1 rounded-full"
+              >
                 <Camera />
-              </button>
+              </label>
+              <input
+                id="fileInput"
+                type="file"
+                className="hidden"
+                accept="image/*"
+                capture="environment"
+                onChange={handleChangeImage}
+              />
             </div>
-            <label className="cursor-pointer bg-sky-500 text-white shadow-md p-1 px-2 mt-2 rounded-md">
-              <input type="file" className="hidden" accept="image/*" />
-              Change Photo
-            </label>
+            <div className="flex mt-2">
+              <label
+                htmlFor="fileInput"
+                className="cursor-pointer bg-sky-500 text-white shadow-md p-1 px-2  rounded-md"
+              >
+                {/* <input type="file" className="hidden" accept="image/*" /> */}
+                Change Photo
+              </label>
+            </div>
           </div>
 
           <div className="flex flex-col gap-5 mt-5 bg-white shadow-sm p-3 rounded-xl">
@@ -206,7 +303,7 @@ function Edit_Profile() {
                 />
                 {formErrors.lastName && (
                   <span className="text-red-500 text-xs mt-1">
-                    {formErrors.lastNa2me}
+                    {formErrors.lastName}
                   </span>
                 )}
               </div>
@@ -251,13 +348,6 @@ function Edit_Profile() {
                 portalId="root"
                 popperClassName="!z-99"
               />
-              {/* <Inputform
-              type="date"
-              placeholder="Enter your first name"
-              name="birthDay"
-              value={formData.birthDay}
-              onChange={handleChange}
-            /> */}
             </div>
             <div className="flex flex-col relative">
               <div>

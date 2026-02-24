@@ -6,7 +6,7 @@ import {
   Hash,
   CircleAlert,
 } from "lucide-react";
-import Default_pic from "../assets/images/default_pic.jpg";
+import { getProfileImage } from "../reusableComponents/Hooks/ImageGet";
 import { Link, useNavigate } from "react-router-dom";
 import { useFetchData } from "../serviceToApi/fetchData";
 import { API_ENDPOINTS } from "../serviceToApi/ApiEndpoint";
@@ -85,7 +85,7 @@ function Profile() {
 
           <div className="flex flex-col justify-center items-center">
             <img
-              src={Default_pic}
+              src={getProfileImage(profileData?.profileImage)}
               alt="Profile_pic"
               className="rounded-full w-30 h-30 border-2 border-sky-300"
             />
