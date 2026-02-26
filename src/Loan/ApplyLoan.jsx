@@ -16,7 +16,7 @@ import { showAlert } from "../reusableComponents/Alerts/SweetAlerts";
 import { useNavigate } from "react-router-dom";
 import { useFetchData } from "../serviceToApi/fetchData";
 import { LoadingApply } from "../reusableComponents/loading";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useIsFetching } from "@tanstack/react-query";
 
 function ApplyLoan() {
   console.log("ApplyLoan Component Rendered!");
@@ -42,11 +42,6 @@ function ApplyLoan() {
   );
 
   //APIs
-  const {
-    data: statusData,
-    loading: isStatusLoading,
-    isError: isStatusError,
-  } = useFetchData("/api/loan/status", API_ENDPOINTS.APPLY_STATUS);
 
   const { mutate: calculateMutate, isLoading: isCalculating } = usePostData(
     "api/loan/calculate-loan",
@@ -57,24 +52,14 @@ function ApplyLoan() {
     "/api/loan/apply-loan",
     API_ENDPOINTS.APPLY_LOAN_POST,
   );
+  const isStatusFetching = useIsFetching({ queryKey: ["/api/user/status"] });
+  const statusData = queryClient.getQueryData(["/api/user/status"]);
+  const payload = statusData?.payload;
   useEffect(() => {
-    console.log("Status Data Check:", statusData);
-    const payload = statusData?.payload || statusData?.data?.payload;
-    if (payload) {
-      const isPending =
-        payload.hasPendingApplication === true ||
-        payload.latestApplicationStatus === "PENDING";
-
-      if (isPending) {
-        console.log("MATCH! Redirecting now...");
-        navigate("/pending_status", { replace: true });
-      } else {
-        console.log("NOT PENDING. Status is:", payload.latestApplicationStatus);
-      }
-    } else {
-      console.log("NO PAYLOAD FOUND YET");
+    if (payload?.hasPendingApplication) {
+      navigate("/pending_status", { replace: true });
     }
-  }, [statusData, navigate]);
+  }, [payload, navigate]);
 
   const handleOpenApplyMoodal = (e) => {
     e.preventDefault();
@@ -120,15 +105,16 @@ function ApplyLoan() {
         };
 
         postApplyMutate(payLoadData, {
-          onSuccess: () => {
-            showAlert
-              .success("Success!", "Application submitted successfully.")
-              .then(() => {
-                queryClient.invalidateQueries({
-                  queryKey: ["/api/loan/status"],
-                });
-                navigate("/pending_status");
-              });
+          onSuccess: async () => {
+            showAlert.success(
+              "Success!",
+              "Application submitted successfully.",
+            );
+            await queryClient.invalidateQueries({
+              queryKey: ["user-status-key"],
+            });
+
+            navigate("/pending_status");
           },
           onError: (error) => {
             setIsCompOpen(true);
@@ -144,7 +130,7 @@ function ApplyLoan() {
 
   return (
     <div key="apply-form-container">
-      {isStatusLoading ? (
+      {!payload && isStatusFetching ? (
         <LoadingApply key="loading-view" />
       ) : (
         <div className="min-h-screen p-3 flex  flex-col gap-5">

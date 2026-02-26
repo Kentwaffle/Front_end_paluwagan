@@ -121,7 +121,7 @@ export const PaymentListLoading = () => (
   <>
     <div
       key={"paymentListLoading"}
-      className="min-h-screen p-5 flex  flex-col gap-5"
+      className="min-h-screen  flex flex-col gap-5"
     >
       <div className="skeleton h-50 shadow-sm border border-slate-200 p-3 rounded-lg"></div>
       <div className="skeleton w-30 h-5 shadow-sm border border-slate-200 p-3 rounded-xl"></div>

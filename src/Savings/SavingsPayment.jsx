@@ -53,15 +53,6 @@ function SavingsPayment() {
             <label className="text-slate-500 font-semibold text-sm tracking-wider">
               Search reference
             </label>
-            <button
-              onClick={() => navigate(-1)}
-              className="flex items-center text-sky-500  font-bold text-xs uppercase"
-            >
-              <span className="font-extrabold">
-                <ChevronLeft size={18} />
-              </span>
-              <span className="mt-0.5">Return</span>
-            </button>
           </div>
           <SearchInput
             value={refSearch}

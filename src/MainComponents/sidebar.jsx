@@ -15,11 +15,11 @@ const LINKS = {
       path: "/admin/savings_management",
       icon: <PiggyBank size={25} />,
     },
-    { label: "Transactions", path: "/", icon: <HandCoins size={25} /> },
+    { label: "Funds", path: "/", icon: <HandCoins size={25} /> },
   ],
   ROLE_USER: [
     { label: "Loan", path: "/loan", icon: <BadgeCent size={25} /> },
-    { label: "Savings", path: "savings", icon: <PiggyBank size={25} /> },
+    { label: "Savings", path: "/savings", icon: <PiggyBank size={25} /> },
     { label: "Payment", path: "/", icon: <HandCoins size={25} /> },
   ],
 };
@@ -43,10 +43,17 @@ function Sidebar({ isOpen, setIsOpen, role }) {
 
         <aside className="flex flex-col gap-3 text-xl  text-white pl-2">
           {sideBarlinks.map((link) => {
-            const currentPath = location.pathname;
-            const isActive =
-              currentPath === link.path ||
-              (currentPath.startsWith(link.path) && link.path !== "/");
+            const isActive = (() => {
+              const currentPath = location.pathname;
+              if (currentPath === link.path) return true;
+              if (currentPath.startsWith(link.path) && link.path !== "/")
+                return true;
+              if (link.label === "Loan") {
+                return ["/apply_loan", "/pending_status"].includes(currentPath);
+              }
+
+              return false;
+            })();
 
             return (
               <Link

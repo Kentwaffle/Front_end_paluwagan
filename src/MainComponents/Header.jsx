@@ -20,9 +20,10 @@ function Header({ openSideBar }) {
     API_ENDPOINTS.PROFILE_GET,
   );
   const pathSegments = location.pathname.split("/").filter(Boolean);
-  const isChildRoute = pathSegments.length > 2;
-
-  console.log("Current Segments:", pathSegments.length);
+  const isChildRoute =
+    pathSegments.length > 2 ||
+    (pathSegments[0] === "savings" && pathSegments.length > 1) ||
+    console.log("Current Segments:", pathSegments.length);
   return (
     <div key={"main_header"} className="sticky top-0 z-5">
       {isLoading ? (

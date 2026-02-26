@@ -20,7 +20,7 @@ function PendingStatus({ applicationId }) {
     data: statusData,
     loading: statusLoading,
     isError: statusError,
-  } = useFetchData("/api/loan/status", API_ENDPOINTS.APPLY_STATUS);
+  } = useFetchData("/api/loan/status", API_ENDPOINTS.STATUS);
 
   const { data: detailsData, loading: detailsLoading } = useFetchData(
     "/api/loan/status/details",

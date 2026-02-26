@@ -97,7 +97,7 @@ const ProtectedRoute = ({
     // Pending User logic
     else if (payload.hasPendingApplication) {
       if (["/apply_loan", "/loan", "/"].includes(currentPath)) {
-        return <Navigate to="/pending_status" replace />; // <--- DITO PALANG, SIPA NA AGAD!
+        return <Navigate to="/pending_status" replace />;
       }
     }
     // New User logic
@@ -109,10 +109,8 @@ const ProtectedRoute = ({
 
     //Savings\
     if (currentPath.startsWith("/savings")) {
-      // Gamitin ang .startsWith para safe
       if (payload.hasSavingsAccount) {
         if (currentPath === "/savings/apply_savings") {
-          // Isama ang full path
           return <Navigate to="/savings" replace />;
         }
       } else {
@@ -143,10 +141,10 @@ const Main = () => {
   const roles = user?.role;
   useLoanSSE(!!token && !isLoadingAuth);
 
-  const { data: isStatus, loading: isStatusLoading } = useFetchData(
-    "/api/user/status",
+  const { data: isStatus, isLoading: isStatusLoading } = useFetchData(
+    "user-status-key",
     API_ENDPOINTS.STATUS,
-    { enabled: !!token && roles === "ROLE_USER" },
+    { enabled: !!token && !isLoadingAuth && roles === "ROLE_USER" },
   );
 
   useEffect(() => {

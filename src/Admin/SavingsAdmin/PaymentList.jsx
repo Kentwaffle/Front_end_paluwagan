@@ -183,7 +183,7 @@ function PaymentList() {
                     Maturity Date
                   </span>
                   <span className="font-black ">
-                    {formatDate(userCreds.maturityDate)}
+                    {formatDate(userCreds.maturityDate) || "No deposit yet"}
                   </span>
                 </div>
               </div>

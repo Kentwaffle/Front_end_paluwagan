@@ -15,23 +15,40 @@ export const useLoanSSE = (shouldConnect, savingsId) => {
     // para ma-access siya ng cleanup function sa ibaba.
     const handleUpdate = (event) => {
       console.log("Realtime update received!", event.data);
-      queryClient.invalidateQueries({
-        predicate: (query) =>
-          query.queryKey[0].includes("api/admin/loan") ||
-          query.queryKey[0].includes("/api/savings/summary") ||
-          query.queryKey[0].includes("/api/user/status") ||
-          (savingsId &&
-            query.queryKey[0].includes(
-              `/api/admin/savings/payment/filter/${savingsId}`,
-            )) ||
-          query.queryKey[0].includes("/api/profile/info") ||
-          query.queryKey[0].includes("/edit_profile") ||
-          query.queryKey[0].includes("/header"),
-      });
+
+      // Opsyonal: Magdagdag ng maliit na delay para hindi sumabog ang requests
+      setTimeout(() => {
+        queryClient.invalidateQueries({
+          predicate: (query) => {
+            // Kunin ang key, siguraduhing string ito
+            const key = Array.isArray(query.queryKey)
+              ? query.queryKey[0]
+              : query.queryKey;
+
+            if (typeof key !== "string") return false;
+
+            return (
+              key.includes("api/admin/loan") ||
+              key.includes("admin-loans") ||
+              key.includes("/api/savings/summary") ||
+              key.includes("/api/user/status") ||
+              key.includes("admin-loan-counts") ||
+              (savingsId &&
+                key.includes(
+                  `/api/admin/savings/payment/filter/${savingsId}`,
+                )) ||
+              key.includes("/api/profile/info") ||
+              key.includes("/edit_profile") ||
+              key.includes("/header")
+            );
+          },
+        });
+      }, 500);
     };
 
     const connect = () => {
       console.log("Attempting SSE connection...");
+      if (eventSource?.readyState === 1) return;
       eventSource = new EventSource(API_ENDPOINTS.SSE);
 
       eventSource.addEventListener("loan-update", handleUpdate);
@@ -59,5 +76,5 @@ export const useLoanSSE = (shouldConnect, savingsId) => {
         console.log("SSE Connection closed");
       }
     };
-  }, [queryClient, shouldConnect]);
+  }, [shouldConnect, savingsId]);
 };

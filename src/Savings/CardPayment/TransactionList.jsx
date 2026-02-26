@@ -36,7 +36,7 @@ const TransactionList = ({
         <div className="flex flex-col gap-2">
           {transactions.slice(0, 20).map((transac, index) => (
             <div
-              key={`${transac.reference}-${index}`}
+              key={transac.id || transac.reference}
               className="bg-white shadow-sm p-3 px-5 rounded-xl border border-slate-50"
             >
               <div className="flex justify-between items-center">
