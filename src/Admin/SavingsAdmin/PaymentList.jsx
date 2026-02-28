@@ -5,7 +5,7 @@ import { API_ENDPOINTS } from "../../serviceToApi/ApiEndpoint";
 import { useFetchData } from "../../serviceToApi/fetchData";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import TransactionList from "../../Savings/CardPayment/TransactionList";
-import { UserX, RotateCw } from "lucide-react";
+import { UserX, RotateCw, Check, X } from "lucide-react";
 import { useForm } from "../../reusableComponents/Hooks/HandleChange&Submit";
 import { usePostData } from "../../serviceToApi/PostData";
 import { showAlert } from "../../reusableComponents/Alerts/SweetAlerts";
@@ -14,6 +14,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useLoanSSE } from "../../reusableComponents/Hooks/SSE";
 import { PaymentListLoading } from "../../reusableComponents/loading";
 import { getProfileImage } from "../../reusableComponents/Hooks/ImageGet";
+import { formatDistanceToNow } from "date-fns";
+import { handleTransactionAction } from "./handleStatusChange";
+
 function PaymentList() {
   const { savingsId } = useParams();
   useLoanSSE(true, savingsId);
@@ -50,53 +53,9 @@ function PaymentList() {
     `/api/admin/savings/payment`,
     API_ENDPOINTS.SAVINGS_ACCEPT_PAYMENT,
   );
-
   const userCreds = savingsMember?.payload?.user;
   const referencePayment = savingsMember?.payload?.payments?.[0];
-  const approvedPayment = async (e) => {
-    const paymendApproved = await swalModal({
-      title: "Accept payments?",
-      html: `You are about to approve the payment for Member ID: <b>${userCreds?.savingsId}</b>. <br/> This will update the member's balance. Do you want to proceed?`,
-      confirmButtonText: "Yes, Accept",
-      icon: "question",
-    });
-    if (paymendApproved) handleApprovePayment(e);
-  };
-
-  const handleApprovePayment = (e) => {
-    e.preventDefault();
-    const payload = {
-      savingsId: userCreds?.savingsId,
-      reference: referencePayment?.reference || "N/A",
-      status: "PAID",
-    };
-    showAlert.loading("Loading...");
-    console.log("PAYLOAD BEING SENT:", payload);
-    ApproveData(payload, {
-      onSuccess: (response) => {
-        if (response?.success) {
-          showAlert.success("Payment Approved Successfully!").then(() => {
-            queryClient.invalidateQueries({
-              queryKey: ["/api/savings/summary"],
-            });
-            queryClient.invalidateQueries({
-              queryKey: [`api/admin/savings/members/${savingsId}`],
-            });
-            console.log("Submitted Data:", formData);
-          });
-        } else {
-          showAlert.error("Failed", response.message);
-        }
-      },
-      onError: (error) => {
-        showAlert.error(
-          "Failed",
-          "Something happened, please try again." + error,
-        );
-      },
-    });
-  };
-
+  const withdrawRef = savingsMember?.payload?.withdraw;
   const isInvalid =
     !savingsMember?.payload ||
     (Array.isArray(savingsMember.payload) &&
@@ -104,21 +63,22 @@ function PaymentList() {
     error;
 
   const isPending = savingsMember?.payload?.payments?.[0]?.status;
-
+  const withdrawStatus = savingsMember?.payload?.withdraw?.status;
+  const widthDraw = savingsMember?.payload?.withdraw;
   const paidArray = filterApproved?.savings || [];
   const isPaid = paidArray.length > 0 && paidArray[0].status === "PAID";
   // return <PaymentListLoading />;
+
+  const context = { ApproveData, queryClient, savingsId, userCreds };
   return (
     <div className="min-h-screen p-5">
       {isLoadingFilterApproved || LoadingsavingsMember ? (
         <PaymentListLoading />
       ) : isInvalid ? (
         <div className="flex flex-col items-center justify-center min-h-[400px] p-6 text-center animate-in fade-in duration-500">
-          {/* Visual Icon Container */}
           <div className="relative mb-6">
             <div className="absolute inset-0 bg-sky-100 rounded-full blur-2xl opacity-50 animate-pulse"></div>
             <div className="relative bg-white p-6 rounded-full shadow-sm border border-slate-100">
-              {/* Isang line na lang! */}
               <UserX size={48} strokeWidth={1.5} className="text-slate-300" />
             </div>
           </div>
@@ -143,11 +103,11 @@ function PaymentList() {
           <div className="bg-gradient-to-br from-sky-500 via-sky-500 to-sky-600 shadow-sm p-5 rounded-2xl">
             <div className="relative">
               <div className="flex items-center gap-2">
-                <div className="w-9">
+                <div className="w-9 h-9 flex justify-center items-center border border-sky-500 rounded-full overflow-hidden">
                   <img
                     alt="Profile picture"
                     src={getProfileImage(userCreds.profileImage)}
-                    className="rounded-full"
+                    className="w-full h-full object-cover rounded-full"
                   />
                 </div>
                 <div className="flex flex-col flex-1 items-start min-w-0">
@@ -189,6 +149,64 @@ function PaymentList() {
               </div>
             </div>
           </div>
+          {withdrawStatus === "WITHDRAW" ? (
+            <>
+              <div className="my-3 mx-2 text-slate-800 font-black">
+                User withdrawal
+              </div>
+              <div>
+                <div className="bg-white border-l-4 border-l-amber-500 shadow-sm p-3 px-5 rounded-xl border border-slate-50">
+                  <div className="flex justify-between items-center">
+                    <div className="text-xl font-bold text-red-500">
+                      {formatCurrency(widthDraw.totalBalance)}
+                    </div>
+                    <div className="text-sm font-semibold text-slate-600">
+                      {formatDate(widthDraw.withdrawDate)}
+                    </div>
+                  </div>
+                  <div className="flex justify-between text-slate-500">
+                    <div className="text-xs text-slate-400">
+                      {formatDistanceToNow(new Date(widthDraw.withdrawDate), {
+                        addSuffix: true,
+                      }).replace("about ", "")}
+                    </div>
+                    <div className="text-xs">{widthDraw.reference}</div>
+                  </div>
+                  <div className="flex gap-1 justify-end border-t  border-t-slate-200 mt-2 py-2">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleTransactionAction(
+                          "WITHDRAW_APPROVE",
+                          withdrawRef,
+                          context,
+                        )
+                      }
+                      className="flex items-center rounded-full px-2 py-0.5 text-sm bg-emerald-50 text-emerald-500"
+                    >
+                      <Check size={20} />
+                      <span>Accept</span>
+                    </button>
+                    <button
+                      onClick={() =>
+                        handleTransactionAction(
+                          "WITHDRAW_REJECT",
+                          withdrawRef,
+                          context,
+                        )
+                      }
+                      className="flex items-center rounded-full px-2 py-0.5 text-sm bg-red-50 text-red-500"
+                    >
+                      <X size={20} />
+                      <span>Declined</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : (
+            ""
+          )}
 
           <div className="my-3 mx-2 text-slate-800 font-black">
             Pending payments
@@ -200,7 +218,12 @@ function PaymentList() {
                 hasSearched={true}
                 isLoading={LoadingsavingsMember}
                 showActions={true}
-                isAccepted={approvedPayment}
+                isAccepted={() =>
+                  handleTransactionAction("APPROVE", referencePayment, context)
+                }
+                isDeclined={() =>
+                  handleTransactionAction("REJECTED", referencePayment, context)
+                }
               />
             ) : (
               <div className="flex flex-col items-center text-center mt-5 p-5 h-auto italic rounded-2xl text-slate-500 bg-white-50 border border-slate-100 shadow-inner">

@@ -36,7 +36,7 @@ const TransactionList = ({
         <div className="flex flex-col gap-2">
           {transactions.slice(0, 20).map((transac, index) => (
             <div
-              key={transac.id || transac.reference}
+              key={`${transac.reference}-${index}`}
               className="bg-white shadow-sm p-3 px-5 rounded-xl border border-slate-50"
             >
               <div className="flex justify-between items-center">
@@ -65,7 +65,10 @@ const TransactionList = ({
                     <Check size={20} />
                     <span>Accept</span>
                   </button>
-                  <button className="flex items-center rounded-full px-2 py-0.5 text-sm bg-red-50 text-red-500">
+                  <button
+                    onClick={isDeclined}
+                    className="flex items-center rounded-full px-2 py-0.5 text-sm bg-red-50 text-red-500"
+                  >
                     <X size={20} />
                     <span>Declined</span>
                   </button>

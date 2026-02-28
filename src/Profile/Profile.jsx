@@ -176,6 +176,8 @@ function Profile() {
             </div>
           </div>
 
+          <div className="my-3 flex flex-col bg-white shadow-sm rounded-2xl p-5"></div>
+
           <button
             className="w-full bg-red-400 text-white rounded-xl shadow p-3 text-xl"
             onClick={logout}

@@ -15,7 +15,11 @@ const LINKS = {
       path: "/admin/savings_management",
       icon: <PiggyBank size={25} />,
     },
-    { label: "Funds", path: "/", icon: <HandCoins size={25} /> },
+    {
+      label: "Ledger",
+      path: "/admin/ledger_management",
+      icon: <HandCoins size={25} />,
+    },
   ],
   ROLE_USER: [
     { label: "Loan", path: "/loan", icon: <BadgeCent size={25} /> },

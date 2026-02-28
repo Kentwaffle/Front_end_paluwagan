@@ -54,6 +54,7 @@ import { useLoanSSE } from "./reusableComponents/Hooks/SSE";
 //Auth
 import { useAuth } from "./auth/Auth";
 import Auth from "./auth/Auth";
+import FundsMain from "./Admin/FundsAdmin/FundsMain";
 
 const queryClient = new QueryClient();
 
@@ -239,6 +240,10 @@ const Main = () => {
             { index: true, element: <Saving_management /> },
             { path: "paymentList/:savingsId", element: <PaymentList /> },
           ],
+        },
+        {
+          path: "ledger_management",
+          children: [{ index: true, element: <FundsMain /> }],
         },
       ],
     },

@@ -9,7 +9,7 @@ export const useFetchData = (key, endpoint, options = {}) => {
     queryKey: [key],
     queryFn: async ({ queryKey }) => {
       const response = await api.get(endpoint);
-      console.log("Fetching data for:", queryKey, response.data);
+      console.log("Fetching data for:" + queryKey, response.data);
       return response.data;
     },
     enabled: (enabled !== undefined ? enabled : true) && !!endpoint,

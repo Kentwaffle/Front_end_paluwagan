@@ -94,11 +94,11 @@ function Saving_management() {
             <div className=" w-full">
               <div className="flex items-start flex-1 gap-3 justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-9">
+                  <div className="w-9 h-9 flex justify-center items-center border border-sky-500 rounded-full overflow-hidden">
                     <img
                       alt="Profile picture"
                       src={getProfileImage(member.profileImage)}
-                      className="rounded-full"
+                      className="w-full h-full object-cover rounded-full"
                     />
                   </div>
                   <div className="flex flex-col flex-1 items-start min-w-0">
