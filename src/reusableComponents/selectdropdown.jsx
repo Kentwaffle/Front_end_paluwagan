@@ -7,7 +7,7 @@ function SelectDropdown({ name, value, onChange, options, className, label }) {
         name={name}
         value={value}
         onChange={onChange}
-        className={`select select-bordered w-full focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+        className={`select select-bordered w-full focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-800 dark:text-gray-400 dark:border-slate-300 ${
           className || ""
         }`}
       >

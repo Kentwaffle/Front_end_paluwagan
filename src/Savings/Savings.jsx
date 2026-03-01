@@ -208,12 +208,14 @@ function Savings() {
         <SavingsLoading />
       ) : (
         <div key={"savings"} className="min-h-screen p-5">
-          <div className="card shadow-sm border border-slate-200 rounded-2xl bg-white">
+          <div className="card shadow-sm border border-slate-200 rounded-2xl bg-white dark:bg-slate-800 dark:border-slate-700">
             <div className="card-content p-5">
               <div className="flex justify-between items-start">
                 <div className="flex flex-col">
-                  <h1 className="text-md text-slate-500">Total Savings</h1>
-                  <h2 className="text-4xl font-semibold text-slate-700">
+                  <h1 className="text-md text-slate-500 dark:text-slate-400">
+                    Total Savings
+                  </h1>
+                  <h2 className="text-4xl font-semibold text-slate-700 dark:text-slate-200  ">
                     {displaySavings}
                   </h2>
                 </div>
@@ -221,33 +223,35 @@ function Savings() {
                   <button
                     onClick={toggle}
                     type="button"
-                    className="text-slate-400 transition-colors"
+                    className="text-slate-400 transition-colors dark:text-slate-200 "
                   >
                     {show ? <Eye size={25} /> : <EyeClosed size={25} />}
                   </button>
                 </span>
               </div>
 
-              <div className="flex flex-col justify-center items-start mt-5 pt-2 border-t border-slate-100">
+              <div className="flex flex-col justify-center items-start mt-5 pt-2 border-t border-slate-100 dark:border-slate-700 w-full gap-2">
                 <div className="flex justify-between w-full text-xs items-center">
-                  <h5 className="text-emerald-500 rounded-lg">
+                  <h5 className="text-emerald-500 rounded-lg dark:text-emerald-400 flex gap-1 items-center">
                     Estimated Annual Earnings
                   </h5>
-                  <h2 className="text-emerald-600 font-semibold">
+                  <h2 className="text-emerald-600 font-semibold dark:text-emerald-300">
                     {formatCurrency(responseData?.annualMoney || 0)}
                   </h2>
                 </div>
                 <div className="flex justify-between w-full text-xs items-center">
-                  <h5 className="text-slate-400 rounded-lg">Target amount</h5>
-                  <h2 className="text-slate-600 font-semibold">
+                  <h5 className="text-slate-400 rounded-lg dark:text-slate-500">
+                    Target amount
+                  </h5>
+                  <h2 className="text-slate-600 font-semibold dark:text-slate-300">
                     {formatCurrency(responseData?.targetAmount || 0)}
                   </h2>
                 </div>
                 <div className="flex justify-between w-full text-xs items-center">
-                  <h5 className="text-slate-400 flex gap-1 items-center rounded-lg">
+                  <h5 className="text-slate-400 flex gap-1 items-center rounded-lg dark:text-slate-500">
                     Account number
                   </h5>
-                  <h2 className="text-slate-600 font-semibold">
+                  <h2 className="text-slate-600 font-semibold dark:text-slate-300">
                     {responseData?.savingsId || "000000000"}
                   </h2>
                 </div>
@@ -256,17 +260,19 @@ function Savings() {
           </div>
 
           <div className="my-5">
-            <h3 className="text-slate-800 font-bold uppercase">Quick Remit</h3>
-            <div className="mt-3 bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
-              <div className="bg-slate-200/50 p-1 rounded-xl shadow-inner flex w-full border border-slate-100">
+            <h3 className="text-slate-800 font-bold uppercase dark:text-slate-200">
+              Quick Remit
+            </h3>
+            <div className="mt-3 bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+              <div className="bg-slate-200/50 p-1 rounded-xl shadow-inner flex w-full border border-slate-100 dark:border-slate-700 dark:bg-slate-700/50">
                 {savingsTabs.map((tab) => (
                   <button
                     key={tab.value}
                     onClick={() => setActiveTab(tab.value)}
                     className={`px-4 py-2 flex-1 text-sm font-semibold transition-all ${
                       activeTab === tab.value
-                        ? "bg-sky-400 text-white shadow-md font-bold rounded-lg"
-                        : "text-slate-700 font-medium"
+                        ? "bg-sky-400 text-white shadow-md font-bold rounded-lg dark:bg-sky-600"
+                        : "text-slate-700 font-medium dark:text-slate-300"
                     }`}
                   >
                     {tab.label}
@@ -276,13 +282,13 @@ function Savings() {
 
               {activeTab === "deposit" ? (
                 <div className="flex flex-col mt-3 gap-3">
-                  <div className="bg-white shadow-sm border border-slate-100 rounded-lg">
+                  <div className="bg-white shadow-sm border border-slate-100 rounded-lg dark:bg-slate-700 dark:border-slate-600 ">
                     <div className="flex items-center p-2 gap-3">
-                      <div className="bg-sky-50 text-sky-500 p-2 rounded-lg">
+                      <div className="bg-sky-50 text-sky-500 p-2 rounded-lg dark:bg-sky-900 dark:text-sky-400">
                         <PhilippinePeso />
                       </div>
                       <div className="relative w-full">
-                        <h6 className="absolute -top-2 left-2 px-1 bg-white text-xs tracking-wider text-gray-400 font-bold">
+                        <h6 className="absolute -top-2 left-2 px-1 bg-white text-xs tracking-wider text-gray-400 font-bold dark:bg-slate-700 dark:text-gray-500">
                           Amount
                         </h6>
                         <Inputform
@@ -290,10 +296,10 @@ function Savings() {
                           placeholder="Enter remit amount"
                           value={depositData.amountDeposit}
                           onChange={handleDepositChange}
-                          className={`${depositErrors.amountDeposit ? "border-red-500" : ""} h-9 text-slate-700 font-semibold placeholder:text-slate-300 focus:ring-sky-500`}
+                          className={`${depositErrors.amountDeposit ? "border-red-500" : ""} h-9 text-slate-700 font-semibold placeholder:text-slate-300 focus:ring-sky-500 dark:text-slate-200 dark:placeholder:text-slate-500 dark:focus:ring-sky-400`}
                         />
                         {depositErrors.amountDeposit && (
-                          <span className="text-red-500 text-xs mt-1">
+                          <span className="text-red-500 text-xs mt-1 dark:text-red-400">
                             {depositErrors.amountDeposit}
                           </span>
                         )}
@@ -303,7 +309,7 @@ function Savings() {
                   <button
                     onClick={agreeDeposit}
                     type="button"
-                    className="bg-gradient-to-r from-sky-400 to-sky-600 py-3 text-white rounded-xl shadow flex items-center justify-center gap-2"
+                    className="bg-gradient-to-r from-sky-400 to-sky-600 py-3 text-white rounded-xl shadow flex items-center justify-center gap-2 dark:from-sky-600 dark:to-sky-400"
                   >
                     <span>Deposit</span>
                     <ArrowRight size={15} />
@@ -311,7 +317,7 @@ function Savings() {
                 </div>
               ) : userStatusPayload?.hasActiveSavings ? (
                 <div className="flex flex-col mt-3 gap-3">
-                  <div className="flex flex-col text-sm bg-sky-50 border shadow-sm border-sky-200 p-3 rounded-xl">
+                  <div className="flex flex-col text-sm bg-sky-50 border shadow-sm border-sky-200 p-3 rounded-xl dark:bg-sky-900 dark:border-sky-700">
                     <div className="flex items-center justify-center gap-1">
                       <span className="p-1 bg-amber-50 text-amber-500 rounded-full">
                         <ShieldAlert />
@@ -320,10 +326,10 @@ function Savings() {
                         {activeContent?.title}
                       </h1>
                     </div>
-                    <span className="italic mt-2 text-slate-600">
+                    <span className="italic mt-2 text-slate-600 dark:text-slate-200 text-center">
                       {activeContent?.description}
                     </span>
-                    <span className="italic mt-2 text-slate-600 text-center">
+                    <span className="italic mt-2 text-slate-600 dark:text-slate-200 text-center">
                       {activeContent?.instruction}
                     </span>
                     <Inputform
@@ -331,7 +337,7 @@ function Savings() {
                       value={offsetData.agreementText}
                       onChange={handleOffsetChange}
                       placeholder="Type I AGREE"
-                      className={`${offsetErrors.agreementText ? "border border-red-400" : "border border-sky-100"} bg-slate-50 text-center mt-2 font-bold uppercase`}
+                      className={`${offsetErrors.agreementText ? "border border-red-400" : "border border-sky-100"} bg-slate-50 text-center mt-2 font-bold uppercase dark:bg-slate-700 dark:border-slate-600 dark:text-slate-200`}
                     />
                     {offsetErrors.agreementText && (
                       <span className="text-red-500 text-center text-xs mt-1">
@@ -349,11 +355,11 @@ function Savings() {
                   </button>
                 </div>
               ) : (
-                <div className="flex gap-2 justify-center items-center mt-3 p-5 italic shadow-inner rounded-2xl bg-white border border-slate-100">
-                  <span className="bg-amber-50 p-1 text-amber-500 rounded-full">
+                <div className="flex gap-2 justify-center items-center mt-3 p-5 italic shadow-inner rounded-2xl bg-white border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
+                  <span className="bg-amber-50 p-1 text-amber-500 rounded-full dark:bg-amber-900 dark:text-amber-400">
                     <CircleAlert />
                   </span>
-                  <span className="text-slate-700">
+                  <span className="text-slate-700 dark:text-slate-300">
                     You need to deposit first.
                   </span>
                 </div>
@@ -363,13 +369,13 @@ function Savings() {
 
           <div className="my-5">
             <div className="flex justify-between mb-3 mx-2">
-              <h3 className="text-slate-800 font-bold uppercase">
+              <h3 className="text-slate-800 font-bold uppercase dark:text-slate-200">
                 Transaction
               </h3>
               <button
                 type="button"
                 onClick={() => navigate("savings_payments")}
-                className="text-sky-500"
+                className="text-sky-500 dark:text-sky-400 font-semibold flex items-center gap-1"
               >
                 See all
               </button>

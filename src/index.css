@@ -1,10 +1,14 @@
 @import "tailwindcss";
 @plugin "daisyui";
+@variant dark (&:where(.dark, .dark *));
 
 :root {
   font-family: sans-serif, "Inter";
 }
-
+* {
+  @apply transition-colors duration-300;
+}
 body {
-  @apply bg-slate-50;
+  /* Sa light mode, off-white. Sa dark mode, deep slate. */
+  @apply bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-50;
 }

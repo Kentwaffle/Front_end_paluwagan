@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { useFetchData } from "../serviceToApi/fetchData";
 import { LoadingApply } from "../reusableComponents/loading";
 import { useQueryClient, useIsFetching } from "@tanstack/react-query";
+import DatePickerField from "../reusableComponents/Hooks/Datepicker";
 
 function ApplyLoan() {
   console.log("ApplyLoan Component Rendered!");
@@ -136,24 +137,24 @@ function ApplyLoan() {
         <div className="min-h-screen p-3 flex  flex-col gap-5">
           <form
             onSubmit={handleOpenApplyMoodal}
-            className=" bg-white shadow-sm p-3 rounded-xl"
+            className=" bg-white shadow-sm p-3 rounded-xl dark:bg-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700"
           >
             <div className="flex items-center justify-start mb-2">
-              <h1 className="text-3xl p-2 font-extrabold  text-slate-800">
+              <h1 className="text-3xl p-2 font-extrabold  text-slate-800 dark:text-slate-200">
                 Apply for loan
               </h1>
             </div>
-            <div className="bg-white p-2 mb-4 rounded-lg border border-slate-100 shadow">
-              <h3 className="text-sm font-semibold mb-3 text-slate-500 ">
+            <div className="bg-white p-2 mb-4 rounded-lg border border-slate-100 shadow dark:bg-slate-700 dark:border-slate-600">
+              <h3 className="text-sm font-semibold mb-3 text-slate-500 dark:text-slate-400">
                 Enter the amount you want to borrow
               </h3>
               <div
-                className={`flex p-1 px-3 rounded-md items-center border border-slate-200 transition-all duration-300 ${
+                className={`flex p-1 px-3 rounded-md items-center border border-slate-200 transition-all duration-300 dark:bg-slate-800 ${
                   formErrors.loanAmount
-                    ? "border-red-200 bg-red-50"
+                    ? "border-red-200 bg-red-50 dark:border-red-700 dark:bg-red-900/30"
                     : Number(formData.loanAmount) === 20000
-                      ? "border-orange-400 bg-orange-50"
-                      : "border-gray-300 bg-gray-50"
+                      ? "border-orange-400 bg-orange-50 dark:border-orange-700 dark:bg-orange-900/30"
+                      : "border-gray-300 bg-gray-50 dark:border-slate-600 dark:bg-slate-800"
                 }`}
               >
                 <Inputform
@@ -162,52 +163,39 @@ function ApplyLoan() {
                   value={formData.loanAmount}
                   onChange={handleChange}
                   placeholder={"How much do you need?"}
-                  className="h-8 !border-none !outline-none !ring-0 !focus:ring-0 !focus:outline-none w-full px-0 shadow-none bg-transparent"
+                  className="h-8 !border-none !outline-none !ring-0 !focus:ring-0 !focus:outline-none w-full px-0 shadow-none bg-transparent dark:text-slate-200"
                 />
-                <span className="divider divider-horizontal m-0"></span>
+                <span className="divider divider-horizontal m-0 dark:divider-info"></span>
                 <button
                   type="button"
                   onClick={() =>
                     setFormData({ ...formData, loanAmount: 20000 })
                   }
-                  className="text-xs w-15 text-slate-500"
+                  className="text-xs w-15 text-slate-500 dark:text-slate-400"
                 >
                   Max 20k
                 </button>
               </div>
               {formErrors.loanAmount && (
-                <span className="text-red-500 text-xs mt-1">
+                <span className="text-red-500 text-xs mt-1 dark:text-red-400">
                   {formErrors.loanAmount}
                 </span>
               )}
             </div>
 
-            <div className="flex bg-slate-100 p-3 rounded-xl shadow-sm">
+            <div className="flex bg-slate-100 p-3 rounded-xl shadow-sm dark:bg-slate-700 dark:border-slate-600 border border-slate-200">
               <div className=" flex flex-col w-full  gap-1 justify-center items-center ">
                 <div className="flex items-center justify-center gap-1">
                   <CalendarRange size={20} className="text-sky-500" />
                   <span>Start date</span>
                 </div>
                 <div className="relative w-full flex flex-col">
-                  <DatePicker
-                    selected={
-                      formData.startDate ? new Date(formData.startDate) : null
-                    }
-                    onChange={(date) => {
-                      if (date) {
-                        const formatted = date.toISOString().split("T")[0];
-                        handleChange({
-                          target: { name: "startDate", value: formatted },
-                        });
-                      }
-                    }}
-                    onKeyDown={(e) => e.preventDefault()}
-                    dropdownMode="select"
-                    dateFormat="MMMM dd yyyy"
-                    minDate={new Date()}
-                    className="w-full border  border-gray-300 bg-gray-50 py-2 text-sm  rounded-md font-semibold text-center outline-none focus:border-sky-500"
-                    calendarClassName="custom-calendar-style"
-                    popperClassName="z-50"
+                  <DatePickerField
+                    name="startDate"
+                    value={formData.startDate}
+                    onChange={handleChange}
+                    minDate={new Date()} // Hindi na makakapili ng past dates
+                    error={formErrors.startDate}
                   />
                 </div>
               </div>
@@ -218,37 +206,14 @@ function ApplyLoan() {
                   <span>End date</span>
                 </div>
                 <div className="relative w-full flex flex-col ">
-                  <DatePicker
-                    selected={
-                      formData.endDate ? new Date(formData.endDate) : null
-                    }
-                    onChange={(date) => {
-                      if (date) {
-                        const formatted = date.toISOString().split("T")[0];
-                        handleChange({
-                          target: { name: "endDate", value: formatted },
-                        });
-                      }
-                    }}
-                    onKeyDown={(e) => e.preventDefault()}
-                    dropdownMode="select"
-                    dateFormat="MMMM dd yyyy"
-                    placeholderText="Select End Date"
-                    minDate={
-                      formData.startDate
-                        ? new Date(formData.startDate)
-                        : new Date()
-                    }
-                    className={`w-full border py-2 text-sm rounded-md font-semibold text-center placeholder:text-slate-400 placeholder:font-normal outline-none  ${formErrors.endDate ? "border-red-300 bg-red-50" : "border-gray-300 bg-gray-50"}`}
-                    calendarClassName="custom-calendar-style"
-                    popperClassName="z-50"
+                  <DatePickerField
+                    name="endDate"
+                    value={formData.endDate}
+                    onChange={handleChange}
+                    minDate={new Date()} // Hindi na makakapili ng past dates
+                    error={formErrors.endDate}
                   />
                 </div>
-                {formErrors.endDate && (
-                  <span className="text-red-500 text-xs mt-1">
-                    {formErrors.endDate}
-                  </span>
-                )}
               </div>
             </div>
 

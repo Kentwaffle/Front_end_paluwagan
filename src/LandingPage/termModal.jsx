@@ -29,63 +29,66 @@ const TermsModal = forwardRef(({ onAccept }, ref) => {
 
   return (
     <dialog id="terms_modal" className="modal" ref={dialogRef}>
-      <div className="modal-box max-w-lg">
-        <h3 className="pb-5 text-3xl text-center font-bold">
+      <div className="modal-box max-w-lg dark:bg-slate-950">
+        <h3 className="pb-5 text-3xl text-center font-bold dark:text-slate-50">
           Paluwagan Terms and Conditions
         </h3>
 
         <div
           ref={scrollRef}
           onScroll={handleScroll}
-          className="py-4 p-3 max-h-80 overflow-y-auto text-sm text-gray-700 space-y-3 bg-stone-100 rounded"
+          className="py-4 p-3 max-h-80 overflow-y-auto text-sm text-gray-700 space-y-3 bg-slate-100 rounded dark:bg-slate-800"
         >
-          <p>
-            **1. Layunin:** Ang Paluwagan ay para lamang sa lehitimong miyembro.
-            Bawal ang double-entry.
-          </p>
-          <p>
-            **2. Kontribusyon:** Kailangang bayaran ang kontribusyon sa takdang
-            oras. Ang late payment ay may multa.
-          </p>
-          <p>
-            **3. Iba Pa:** Lahat ng decision ng Paluwagan administrator ay
-            pinal.
-          </p>
-          <p>
-            **3. Iba Pa:** Lahat ng decision ng Paluwagan administrator ay
-            pinal.
-          </p>
-          <p>
-            **3. Iba Pa:** Lahat ng decision ng Paluwagan administrator ay
-            pinal.
-          </p>
-          <p>
-            **3. Iba Pa:** Lahat ng decision ng Paluwagan administrator ay
-            pinal.
-          </p>
-          <p>
-            **3. Iba Pa:** Lahat ng decision ng Paluwagan administrator ay
-            pinal.
-          </p>
-          <p>
-            **3. Iba Pa:** Lahat ng decision ng Paluwagan administrator ay
-            pinal.
-          </p>
-          <p>
-            **3. Iba Pa:** Lahat ng decision ng Paluwagan administrator ay
-            pinal.
-          </p>
-          <p>
-            **3. Iba Pa:** Lahat ng decision ng Paluwagan administrator ay
-            pinal.
-          </p>
-          <p>
-            **3. Iba Pa:** Lahat ng decision ng Paluwagan administrator ay
-            pinal.
-          </p>
+          <div className="text-slate-700 dark:text-slate-300">
+            {" "}
+            <p>
+              **1. Layunin:** Ang Paluwagan ay para lamang sa lehitimong
+              miyembro. Bawal ang double-entry.
+            </p>
+            <p>
+              **2. Kontribusyon:** Kailangang bayaran ang kontribusyon sa
+              takdang oras. Ang late payment ay may multa.
+            </p>
+            <p>
+              **3. Iba Pa:** Lahat ng decision ng Paluwagan administrator ay
+              pinal.
+            </p>
+            <p>
+              **3. Iba Pa:** Lahat ng decision ng Paluwagan administrator ay
+              pinal.
+            </p>
+            <p>
+              **3. Iba Pa:** Lahat ng decision ng Paluwagan administrator ay
+              pinal.
+            </p>
+            <p>
+              **3. Iba Pa:** Lahat ng decision ng Paluwagan administrator ay
+              pinal.
+            </p>
+            <p>
+              **3. Iba Pa:** Lahat ng decision ng Paluwagan administrator ay
+              pinal.
+            </p>
+            <p>
+              **3. Iba Pa:** Lahat ng decision ng Paluwagan administrator ay
+              pinal.
+            </p>
+            <p>
+              **3. Iba Pa:** Lahat ng decision ng Paluwagan administrator ay
+              pinal.
+            </p>
+            <p>
+              **3. Iba Pa:** Lahat ng decision ng Paluwagan administrator ay
+              pinal.
+            </p>
+            <p>
+              **3. Iba Pa:** Lahat ng decision ng Paluwagan administrator ay
+              pinal.
+            </p>
+          </div>
         </div>
 
-        <span className="block text-sky-400 text-sm text-center italic mt-3">
+        <span className="block text-sky-400 text-sm text-center italic mt-3 dark:text-sky-500">
           Mangyaring basahin ang detalye sa ibaba para ma-click ang button.
           <span className="text-red-500">*</span>
         </span>
@@ -97,7 +100,9 @@ const TermsModal = forwardRef(({ onAccept }, ref) => {
               onClick={onAccept}
               disabled={isDisabled}
               className={`btn flex-1 ${
-                isDisabled ? "btn-disabled" : "bg-sky-500 text-white"
+                isDisabled
+                  ? "btn-disabled"
+                  : "bg-sky-500 text-white dark:bg-sky-600"
               }`}
             >
               I understand

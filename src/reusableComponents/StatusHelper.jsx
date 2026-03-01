@@ -25,11 +25,19 @@ export const statusColorPayments = (status) => {
 export const statusIconPayments = (status) => {
   switch (status) {
     case "PAID":
-      return <CircleCheck size={15} />;
+      return (
+        <div className="text-emerald-500 bg-emerald-50 p-2 rounded-full dark:bg-emerald-900 dark:text-emerald-400">
+          <CircleCheck size={25} />
+        </div>
+      );
     case "FAILED":
-      return <CircleX size={15} />;
+      return (
+        <div className="text-red-500  bg-red-50 p-2 rounded-full dark:bg-red-900 dark:text-red-400">
+          <CircleX size={25} />
+        </div>
+      );
     default:
-      return null;
+      return "none";
   }
 };
 

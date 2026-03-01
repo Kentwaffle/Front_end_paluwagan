@@ -31,7 +31,7 @@ function Header({ openSideBar }) {
       ) : (
         <div
           key={"header"}
-          className="navbar  bg-white border-b border-gray-100 flex justify-between text-sky-800   min-h-12 h-12 py-0 px-4"
+          className="navbar bg-white border-b border-gray-100 flex justify-between text-sky-800   min-h-12 h-12 py-0 px-4 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-200 0"
         >
           <div className="flex items-center cursor-pointer">
             {isChildRoute ? (
@@ -70,17 +70,20 @@ function Header({ openSideBar }) {
               </div>
               <ul
                 tabIndex="-1"
-                className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-25 items-center p-2 shadow"
+                className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-25 items-center p-2 shadow dark:bg-slate-800 dark:text-slate-200  "
               >
                 <li>
-                  <Link to={"/profile"} className="text-sky-800 font-semibold">
+                  <Link
+                    to={"/profile"}
+                    className="text-sky-800 font-semibold dark:text-slate-200"
+                  >
                     Profile
                   </Link>
                 </li>
                 <li>
                   <button
                     onClick={logout}
-                    className="text-red-400 font-semibold"
+                    className="text-red-400 font-semibold dark:text-red-500"
                   >
                     Log out
                   </button>

@@ -191,18 +191,18 @@ function Edit_Profile() {
             <div className="flex-1">
               <button
                 onClick={discard}
-                className=" bg-sky-200 text-sky-500 rounded-lg p-1"
+                className=" bg-sky-200 text-sky-500 rounded-lg p-1 dark:bg-slate-700 flex items-center gap-1"
               >
                 <X size={32} />
               </button>
             </div>
 
-            <span className="text-2xl font-bold text-center text-slate-900">
+            <span className="text-2xl font-bold text-center text-slate-900 dark:text-white ">
               Edit profile
             </span>
             <button
               onClick={save}
-              className="flex-1 flex text-xl justify-end text-sky-500 "
+              className="flex-1 flex text-xl justify-end text-sky-500 dark:text-sky-400 font-bold items-center gap-1"
             >
               Save
             </button>
@@ -217,12 +217,12 @@ function Edit_Profile() {
                     : getProfileImage(editData?.profileImage)
                 }
                 alt="Profile_pic"
-                className="rounded-full w-30 h-30 border-2 border-sky-500"
+                className="rounded-full w-30 h-30 border-2 border-sky-500 dark:border-sky-400"
               />
               <label
                 htmlFor="fileInput"
                 type="button"
-                className="absolute right-1 bottom-1 text-white bg-sky-500 flex items-center p-1 rounded-full"
+                className="absolute right-1 bottom-1 text-white bg-sky-500 flex items-center p-1 rounded-full dark:bg-sky-400 cursor-pointer shadow-md"
               >
                 <Camera />
               </label>
@@ -238,7 +238,7 @@ function Edit_Profile() {
             <div className="flex mt-2">
               <label
                 htmlFor="fileInput"
-                className="cursor-pointer bg-sky-500 text-white shadow-md p-1 px-2  rounded-md"
+                className="cursor-pointer bg-sky-500 text-white shadow-md p-1 px-2  rounded-md dark:bg-sky-400 flex items-center gap-1 dark:text-slate-900"
               >
                 {/* <input type="file" className="hidden" accept="image/*" /> */}
                 Change Photo
@@ -246,13 +246,13 @@ function Edit_Profile() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-5 mt-5 bg-white shadow-sm p-3 rounded-xl">
-            <span className="text-xl font-semibold text-slate-800">
+          <div className="flex flex-col gap-5 mt-5 bg-white shadow-sm p-3 rounded-xl dark:bg-slate-800">
+            <span className="text-xl font-semibold text-slate-800 dark:text-slate-200">
               Personal Information
             </span>
             <div className="flex flex-col relative lazy">
               <div>
-                <span className="absolute -top-2 left-3 bg-white px-1 text-sm font-bold text-gray-500 z-10 ">
+                <span className="absolute -top-2 left-3 bg-white px-1 text-sm font-bold text-gray-500 z-10 dark:bg-slate-800 dark:text-gray-400dark:bg-slate-800 dark:text-gray-400">
                   First name
                 </span>
                 <Inputform
@@ -274,7 +274,7 @@ function Edit_Profile() {
             </div>
             <div className="flex flex-col relative">
               <div>
-                <span className="absolute -top-2 left-3 bg-white px-1 text-sm font-bold text-gray-500 z-10 ">
+                <span className="absolute -top-2 left-3 bg-white px-1 text-sm font-bold text-gray-500 z-10 dark:bg-slate-800 dark:text-gray-400dark:bg-slate-800 dark:text-gray-400">
                   Middle name
                 </span>
                 <Inputform
@@ -288,7 +288,7 @@ function Edit_Profile() {
             </div>
             <div className="flex flex-col relative">
               <div>
-                <span className="absolute -top-2 left-3 bg-white px-1 text-sm font-bold text-gray-500 z-10 ">
+                <span className="absolute -top-2 left-3 bg-white px-1 text-sm font-bold text-gray-500 z-10 dark:bg-slate-800 dark:text-gray-400dark:bg-slate-800 dark:text-gray-400">
                   Last name
                 </span>
                 <Inputform
@@ -310,7 +310,7 @@ function Edit_Profile() {
             </div>
             <div className="flex flex-col relative">
               <div>
-                <span className="absolute -top-2 left-3 bg-white px-1 text-sm font-bold text-gray-500 z-10 ">
+                <span className="absolute -top-2 left-3 bg-white px-1 text-sm font-bold text-gray-500 z-10 dark:bg-slate-800 dark:text-gray-400">
                   Suffix
                 </span>
                 <SelectDropdown
@@ -323,7 +323,7 @@ function Edit_Profile() {
               </div>
             </div>
             <div className="flex flex-col relative">
-              <span className="absolute -top-2 left-3 bg-white px-1 text-sm font-bold text-gray-500 z-10 ">
+              <span className="absolute -top-2 left-3 bg-white px-1 text-sm font-bold text-gray-500 z-10 dark:bg-slate-800 dark:text-gray-400">
                 Birthday
               </span>
               <DatePicker
@@ -351,7 +351,7 @@ function Edit_Profile() {
             </div>
             <div className="flex flex-col relative">
               <div>
-                <span className="absolute -top-2 left-3 bg-white px-1 text-sm font-bold text-gray-500 z-10 ">
+                <span className="absolute -top-2 left-3 bg-white px-1 text-sm font-bold text-gray-500 z-10 dark:bg-slate-800 dark:text-gray-400">
                   Gender
                 </span>
                 <SelectDropdown
@@ -365,7 +365,7 @@ function Edit_Profile() {
             </div>
             <div className="flex flex-col relative">
               <div>
-                <span className="absolute -top-2 left-3 bg-white px-1 text-sm font-bold text-gray-500 z-10 ">
+                <span className="absolute -top-2 left-3 bg-white px-1 text-sm font-bold text-gray-500 z-10 dark:bg-slate-800 dark:text-gray-400">
                   Address
                 </span>
                 <Inputform
@@ -379,7 +379,7 @@ function Edit_Profile() {
             </div>
             <div className="flex flex-col relative">
               <div>
-                <span className="absolute -top-2 left-3 bg-white px-1 text-sm font-bold text-gray-500 z-10 ">
+                <span className="absolute -top-2 left-3 bg-white px-1 text-sm font-bold text-gray-500 z-10 dark:bg-slate-800 dark:text-gray-400">
                   Phone number
                 </span>
                 <Inputform
@@ -401,13 +401,13 @@ function Edit_Profile() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-5 mt-5 bg-white shadow-sm p-3 rounded-xl">
-            <span className="text-xl font-semibold text-slate-800">
+          <div className="flex flex-col gap-5 mt-5 bg-white shadow-sm p-3 rounded-xl dark:bg-slate-800">
+            <span className="text-xl font-semibold text-slate-800 dark:text-gray-200">
               Account
             </span>
             <div className="flex flex-col relative">
               <div>
-                <span className="absolute -top-2 left-3 bg-white px-1 text-sm font-bold text-gray-500 z-10 ">
+                <span className="absolute -top-2 left-3 bg-white px-1 text-sm font-bold text-gray-500 z-10 dark:bg-slate-800 dark:text-gray-400">
                   Email
                 </span>
                 <Inputform
@@ -431,7 +431,7 @@ function Edit_Profile() {
               <div
                 className={`flex items-center border rounded-md px-3 transition-all duration-200 ${formErrors.oldPassword ? "border border-red-500" : "border border-slate-300"} `}
               >
-                <span className="absolute -top-2 left-3 bg-white px-1 text-sm font-bold text-gray-500 z-10 ">
+                <span className="absolute -top-2 left-3 bg-white px-1 text-sm font-bold text-gray-500 z-10 dark:bg-slate-800 dark:text-gray-400">
                   Current password
                 </span>
                 <Inputform
@@ -458,7 +458,7 @@ function Edit_Profile() {
               <div
                 className={`flex items-center border rounded-md px-3 transition-all duration-200 ${formErrors.newPassword ? "border border-red-500" : "border border-slate-300"} `}
               >
-                <span className="absolute -top-2 left-3 bg-white px-1 text-sm font-bold text-gray-500 z-10 ">
+                <span className="absolute -top-2 left-3 bg-white px-1 text-sm font-bold text-gray-500 z-10 dark:bg-slate-800 dark:text-gray-400">
                   New password
                 </span>
                 <div className="flex items-center justify-between w-full">
