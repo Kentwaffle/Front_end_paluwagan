@@ -16,8 +16,8 @@ const LINKS = {
       icon: <PiggyBank size={25} />,
     },
     {
-      label: "Ledger",
-      path: "/admin/ledger_management",
+      label: "Funds Admin",
+      path: "/admin/funds_management",
       icon: <HandCoins size={25} />,
     },
   ],

@@ -219,7 +219,7 @@ function SignIn() {
         </label>
         <Link
           to="/auth/register"
-          className="text-sky-600 font-semibold hover:underline cursor-pointer underline"
+          className="text-sky-600 font-semibold hover:underline cursor-pointer underline dark:text-sky-400"
         >
           Register here
         </Link>

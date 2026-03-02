@@ -247,7 +247,7 @@ function Register() {
               <div className="flex items-center justify-between w-full">
                 <Inputform
                   type={passwordField.type}
-                  placeholder="••••••••"
+                  placeholder="Enter your password"
                   name="password"
                   value={formData.password}
                   onChange={handleChange}

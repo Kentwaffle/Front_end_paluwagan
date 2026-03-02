@@ -9,6 +9,8 @@ import { formatCurrency, formatDate } from "../reusableComponents/formatter";
 import { ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import TransactionList from "./CardPayment/TransactionList";
+import SeeAllPayments from "../reusableComponents/SeeAllPayments";
+
 function SavingsPayment() {
   const navigate = useNavigate();
   const [startDateFilter, setStartdateFilter] = useState("");
@@ -47,52 +49,15 @@ function SavingsPayment() {
 
   return (
     <div className="min-h-screen p-5">
-      <div className="flex flex-col gap-3 bg-white p-5 shadow-sm rounded-xl">
-        <div className="flex flex-col gap-1">
-          <div className="flex justify-between items-center mb-1">
-            <label className="text-slate-500 font-semibold text-sm tracking-wider">
-              Search reference
-            </label>
-          </div>
-          <SearchInput
-            value={refSearch}
-            onChange={(e) => setRefSeach(e.target.value)}
-            placeholder="Search reference number..."
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-slate-500 font-semibold text-sm tracking-wider">
-            Date Range
-          </label>
-          <div className="flex gap-3 items-center">
-            <div className="relative">
-              <DatePickerField
-                className="rounded-xl !py-2"
-                name="startDateFilter"
-                value={startDateFilter}
-                onChange={(e) => setStartdateFilter(e.target.value)}
-              />
-            </div>
-            <span className="text-slate-300 text-sm">to</span>
-            <div className="relative">
-              <DatePickerField
-                className="rounded-xl !py-2"
-                name="endDateFilter"
-                value={endDateFilter}
-                onChange={(e) => setEnddateFilter(e.target.value)}
-              />
-            </div>
-          </div>
-        </div>
-        <button
-          type="button"
-          onClick={(e) => handleFilterSaving(e)}
-          className="shadow-blue-200/50 bg-gradient-to-r from-sky-500 to-sky-600 py-3 text-white rounded-xl shadow flex items-center justify-center gap-2"
-        >
-          Search
-          <Search size={15} />
-        </button>
-      </div>
+      <SeeAllPayments
+        refSearch={refSearch}
+        setRefSeach={setRefSeach}
+        startDateFilter={startDateFilter}
+        setStartdateFilter={setStartdateFilter}
+        endDateFilter={endDateFilter}
+        setEnddateFilter={setEnddateFilter}
+        handleFilterSaving={handleFilterSaving}
+      />
       <div className=" my-3 text-slate-700 font-semibold">
         Transaction History
       </div>

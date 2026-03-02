@@ -21,25 +21,23 @@ export const useLoanSSE = (shouldConnect, savingsId) => {
         queryClient.invalidateQueries({
           predicate: (query) => {
             // Kunin ang key, siguraduhing string ito
-            const key = Array.isArray(query.queryKey)
-              ? query.queryKey[0]
-              : query.queryKey;
-
-            if (typeof key !== "string") return false;
+            const queryKey = query.queryKey;
+            const keyString = JSON.stringify(queryKey);
 
             return (
-              key.includes("api/admin/loan") ||
-              key.includes("admin-loans") ||
-              key.includes("/api/savings/summary") ||
-              key.includes("/api/user/status") ||
-              key.includes("admin-loan-counts") ||
+              keyString.includes("api/admin/loan") ||
+              keyString.includes("admin-loans") ||
+              keyString.includes("api/admin/savings/members") ||
+              keyString.includes("/api/savings/summary") ||
+              keyString.includes("user-status-key") ||
+              keyString.includes("admin-loan-counts") ||
               (savingsId &&
-                key.includes(
+                keyString.includes(
                   `/api/admin/savings/payment/filter/${savingsId}`,
                 )) ||
-              key.includes("/api/profile/info") ||
-              key.includes("/edit_profile") ||
-              key.includes("/header")
+              keyString.includes("/api/profile/info") ||
+              keyString.includes("/edit_profile") ||
+              keyString.includes("/header")
             );
           },
         });

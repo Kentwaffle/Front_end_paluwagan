@@ -7,7 +7,7 @@ const TransactionList = ({
   hasSearched = false,
   isLoading,
   showActions = false,
-  NoRecord = false,
+  NoRecord = "No payment records found.",
   isAccepted,
   isDeclined,
 }) => {
@@ -84,7 +84,7 @@ const TransactionList = ({
       ) : (
         NoRecord && (
           <div className="flex flex-col items-center text-center mt-5 p-5 h-auto italic rounded-2xl text-slate-500 bg-white-50 border border-slate-100 shadow-inner dark:bg-slate-800 dark:border-slate-700">
-            <span>"No payment records found."</span>
+            <span>{NoRecord}</span>
           </div>
         )
       )}

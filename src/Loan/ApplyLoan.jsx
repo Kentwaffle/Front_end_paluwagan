@@ -53,8 +53,8 @@ function ApplyLoan() {
     "/api/loan/apply-loan",
     API_ENDPOINTS.APPLY_LOAN_POST,
   );
-  const isStatusFetching = useIsFetching({ queryKey: ["/api/user/status"] });
-  const statusData = queryClient.getQueryData(["/api/user/status"]);
+  const isStatusFetching = useIsFetching({ queryKey: ["user-status-key"] });
+  const statusData = queryClient.getQueryData(["user-status-key"]);
   const payload = statusData?.payload;
   useEffect(() => {
     if (payload?.hasPendingApplication) {

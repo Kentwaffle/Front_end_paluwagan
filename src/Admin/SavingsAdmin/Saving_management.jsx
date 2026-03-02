@@ -127,13 +127,15 @@ function Saving_management() {
                   className="relative p-2 rounded-full bg-sky-50 text-sky-600 transition-all duration-300 
                group-hover:bg-sky-500 group-hover:text-white group-hover:shadow-md"
                 >
-                  {member.hasPendingPayment ? (
+                  {member.hasPendingWithdrawal ? (
+                    <div className="bg-white p-1 rounded-full absolute -top-1 -right-0.5">
+                      <div className=" bg-red-500 h-3 w-3 r rounded-full flex items-center"></div>
+                    </div>
+                  ) : member.hasPendingPayment ? (
                     <div className="bg-white p-1 rounded-full absolute -top-1 -right-0.5">
                       <div className=" bg-amber-500 h-3 w-3 r rounded-full flex items-center"></div>
                     </div>
-                  ) : (
-                    ""
-                  )}
+                  ) : null}
                   <ChevronRight size={30} />
                 </button>
               </div>

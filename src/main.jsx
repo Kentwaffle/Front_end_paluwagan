@@ -49,12 +49,12 @@ import Error from "./reusableComponents/Error";
 import Loan_management from "./Admin/Loan_management";
 import Saving_management from "./Admin/SavingsAdmin/Saving_management";
 import PaymentList from "./Admin/SavingsAdmin/PaymentList";
+import LoanFundsMain from "./Admin/FundsAdmin/LoanFundsMain";
 //SSE
 import { useLoanSSE } from "./reusableComponents/Hooks/SSE";
 //Auth
 import { useAuth } from "./auth/Auth";
 import Auth from "./auth/Auth";
-import FundsMain from "./Admin/FundsAdmin/FundsMain";
 
 const queryClient = new QueryClient();
 
@@ -242,8 +242,8 @@ const Main = () => {
           ],
         },
         {
-          path: "ledger_management",
-          children: [{ index: true, element: <FundsMain /> }],
+          path: "funds_management",
+          children: [{ index: true, element: <LoanFundsMain /> }],
         },
       ],
     },

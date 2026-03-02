@@ -110,6 +110,7 @@ function Savings() {
               setDepositData((prev) => ({ ...prev, amountDeposit: "" }));
               queryClient.invalidateQueries({
                 queryKey: ["/api/savings/summary"],
+                queryKey: ["api/admin/savings/members"],
               });
             });
         } else {
@@ -159,6 +160,7 @@ function Savings() {
                   setOffsetData({ agreementText: "" });
                   queryClient.invalidateQueries({
                     queryKey: ["/api/savings/summary"],
+                    queryKey: ["api/admin/savings/members"],
                   });
                 });
             } else {
@@ -384,6 +386,9 @@ function Savings() {
               transactions={depositHistory?.slice(0, 5)}
               hasSearched={true}
               isLoading={loadingSummary}
+              NoRecord={
+                "No transaction history available. Deposit now to see your transactions here."
+              }
             />
           </div>
         </div>
