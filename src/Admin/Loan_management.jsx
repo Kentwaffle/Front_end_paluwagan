@@ -13,6 +13,7 @@ import CardStatus from "./CardStatus";
 import { Search } from "lucide-react";
 import { swalModal } from "../reusableComponents/Alerts/SweetAlerts";
 import { useAuth } from "../auth/Auth";
+import SearchInput from "../reusableComponents/SearchInput";
 
 function Loan_management() {
   const [searchrefPending, setSearchrefPending] = useState("");
@@ -97,44 +98,43 @@ function Loan_management() {
   const tabs = [
     { label: "Pending", value: "PENDING" },
     { label: "Approved", value: "APPROVED" },
-    { label: "Rejected", value: "REJECTED" },
+    // { label: "Rejected", value: "REJECTED" },
   ];
   const count = admin_data?.payload?.length || 0;
   return (
     <div key={"admin_laon_management"} className="min-h-screen p-3">
-      <label className="input rounded-3xl w-full ">
-        <Search className="opacity-50" />
-        <input
-          type="search"
-          required
-          value={searchrefPending}
-          placeholder="Search reference or name"
-          className="grow"
-          onChange={(e) => setSearchrefPending(e.target.value)}
+      <div className="flex gap-3 items-center mb-5">
+        <SearchInput
+          placeholder="Search reference ID"
+          className="dark:bg-slate-700/50 dark:border-slate-700"
         />
-      </label>
-      <div className="flex w-full  gap-2 mt-3">
+        <button className="p-2  bg-sky-100 text-sky-500 rounded-xl transition-colors hover:bg-sky-200 dark:bg-sky-900/30 dark:text-sky-400 dark:hover:bg-sky-900/50">
+          <Search />
+        </button>
+      </div>
+
+      <div className="flex w-full bg-white shadow-inner gap-2 rounded-2xl mt-3 p-2 dark:bg-gray-800">
         {tabs.map((tab) => (
           <button
             key={tab.value}
             type="button"
-            className={`flex-1 tab transition-all  shadow-sm ${
+            className={`flex-1 tab transition-all ${
               currentStatus === tab.value
-                ? `tab-active ${tabsColor(tab.value)}  shadow-md`
-                : "bg-white text-gray-500"
+                ? `tab-active ${tabsColor(tab.value)}  shadow-sm`
+                : "bg-white text-gray-500 dark:bg-gray-800 dark:text-gray-400"
             } rounded-xl px-2 py-1 `}
             onClick={() => setCurrentStatus(tab.value)}
           >
             <div className="flex items-center gap-1">
               <div className="flex gap-1 items-center font-semibold">
-                {statusIcon(tab.value)}
+                {/* {statusIcon(tab.value)} */}
                 {tab.label}
               </div>
 
-              <span
-                className={`border ${tabsBorder(tab.value)} px-1 py-0 rounded-full text-xs font-bold `}
-              >
-                {application_count?.[tab.value] || 0}
+              <span className={` px-1 py-0  text-xs font-bold `}>
+                {application_count?.[tab.value] == 0
+                  ? ""
+                  : application_count?.[tab.value]}
               </span>
             </div>
           </button>

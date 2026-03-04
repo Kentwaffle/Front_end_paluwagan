@@ -55,7 +55,8 @@ import { useLoanSSE } from "./reusableComponents/Hooks/SSE";
 //Auth
 import { useAuth } from "./auth/Auth";
 import Auth from "./auth/Auth";
-
+import Notification from "./MainComponents/Notification";
+import LoanCardPayment from "./Admin/FundsAdmin/LoanCardPayment";
 const queryClient = new QueryClient();
 
 const UserIndexRedirect = ({ isStatus }) => {
@@ -177,6 +178,7 @@ const Main = () => {
         { path: "changepassword", element: <ChangePassword /> },
       ],
     },
+
     // USER ROUTES
     {
       path: "/",
@@ -204,6 +206,7 @@ const Main = () => {
         { path: "profile", element: <Profile /> },
         { path: "profile/edit_profile", element: <Edit_Profile /> },
 
+        { path: "notification", element: <Notification /> },
         { path: "loan", element: <Loan /> },
         { path: "apply_loan", element: <ApplyLoan /> },
         { path: "pending_status", element: <PendingStatus /> },
@@ -243,7 +246,10 @@ const Main = () => {
         },
         {
           path: "funds_management",
-          children: [{ index: true, element: <LoanFundsMain /> }],
+          children: [
+            { index: true, element: <LoanFundsMain /> },
+            { path: "addPayment/:type", element: <LoanCardPayment /> },
+          ],
         },
       ],
     },

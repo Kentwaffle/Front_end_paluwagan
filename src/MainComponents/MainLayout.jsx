@@ -12,7 +12,8 @@ function MainLayout({ isStatus, isStatusLoading }) {
   const location = useLocation();
   const isProfilePage = location.pathname === "/profile";
   const isEditProfilePage = location.pathname === "/profile/edit_profile";
-  const hideLayout = isProfilePage || isEditProfilePage;
+  const isNotification = location.pathname === "/notification";
+  const hideLayout = isProfilePage || isEditProfilePage || isNotification;
   const roles = user?.role;
 
   // Redirect kung walang token o invalid
@@ -28,7 +29,7 @@ function MainLayout({ isStatus, isStatusLoading }) {
       )}
 
       {!hideLayout && <Header openSideBar={() => setIsOpen(!isOpen)} />}
-      <main className={`${!hideLayout ? "w-full min-h-screen" : "p-4"}`}>
+      <main className={`${!hideLayout ? "w-full min-h-screen" : "p-5"}`}>
         <Outlet context={{ roles, isStatus, isStatusLoading }} />
       </main>
     </div>

@@ -77,30 +77,34 @@ function PaymentList() {
       ) : isInvalid ? (
         <div className="flex flex-col items-center justify-center min-h-[400px] p-6 text-center animate-in fade-in duration-500">
           <div className="relative mb-6">
-            <div className="absolute inset-0 bg-sky-100 rounded-full blur-2xl opacity-50 animate-pulse"></div>
-            <div className="relative bg-white p-6 rounded-full shadow-sm border border-slate-100">
-              <UserX size={48} strokeWidth={1.5} className="text-slate-300" />
+            <div className="absolute inset-0 bg-sky-100 rounded-full blur-2xl opacity-50 animate-pulse dark:bg-slate-700"></div>
+            <div className="relative bg-white p-6 rounded-full shadow-sm border border-slate-100 dark:bg-slate-800">
+              <UserX
+                size={48}
+                strokeWidth={1.5}
+                className="text-slate-300 dark:text-slate-500"
+              />
             </div>
           </div>
 
-          <h3 className="text-xl font-black text-slate-800 mb-2">
+          <h3 className="text-xl font-black text-slate-800 mb-2 dark:text-slate-200">
             Member not Found
           </h3>
-          <p className="text-slate-500 text-sm max-w-[250px] leading-relaxed">
+          <p className="text-slate-500 text-sm max-w-[250px] leading-relaxed dark:text-slate-400">
             We couldn't find a record matching this ID. The link might be broken
             or the member has been removed from the database.
           </p>
 
           <button
             onClick={() => navigate("/admin/savings_management")}
-            className="mt-6 px-6 py-2 bg-sky-500 text-white rounded-full text-sm font-bold shadow-md shadow-sky-200 active:scale-95 transition-all"
+            className="mt-6 px-6 py-2 bg-sky-500 text-white rounded-full text-sm font-bold shadow-md shadow-sky-200 active:scale-95 transition-all dark:bg-sky-400 dark:shadow-sky-700  "
           >
             Go to member list
           </button>
         </div>
       ) : (
         <div className="min-h-screen">
-          <div className="bg-gradient-to-br from-sky-500 via-sky-500 to-sky-600 shadow-sm p-5 rounded-2xl">
+          <div className="bg-gradient-to-br from-sky-500 via-sky-500 to-sky-600 shadow-sm p-5 rounded-2xl dark:bg-gradient-to-br dark:from-slate-700 dark:via-slate-700 dark:to-slate-900">
             <div className="relative">
               <div className="flex items-center gap-2">
                 <div className="w-9 h-9 flex justify-center items-center border border-sky-500 rounded-full overflow-hidden">
@@ -111,19 +115,21 @@ function PaymentList() {
                   />
                 </div>
                 <div className="flex flex-col flex-1 items-start min-w-0">
-                  <div className="flex flex-wrap gap-1 truncate w-full font-bold text-white">
+                  <div className="flex flex-wrap gap-1 truncate w-full font-bold text-white dark:text-slate-200">
                     <div>{userCreds.firstName || "No name"}</div>
                     <div>{userCreds.lastName || "No name"}</div>
                   </div>
-                  <div className="text-xs text-sky-100">
+                  <div className="text-xs text-sky-100 dark:text-slate-400">
                     {userCreds.savingsId || "000000000"}
                   </div>
                 </div>
               </div>
               <div className="my-5">
-                <div className="flex flex-col text-sky-100">
-                  <div className="text-xs ">Total Savings</div>
-                  <div className="text-3xl font-black text-white tracking-tight">
+                <div className="flex flex-col text-sky-100 dark:text-slate-400">
+                  <div className="text-xs dark:text-slate-400">
+                    Total Savings
+                  </div>
+                  <div className="text-3xl font-black text-white tracking-tight dark:text-slate-200">
                     {formatCurrency(userCreds.accountBalance)}
                   </div>
                 </div>
@@ -131,18 +137,18 @@ function PaymentList() {
 
               <div className="grid grid-cols-2 gap-4 border-t border-white/20 pt-4">
                 <div className="flex flex-col text-xs text-white">
-                  <span className="text-sky-100 font-medium">
+                  <span className="text-sky-100 font-medium dark:text-slate-400">
                     Target amount
                   </span>
-                  <span className=" font-black">
+                  <span className=" font-black dark:text-slate-200">
                     {formatCurrency(userCreds.targetAmount)}
                   </span>
                 </div>
-                <div className="flex flex-col text-xs text-white border-l border-white/40 pl-4">
-                  <span className=" text-sky-100 font-medium">
+                <div className="flex flex-col text-xs text-white border-l border-white/40 pl-4 dark:border-slate-400/40 ">
+                  <span className=" text-sky-100 font-medium dark:text-slate-400">
                     Maturity Date
                   </span>
-                  <span className="font-black ">
+                  <span className="font-black dark:text-slate-200">
                     {formatDate(userCreds.maturityDate) || "No deposit yet"}
                   </span>
                 </div>
@@ -151,28 +157,30 @@ function PaymentList() {
           </div>
           {withdrawStatus === "WITHDRAW" ? (
             <>
-              <div className="my-3 mx-2 text-slate-800 font-black">
+              <div className="my-3 mx-2 text-slate-800 font-black dark:text-slate-200">
                 User withdrawal
               </div>
               <div>
-                <div className="bg-white border-l-4 border-l-amber-500 shadow-sm p-3 px-5 rounded-xl border border-slate-50">
+                <div className="bg-white border-l-4 border-l-amber-500 shadow-sm p-3 px-5 rounded-xl border border-slate-50 dark:bg-slate-800 dark:border-slate-700">
                   <div className="flex justify-between items-center">
-                    <div className="text-xl font-bold text-red-500">
+                    <div className="text-xl font-bold text-red-500 dark:text-red-400">
                       {formatCurrency(widthDraw.totalBalance)}
                     </div>
-                    <div className="text-sm font-semibold text-slate-600">
+                    <div className="text-sm font-semibold text-slate-600 dark:text-slate-300">
                       {formatDate(widthDraw.withdrawDate)}
                     </div>
                   </div>
                   <div className="flex justify-between text-slate-500">
-                    <div className="text-xs text-slate-400">
+                    <div className="text-xs text-slate-400 dark:text-slate-500">
                       {formatDistanceToNow(new Date(widthDraw.withdrawDate), {
                         addSuffix: true,
                       }).replace("about ", "")}
                     </div>
-                    <div className="text-xs">{widthDraw.reference}</div>
+                    <div className="text-xs dark:text-slate-400">
+                      {widthDraw.reference}
+                    </div>
                   </div>
-                  <div className="flex gap-1 justify-end border-t  border-t-slate-200 mt-2 py-2">
+                  <div className="flex gap-1 justify-end border-t  border-t-slate-200 mt-2 py-2 dark:border-t-slate-700">
                     <button
                       type="button"
                       onClick={() =>
@@ -182,7 +190,7 @@ function PaymentList() {
                           context,
                         )
                       }
-                      className="flex items-center rounded-full px-2 py-0.5 text-sm bg-emerald-50 text-emerald-500"
+                      className="flex items-center rounded-full px-2 py-0.5 text-sm bg-emerald-50 text-emerald-500 dark:bg-emerald-900 dark:text-emerald-400"
                     >
                       <Check size={20} />
                       <span>Accept</span>
@@ -195,7 +203,7 @@ function PaymentList() {
                           context,
                         )
                       }
-                      className="flex items-center rounded-full px-2 py-0.5 text-sm bg-red-50 text-red-500"
+                      className="flex items-center rounded-full px-2 py-0.5 text-sm bg-red-50 text-red-500 dark:bg-red-900 dark:text-red-400"
                     >
                       <X size={20} />
                       <span>Declined</span>
@@ -208,7 +216,7 @@ function PaymentList() {
             ""
           )}
 
-          <div className="my-3 mx-2 text-slate-800 font-black">
+          <div className="my-3 mx-2 text-slate-800 font-black dark:text-slate-200">
             Pending payments
           </div>
           <div>
@@ -226,12 +234,12 @@ function PaymentList() {
                 }
               />
             ) : (
-              <div className="flex flex-col items-center text-center mt-5 p-5 h-auto italic rounded-2xl text-slate-500 bg-white-50 border border-slate-100 shadow-inner">
+              <div className="flex flex-col items-center text-center mt-5 p-5 h-auto italic rounded-2xl text-slate-500 bg-white-50 border border-slate-100 shadow-inner dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400 ">
                 No pending payments
               </div>
             )}
           </div>
-          <div className="my-3 mx-2 text-slate-800 font-black">
+          <div className="my-3 mx-2 text-slate-800 font-black dark:text-slate-200">
             Approved payments
           </div>
           <div className="flex gap-2 mb-4 items-center">
@@ -239,12 +247,12 @@ function PaymentList() {
               value={refSearch}
               onChange={(e) => setRefSearch(e.target.value)}
               placeholder="Search ID and Date"
-              className="!rounded-full h-9"
+              className="!rounded-full h-9 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100 dark:placeholder:text-slate-500"
             />
             <button
               type="button"
               onClick={handleSearchClick}
-              className="px-4 py-1.5 bg-sky-500 text-white rounded-full text-sm font-medium"
+              className="px-4 py-1.5 bg-sky-500 text-white rounded-full text-sm font-medium dark:bg-sky-600 dark:hover:bg-sky-700 active:scale-95 transition-all"
             >
               Search
             </button>
@@ -257,7 +265,7 @@ function PaymentList() {
                 isLoading={LoadingsavingsMember}
               />
             ) : (
-              <div className="flex flex-col items-center text-center mt-5 p-5 h-auto italic rounded-2xl text-slate-500 bg-white-50 border border-slate-100 shadow-inner">
+              <div className="flex flex-col items-center text-center mt-5 p-5 h-auto italic rounded-2xl text-slate-500 bg-white-50 border border-slate-100 shadow-inner dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400 ">
                 No approved payments
               </div>
             )}

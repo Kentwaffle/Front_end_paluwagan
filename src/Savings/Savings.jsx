@@ -110,6 +110,8 @@ function Savings() {
               setDepositData((prev) => ({ ...prev, amountDeposit: "" }));
               queryClient.invalidateQueries({
                 queryKey: ["/api/savings/summary"],
+              });
+              queryClient.invalidateQueries({
                 queryKey: ["api/admin/savings/members"],
               });
             });
@@ -160,6 +162,8 @@ function Savings() {
                   setOffsetData({ agreementText: "" });
                   queryClient.invalidateQueries({
                     queryKey: ["/api/savings/summary"],
+                  });
+                  queryClient.invalidateQueries({
                     queryKey: ["api/admin/savings/members"],
                   });
                 });

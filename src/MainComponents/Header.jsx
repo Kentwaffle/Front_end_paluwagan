@@ -1,5 +1,5 @@
 import React from "react";
-import { Menu, ChevronLeft } from "lucide-react";
+import { Menu, ChevronLeft, Bell } from "lucide-react";
 import { getProfileImage } from "../reusableComponents/Hooks/ImageGet";
 import { Link, useLocation } from "react-router-dom";
 import { useFetchData } from "../serviceToApi/fetchData";
@@ -53,42 +53,58 @@ function Header({ openSideBar }) {
             )}
           </div>
 
-          <div className="flex items-center">
-            <span className="font-semibold pr-1">{headerData?.firstName}</span>
-            <div className="dropdown dropdown-end">
-              <div
-                tabIndex="-1"
-                role="button"
-                className="btn btn-ghost btn-circle avatar"
-              >
-                <div className="w-9 border border-sky-500 rounded-full">
-                  <img
-                    alt="Profile picture"
-                    src={getProfileImage(headerData?.profileImage)}
-                  />
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => navigate("/notification")}
+              className="relative cursor-pointer hover:opacity-70 transition-all"
+            >
+              <Bell size={20} className="text-sky-700 dark:text-slate-300" />
+              <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                <span className="absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500 border-2 border-white dark:border-slate-900"></span>
+              </span>
+            </button>
+            <div className="h-4 w-[1px] bg-slate-300 dark:bg-slate-700"></div>
+            <div className="flex items-center">
+              <span className="font-semibold pr-1">
+                {headerData?.firstName}
+              </span>
+              <div className="dropdown dropdown-end">
+                <div
+                  tabIndex="-1"
+                  role="button"
+                  className="btn btn-ghost btn-circle avatar"
+                >
+                  <div className="w-9 border border-sky-500 rounded-full">
+                    <img
+                      alt="Profile picture"
+                      src={getProfileImage(headerData?.profileImage)}
+                    />
+                  </div>
                 </div>
+                <ul
+                  tabIndex="-1"
+                  className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-25 items-center p-2 shadow dark:bg-slate-800 dark:text-slate-200  "
+                >
+                  <li>
+                    <Link
+                      to={"/profile"}
+                      className="text-sky-800 font-semibold dark:text-slate-200"
+                    >
+                      Profile
+                    </Link>
+                  </li>
+                  <li>
+                    <button
+                      onClick={logout}
+                      className="text-red-400 font-semibold dark:text-red-500"
+                    >
+                      Log out
+                    </button>
+                  </li>
+                </ul>
               </div>
-              <ul
-                tabIndex="-1"
-                className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-25 items-center p-2 shadow dark:bg-slate-800 dark:text-slate-200  "
-              >
-                <li>
-                  <Link
-                    to={"/profile"}
-                    className="text-sky-800 font-semibold dark:text-slate-200"
-                  >
-                    Profile
-                  </Link>
-                </li>
-                <li>
-                  <button
-                    onClick={logout}
-                    className="text-red-400 font-semibold dark:text-red-500"
-                  >
-                    Log out
-                  </button>
-                </li>
-              </ul>
             </div>
           </div>
         </div>
