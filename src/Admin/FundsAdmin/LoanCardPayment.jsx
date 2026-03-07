@@ -6,6 +6,8 @@ import { getProfileImage } from "../../reusableComponents/Hooks/ImageGet";
 import { ChevronRight } from "lucide-react";
 import { formatCurrency } from "../../reusableComponents/formatter";
 import { useParams } from "react-router-dom";
+import { usePostData } from "../../serviceToApi/PostData";
+import { API_ENDPOINTS } from "../../serviceToApi/ApiEndpoint";
 function LoanCardPayment() {
   const { type } = useParams();
   const [selectedUser, setSelectedUser] = useState(null);
@@ -22,6 +24,11 @@ function LoanCardPayment() {
     { label: "Cash", value: "cash" },
     { label: "Online payment", value: "online" },
   ];
+
+  const { data: loanFundsData } = usePostData(
+    API_ENDPOINTS.FUNDS_PAYMENT_LOAN,
+    "fundsPaymentLoan",
+  );
 
   return (
     <div className="min-h-screen p-5">

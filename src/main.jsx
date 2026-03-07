@@ -57,6 +57,7 @@ import { useAuth } from "./auth/Auth";
 import Auth from "./auth/Auth";
 import Notification from "./MainComponents/Notification";
 import LoanCardPayment from "./Admin/FundsAdmin/LoanCardPayment";
+import SavingsMemberFilter from "./Admin/SavingsAdmin/SavingsMemberFilter";
 const queryClient = new QueryClient();
 
 const UserIndexRedirect = ({ isStatus }) => {
@@ -242,6 +243,7 @@ const Main = () => {
           children: [
             { index: true, element: <Saving_management /> },
             { path: "paymentList/:savingsId", element: <PaymentList /> },
+            { path: "savingsmembers", element: <SavingsMemberFilter /> },
           ],
         },
         {

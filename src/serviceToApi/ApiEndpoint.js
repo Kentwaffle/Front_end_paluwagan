@@ -40,5 +40,7 @@ export const API_ENDPOINTS = {
   SAVINGS_FILTER_APPROVED: `${BASE_URL}/api/admin/savings/payment/filter/{savingsId}`,
   SAVINGS_ACCEPT_PAYMENT: `${BASE_URL}/api/admin/savings/payment`,
 
+  FUNDS_PAYMENT_LOAN: `${BASE_URL}/api/admin/payment/loan`,
+
   LOGOUT: `${BASE_URL}/api/auth/logout`,
 };

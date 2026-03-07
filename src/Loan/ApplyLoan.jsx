@@ -5,7 +5,7 @@ import {
 import { useState, useEffect } from "react";
 import { API_ENDPOINTS } from "../serviceToApi/ApiEndpoint";
 import Inputform from "../reusableComponents/Inputform";
-import { CalendarRange, FileText } from "lucide-react";
+import { CalendarRange, FileText, PhilippinePeso } from "lucide-react";
 import { useForm } from "../reusableComponents/Hooks/HandleChange&Submit";
 import { ValidateLoan } from "../validations/CredentialValidation";
 import DatePicker from "react-datepicker";
@@ -128,26 +128,39 @@ function ApplyLoan() {
       });
     }, 100);
   };
+  const minSelectableDate = new Date();
+  minSelectableDate.setDate(minSelectableDate.getDate() + 7);
 
   return (
     <div key="apply-form-container">
       {!payload && isStatusFetching ? (
         <LoadingApply key="loading-view" />
       ) : (
-        <div className="min-h-screen p-3 flex  flex-col gap-5">
-          <form
-            onSubmit={handleOpenApplyMoodal}
-            className=" bg-white shadow-sm p-3 rounded-xl dark:bg-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700"
-          >
-            <div className="flex items-center justify-start mb-2">
-              <h1 className="text-3xl p-2 font-extrabold  text-slate-800 dark:text-slate-200">
+        <div className="min-h-screen p-5 flex  flex-col gap-5">
+          <form onSubmit={handleOpenApplyMoodal} className="space-y-6">
+            <div className="pl-2">
+              <h1 className="text-3xl font-extrabold  text-slate-800 dark:text-slate-200">
                 Apply for loan
               </h1>
+              <p className="text-sm text-slate-500 mt-1 dark:text-slate-400">
+                Complete the details below to proceed.
+              </p>
             </div>
-            <div className="bg-white p-2 mb-4 rounded-lg border border-slate-100 shadow dark:bg-slate-700 dark:border-slate-600">
-              <h3 className="text-sm font-semibold mb-3 text-slate-500 dark:text-slate-400">
-                Enter the amount you want to borrow
-              </h3>
+            <div className="bg-white p-5 mb-4 rounded-2xl border border-slate-100 shadow dark:bg-slate-700 dark:border-slate-600">
+              <div className="flex justify-between mb-4 items-center">
+                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                  Loan Amount
+                </label>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setFormData({ ...formData, loanAmount: 20000 })
+                  }
+                  className="text-xs font-bold bg-sky-50 text-sky-600 px-2 py-1 rounded-full hover:bg-sky-100 dark:bg-sky-900/30 dark:text-sky-400 transition-colors"
+                >
+                  MAX 20K
+                </button>
+              </div>
               <div
                 className={`flex p-1 px-3 rounded-md items-center border border-slate-200 transition-all duration-300 dark:bg-slate-800 ${
                   formErrors.loanAmount
@@ -157,71 +170,81 @@ function ApplyLoan() {
                       : "border-gray-300 bg-gray-50 dark:border-slate-600 dark:bg-slate-800"
                 }`}
               >
+                <span className="text-2xl font-bold text-slate-400 dark:text-slate-500 pr-1">
+                  <PhilippinePeso />
+                </span>
                 <Inputform
                   type="text"
                   name="loanAmount"
                   value={formData.loanAmount}
                   onChange={handleChange}
-                  placeholder={"How much do you need?"}
+                  placeholder={"0.00"}
                   className="h-8 !border-none !outline-none !ring-0 !focus:ring-0 !focus:outline-none w-full px-0 shadow-none bg-transparent dark:text-slate-200"
                 />
-                <span className="divider divider-horizontal m-0 dark:divider-info"></span>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setFormData({ ...formData, loanAmount: 20000 })
-                  }
-                  className="text-xs w-15 text-slate-500 dark:text-slate-400"
-                >
-                  Max 20k
-                </button>
               </div>
               {formErrors.loanAmount && (
-                <span className="text-red-500 text-xs mt-1 dark:text-red-400">
+                <span className="text-red-500 text-[10px] font-medium mt-2 block ml-1 uppercase">
                   {formErrors.loanAmount}
                 </span>
               )}
             </div>
 
-            <div className="flex bg-slate-100 p-3 rounded-xl shadow-sm dark:bg-slate-700 dark:border-slate-600 border border-slate-200">
-              <div className=" flex flex-col w-full  gap-1 justify-center items-center ">
-                <div className="flex items-center justify-center gap-1">
-                  <CalendarRange size={20} className="text-sky-500" />
-                  <span>Start date</span>
+            <div className="flex flex-col gap-3 bg-white p-5 rounded-2xl shadow-sm dark:bg-slate-700 dark:border-slate-600 border border-slate-200">
+              <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block dark:text-slate-400">
+                Loan Duration
+              </label>
+              <div className="space-y-0">
+                <div className="relative flex items-center gap-4 pb-2 ">
+                  <div className="absolute left-[17px] top-12 bottom-0 w-[1px] bg-slate-300 dark:bg-slate-600"></div>
+                  <div className="z-10 bg-sky-50 p-2 rounded-full dark:bg-sky-900/30">
+                    <CalendarRange
+                      size={20}
+                      className="text-sky-500 dark:text-sky-400"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="text-xs font-black mb-2 text-slate-400 block dark:text-slate-500">
+                      Start Date
+                    </label>
+                    <DatePickerField
+                      name="startDate"
+                      value={formData.startDate}
+                      onChange={handleChange}
+                      minDate={new Date()}
+                      error={formErrors.startDate}
+                    />
+                  </div>
                 </div>
-                <div className="relative w-full flex flex-col">
-                  <DatePickerField
-                    name="startDate"
-                    value={formData.startDate}
-                    onChange={handleChange}
-                    minDate={new Date()} // Hindi na makakapili ng past dates
-                    error={formErrors.startDate}
-                  />
-                </div>
-              </div>
-              <div className="divider divider-horizontal "></div>
-              <div className="flex flex-col gap-1 w-full justify-center items-center">
-                <div className="flex items-center  justify-center  gap-1 ">
-                  <CalendarRange size={20} className="text-red-400" />
-                  <span>End date</span>
-                </div>
-                <div className="relative w-full flex flex-col ">
-                  <DatePickerField
-                    name="endDate"
-                    value={formData.endDate}
-                    onChange={handleChange}
-                    minDate={new Date()} // Hindi na makakapili ng past dates
-                    error={formErrors.endDate}
-                  />
+
+                <div className="relative flex items-center gap-4 pt-2">
+                  <div className="absolute left-[17px] top-0 bottom-12 w-[1px] bg-slate-300 dark:bg-slate-600"></div>
+                  <div className="z-10 bg-rose-50 p-2 rounded-full dark:bg-rose-900/30">
+                    <CalendarRange
+                      size={20}
+                      className="text-rose-400 dark:text-rose-400"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="text-xs font-black mb-2 text-slate-400 block dark:text-slate-500">
+                      End Date
+                    </label>
+                    <DatePickerField
+                      name="endDate"
+                      value={formData.endDate}
+                      onChange={handleChange}
+                      minDate={minSelectableDate}
+                      error={formErrors.endDate}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
 
             <button
               type="submit"
-              className="bg-sky-500 text-white font-semibold w-full p-2 mt-5 rounded-xl text-xl shadow-sm"
+              className="bg-sky-500 text-white font-bold w-full py-4  rounded-2xl text-lg shadow-lg shadow-sky-200 dark:shadow-none hover:bg-sky-600 active:scale-[0.98] transition-all"
             >
-              Submit
+              Calculate & Submit
             </button>
           </form>
         </div>

@@ -286,7 +286,17 @@ function Savings() {
                 ))}
               </div>
 
-              {activeTab === "deposit" ? (
+              {responseData?.hasWithdraw ? (
+                <div className="flex flex-col gap-2 justify-center items-center mt-3 p-5 italic shadow-inner rounded-2xl bg-white border border-slate-100 dark:bg-slate-800 dark:border-slate-700">
+                  <div className="text-sky-500">
+                    <CircleAlert />
+                  </div>
+                  <span className="text-slate-500 text-center">
+                    You have an active withdrawal request. Wait for it to be
+                    processed before making another transaction.
+                  </span>
+                </div>
+              ) : activeTab === "deposit" ? (
                 <div className="flex flex-col mt-3 gap-3">
                   <div className="bg-white shadow-sm border border-slate-100 rounded-lg dark:bg-slate-700 dark:border-slate-600 ">
                     <div className="flex items-center p-2 gap-3">

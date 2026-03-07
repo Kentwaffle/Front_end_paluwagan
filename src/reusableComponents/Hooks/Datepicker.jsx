@@ -50,7 +50,7 @@ const DatePickerField = ({
       />
 
       {error && (
-        <span className="text-xs text-red-500 font-medium ml-1 dark:text-red-400">
+        <span className="text-red-500 text-[10px] font-medium block ml-1 uppercase">
           {error}
         </span>
       )}
