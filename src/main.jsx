@@ -242,7 +242,7 @@ const Main = () => {
           path: "savings_management",
           children: [
             { index: true, element: <Saving_management /> },
-            { path: "paymentList/:savingsId", element: <PaymentList /> },
+            { path: ":savingsId", element: <PaymentList /> },
             { path: "savingsmembers", element: <SavingsMemberFilter /> },
           ],
         },
@@ -250,7 +250,7 @@ const Main = () => {
           path: "funds_management",
           children: [
             { index: true, element: <LoanFundsMain /> },
-            { path: "addPayment/:type", element: <LoanCardPayment /> },
+            { path: ":type", element: <LoanCardPayment /> },
           ],
         },
       ],

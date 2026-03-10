@@ -114,6 +114,9 @@ function Savings() {
               queryClient.invalidateQueries({
                 queryKey: ["api/admin/savings/members"],
               });
+              queryClient.invalidateQueries({
+                queryKey: ["notification_list"],
+              });
             });
         } else {
           showAlert.warning(

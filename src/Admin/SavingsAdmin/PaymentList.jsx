@@ -14,9 +14,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useLoanSSE } from "../../reusableComponents/Hooks/SSE";
 import { PaymentListLoading } from "../../reusableComponents/loading";
 import { getProfileImage } from "../../reusableComponents/Hooks/ImageGet";
-import { formatDistanceToNow } from "date-fns";
 import { handleTransactionAction } from "./handleStatusChange";
-
+import { formatTimeAgo } from "../../reusableComponents/TimeDateformat";
 function PaymentList() {
   const { savingsId } = useParams();
   useLoanSSE(true, savingsId);
@@ -30,7 +29,7 @@ function PaymentList() {
     isLoading: LoadingsavingsMember,
     error,
   } = useFetchData(
-    `api/admin/savings/members/${savingsId}`,
+    `api/admin/savings/members/=${savingsId}`,
     `${API_ENDPOINTS.SAVINGS_MEMBER_URL.replace("{savingsId}", savingsId)}`,
   );
 
@@ -172,9 +171,7 @@ function PaymentList() {
                   </div>
                   <div className="flex justify-between text-slate-500">
                     <div className="text-xs text-slate-400 dark:text-slate-500">
-                      {formatDistanceToNow(new Date(widthDraw.withdrawDate), {
-                        addSuffix: true,
-                      }).replace("about ", "")}
+                      {formatTimeAgo(widthDraw.withdrawDate)}
                     </div>
                     <div className="text-xs dark:text-slate-400">
                       {widthDraw.reference}

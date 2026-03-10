@@ -4,7 +4,7 @@ function LoanFundsMain() {
   const navigate = useNavigate();
 
   const handleChangeType = (newType) => {
-    navigate(`/admin/funds_management/addPayment/${newType}`);
+    navigate(`/admin/funds_management/${newType}`);
   };
 
   return (
@@ -15,7 +15,7 @@ function LoanFundsMain() {
       <div className="flex flex-col w-50  mx-auto">
         <button
           type="button"
-          onClick={() => handleChangeType("loan")}
+          onClick={() => handleChangeType("loanAddPayment")}
           className="bg-sky-500 text-white py-3 px-5 rounded-lg  active:scale-95 transition-transform dark:bg-sky-400 dark:text-gray-800"
         >
           Loan add payment
@@ -25,7 +25,7 @@ function LoanFundsMain() {
         </div>
         <button
           type="button"
-          onClick={() => handleChangeType("savings")}
+          onClick={() => handleChangeType("savingsAddPayment")}
           className="bg-sky-500 text-white py-3 px-5 rounded-lg  active:scale-95 transition-transform dark:bg-sky-400 dark:text-gray-800"
         >
           Savings add Payment

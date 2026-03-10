@@ -42,5 +42,35 @@ export const API_ENDPOINTS = {
 
   FUNDS_PAYMENT_LOAN: `${BASE_URL}/api/admin/payment/loan`,
 
+  NOTIFICATIONS_USER: (userId) =>
+    `${BASE_URL}/api/notifications/user/${userId}`,
+
+  NOTIFICATIONS_ADMIN: `${BASE_URL}/api/notifications/admin`,
+
+  NOTIFICATIONS_USER_UNREAD_COUNT: (userId) =>
+    `${BASE_URL}/api/notifications/user/${userId}/unread-count`,
+
+  NOTIFICATIONS_ADMIN_UNREAD_COUNT: `${BASE_URL}/api/notifications/admin/unread-count`,
+
+  NOTIFICATIONS_MARK_SINGLE_USER: (notificationId) =>
+    `${BASE_URL}/api/notifications/user/${notificationId}/read`,
+
+  NOTIFICATIONS_MARK_SINGLE_ADMIN: (notificationId) =>
+    `${BASE_URL}/api/notifications/admin/${notificationId}/read`,
+
+  NOTIFICATIONS_MARK_ALL_USER: `${BASE_URL}/api/notifications/user/read-selected`,
+
+  NOTIFICATIONS_MARK_ALL_ADMIN: `${BASE_URL}/api/notifications/admin/read-selected`,
+
+  NOTIFICATIONS_DELETE: `${BASE_URL}/api/notifications/clear-all`,
+
+
+
+
+
+
+
+
+
   LOGOUT: `${BASE_URL}/api/auth/logout`,
 };

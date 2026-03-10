@@ -13,17 +13,41 @@ import { useNavigate } from "react-router-dom";
 function Header({ openSideBar }) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { logout } = useAuth();
-
+  const { logout, user } = useAuth();
+  const isAdmin = user?.role === "ROLE_ADMIN";
+  const userID = user?.userId;
   const { data: headerData, isLoading } = useFetchData(
     "/header",
     API_ENDPOINTS.PROFILE_GET,
   );
+
+  const unreadCount = isAdmin
+    ? API_ENDPOINTS.NOTIFICATIONS_ADMIN_UNREAD_COUNT
+    : userID
+      ? API_ENDPOINTS.NOTIFICATIONS_USER_UNREAD_COUNT(userID)
+      : null;
+
+  const { data: notifCount, isLoading: notifCountLoading } = useFetchData(
+    "notifcount",
+    unreadCount,
+  );
+
   const pathSegments = location.pathname.split("/").filter(Boolean);
   const isChildRoute =
     pathSegments.length > 2 ||
     (pathSegments[0] === "savings" && pathSegments.length > 1) ||
     console.log("Current Segments:", pathSegments.length);
+
+  const handleBack = () => {
+    const lastSegment = location.pathname.split("/").filter(Boolean);
+    if (lastSegment.length > 1) {
+      lastSegment.pop();
+      navigate("/" + lastSegment.join("/"));
+    } else {
+      navigate("/admin");
+    }
+  };
+
   return (
     <div key={"main_header"} className="sticky top-0 z-5">
       {isLoading ? (
@@ -37,13 +61,7 @@ function Header({ openSideBar }) {
             {isChildRoute ? (
               <button
                 type="button"
-                onClick={(e) => {
-                  if (location.pathname.includes("savings_management")) {
-                    navigate("/admin/savings_management", { replace: true });
-                  } else {
-                    navigate(-1);
-                  }
-                }}
+                onClick={() => handleBack()}
                 className="p-1 rounded-full"
               >
                 <ChevronLeft size={30} />
@@ -56,14 +74,24 @@ function Header({ openSideBar }) {
           <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={() => navigate("/notification")}
-              className="relative cursor-pointer hover:opacity-70 transition-all"
+              onClick={() => {
+                navigate("/notification");
+              }}
+              className="relative p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-all group"
+              aria-label="Notifications"
             >
-              <Bell size={20} className="text-sky-700 dark:text-slate-300" />
-              <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
-                <span className="absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500 border-2 border-white dark:border-slate-900"></span>
-              </span>
+              <Bell
+                size={22}
+                className="text-sky-700 dark:text-slate-300 group-hover:scale-110 transition-transform"
+              />
+
+              {notifCount ? (
+                <span className="absolute top-1 right-1 flex h-3 w-3 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white dark:ring-slate-900 animate-in zoom-in">
+                  {notifCount}
+                </span>
+              ) : (
+                ""
+              )}
             </button>
             <div className="h-4 w-[1px] bg-slate-300 dark:bg-slate-700"></div>
             <div className="flex items-center">

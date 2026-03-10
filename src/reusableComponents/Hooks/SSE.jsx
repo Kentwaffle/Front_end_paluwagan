@@ -37,7 +37,10 @@ export const useLoanSSE = (shouldConnect, savingsId) => {
                 )) ||
               keyString.includes("/api/profile/info") ||
               keyString.includes("/edit_profile") ||
-              keyString.includes("/header")
+              keyString.includes("/header") ||
+              keyString.includes("notification_list/markOnce") ||
+              keyString.includes("notification_list") ||
+              keyString.includes("notifcount")
             );
           },
         });

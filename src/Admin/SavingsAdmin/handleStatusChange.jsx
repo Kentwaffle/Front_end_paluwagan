@@ -29,7 +29,7 @@ export const handleTransactionAction = async (
     WITHDRAW_REJECT: {
       status: "REJECTED",
       title: "Decline Withdrawal?",
-      msg: "Withdrawal Successfully!",
+      msg: "Successfully! Decline Withdrawal",
       btn: "Decline",
     },
   };
@@ -60,6 +60,13 @@ export const handleTransactionAction = async (
           queryClient.invalidateQueries({ queryKey: ["/api/savings/summary"] });
           queryClient.invalidateQueries({
             queryKey: [`api/admin/savings/members/${savingsId}`],
+          });
+
+          queryClient.invalidateQueries({
+            queryKey: ["notification_list"],
+          });
+          queryClient.invalidateQueries({
+            queryKey: ["notifcount"],
           });
         });
       } else {

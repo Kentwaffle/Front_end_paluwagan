@@ -1,7 +1,7 @@
 // import { useState } from "react";
 import { useFetchData } from "../../serviceToApi/fetchData";
 import { API_ENDPOINTS } from "../../serviceToApi/ApiEndpoint";
-import { EyeClosed, ChevronRight } from "lucide-react";
+import { EyeClosed, ChevronRight, Eye } from "lucide-react";
 import { usePasswordToggle } from "../../reusableComponents/Hooks/ToggleEye";
 import { formatCurrency } from "../../reusableComponents/formatter";
 import { getProfileImage } from "../../reusableComponents/Hooks/ImageGet";
@@ -18,7 +18,8 @@ function Saving_management() {
   );
 
   const hanldeShowMemberPayment = (id) => {
-    navigate(`paymentList/${id}`);
+    navigate(`${id}`);
+    w;
   };
 
   const ApiTO = 100;
