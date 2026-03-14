@@ -233,3 +233,26 @@ export const ValidateOffset = (formData) => {
     errors,
   };
 };
+
+export const ValidateFundsAdmin = (formData) => {
+  let errors = {};
+  if (!formData.amount || formData.amount.toString().trim() === "") {
+    errors.amount = "Enter amount";
+  } else if (isNaN(formData.amount) || Number(formData.amount) <= 0) {
+    errors.amount = "Enter a valid amount";
+  }
+
+  if (formData.paymentMethod !== "CASH") {
+    if (!formData.paymentMethod) {
+      errors.paymentMethod = "Select a payment method";
+    }
+    if (!formData.bankReference || formData.bankReference.trim() === "") {
+      errors.bankReference = "Enter reference ID";
+    }
+  }
+
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors,
+  };
+};

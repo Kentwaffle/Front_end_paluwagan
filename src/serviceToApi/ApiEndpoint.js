@@ -24,9 +24,9 @@ export const API_ENDPOINTS = {
   ADMIN_CHANGE_STATUS: `${BASE_URL}/api/admin/loan/change-status`,
   GET_PAYMENT: `${BASE_URL}/api/loan/payment/filter`,
 
-  ADMIN_PENDING: `${BASE_URL}/api/admin/loan/pending`,
-  ADMIN_APPROVED: `${BASE_URL}/api/admin/loan/approve`,
-  ADMIN_REJECTED: `${BASE_URL}/api/admin/loan/rejected`,
+  ADMIN_STATUS: (status) => `${BASE_URL}/api/admin/loan/${status}`,
+  // ADMIN_APPROVED: `${BASE_URL}/api/admin/loan/approve`,
+  // ADMIN_REJECTED: `${BASE_URL}/api/admin/loan/rejected`,
   ADMIN_COUNT: `${BASE_URL}/api/admin/loan/status-counts`,
   SSE: `${BASE_URL}/api/loan/updates`,
 
@@ -40,11 +40,14 @@ export const API_ENDPOINTS = {
   SAVINGS_FILTER_APPROVED: `${BASE_URL}/api/admin/savings/payment/filter/{savingsId}`,
   SAVINGS_ACCEPT_PAYMENT: `${BASE_URL}/api/admin/savings/payment`,
 
-  FUNDS_PAYMENT_LOAN: `${BASE_URL}/api/admin/payment/loan`,
+  FUNDS_PAYMENT_LOAN_POST: `${BASE_URL}/api/admin/payment/loan`,
+  FUNDS_PAYMENT_LOAN_SEARCH: `${BASE_URL}/api/admin/payment/loan/search`,
+
+  FUNDS_PAYMENT_SAVINGS_POST: `${BASE_URL}/api/admin/payment/savings`,
+  FUNDS_PAYMENT_SAVINGS_SEARCH: `${BASE_URL}/api/admin/payment/savings/search`,
 
   NOTIFICATIONS_USER: (userId) =>
     `${BASE_URL}/api/notifications/user/${userId}`,
-
   NOTIFICATIONS_ADMIN: `${BASE_URL}/api/notifications/admin`,
 
   NOTIFICATIONS_USER_UNREAD_COUNT: (userId) =>
@@ -63,14 +66,6 @@ export const API_ENDPOINTS = {
   NOTIFICATIONS_MARK_ALL_ADMIN: `${BASE_URL}/api/notifications/admin/read-selected`,
 
   NOTIFICATIONS_DELETE: `${BASE_URL}/api/notifications/clear-all`,
-
-
-
-
-
-
-
-
 
   LOGOUT: `${BASE_URL}/api/auth/logout`,
 };

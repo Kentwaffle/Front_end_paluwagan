@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import SearchInput from "../../reusableComponents/SearchInput";
 import Inputform from "../../reusableComponents/Inputform";
 import SelectDropdown from "../../reusableComponents/selectdropdown";
@@ -8,33 +8,119 @@ import { formatCurrency } from "../../reusableComponents/formatter";
 import { useParams } from "react-router-dom";
 import { usePostData } from "../../serviceToApi/PostData";
 import { API_ENDPOINTS } from "../../serviceToApi/ApiEndpoint";
+import { useFetchData } from "../../serviceToApi/fetchData";
+import UserLoanCard from "./UserLoanCard";
+import { useForm } from "../../reusableComponents/Hooks/HandleChange&Submit";
+import { showAlert } from "../../reusableComponents/Alerts/SweetAlerts";
+import { ValidateFundsAdmin } from "../../validations/CredentialValidation";
+
 function LoanCardPayment() {
   const { type } = useParams();
+  const isLoan = type === "loanAddPayment";
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedPanel, setSelectedPanel] = useState("cash");
   const [paymentMode, setPaymentMode] = useState("");
-  const handleChangeUser = () => {
-    setSelectedUser(null);
-  };
+  const [searchInput, setSearchInput] = useState("");
 
-  const handleChangeRecipient = (user) => {
-    setSelectedUser(user);
-  };
   const loanFunds = [
     { label: "Cash", value: "cash" },
     { label: "Online payment", value: "online" },
   ];
 
-  const { data: loanFundsData } = usePostData(
-    API_ENDPOINTS.FUNDS_PAYMENT_LOAN,
-    "fundsPaymentLoan",
+  const DynamicURL = {
+    FundsUrl: isLoan
+      ? API_ENDPOINTS.FUNDS_PAYMENT_LOAN_POST
+      : API_ENDPOINTS.FUNDS_PAYMENT_SAVINGS_POST,
+
+    SearchFundUrl: isLoan
+      ? API_ENDPOINTS.FUNDS_PAYMENT_LOAN_SEARCH
+      : API_ENDPOINTS.FUNDS_PAYMENT_SAVINGS_SEARCH,
+  };
+
+  const { mutate: FundsData } = usePostData(DynamicURL.FundsUrl, [
+    isLoan ? "fundsDataLoan" : "fundsDataavings",
+  ]);
+
+  const { data: SearchFunds, isLoading: loadingSearch } = useFetchData(
+    [isLoan ? "searchLoan" : "searchSavings", searchInput],
+    `${DynamicURL.SearchFundUrl}?name=${searchInput}`,
   );
+
+  const searchFundsMap = isLoan
+    ? SearchFunds?.paymentLoans
+    : SearchFunds?.paymentSavings;
+
+  const {
+    formData,
+    setFormData,
+    handleChange,
+    formErrors,
+    handleSubmit,
+    setFormErrors,
+  } = useForm({ amount: "" }, ValidateFundsAdmin);
+
+  useEffect(() => {
+    if (!selectedUser) return;
+    setFormErrors({});
+    const currentAmount = formData.amount || "";
+    const formdataMap = isLoan
+      ? selectedUser?.applicationId
+      : selectedUser?.savingsId;
+
+    if (selectedPanel === "cash") {
+      setFormData({
+        applicationId: formdataMap,
+        amount: currentAmount,
+        paymentMethod: "CASH",
+      });
+    } else {
+      setFormData({
+        applicationId: formdataMap,
+        amount: currentAmount,
+        paymentMethod: "",
+        bankReference: "",
+      });
+    }
+  }, [selectedPanel, isLoan, selectedUser]);
+
+  const paymentHandler = (e) => {
+    if (e) e.preventDefault();
+    console.log("Current Errors:", formErrors);
+    handleSubmit(e, () => {
+      console.log("Eto ang ipapasa ko:", formData);
+      FundsData(formData, {
+        onSuccess: (response) => {
+          if (response.success) {
+            showAlert.success(
+              "Successfully paid!",
+              `You've successfully paid ₱${formData.amount} to ${selectedUser.firstName}`,
+            );
+
+            setFormData((prev) => ({ ...prev, amount: "" }));
+          } else {
+            showAlert.warning("Failed " + response.message);
+          }
+        },
+        onError: (err) => {
+          showAlert.error(
+            "Error",
+            "Something went wrong with the transaction.",
+          );
+        },
+      });
+    });
+  };
+
+  const handleChangeUser = () => {
+    setSelectedUser(null);
+    setSearchInput("");
+  };
 
   return (
     <div className="min-h-screen p-5">
       <div className="flex justify-between pb-3 text-sm items-center">
         <span className="text-slate-700 dark:text-gray-300 font-black text-lg">
-          {`${type === "loan" ? "Loan" : "Savings"} Add Payment`}
+          {`${type === "loanAddPayment" ? "Loan" : "Savings"} Add Payment`}
         </span>
         {selectedUser && (
           <button
@@ -45,49 +131,49 @@ function LoanCardPayment() {
           </button>
         )}
       </div>
-      {!selectedUser ? (
-        <SearchInput
-          placeholder="Search recipient..."
-          onChange={(e) => {
-            if (e.target.value === "test")
-              handleChangeRecipient({ name: "Test User" });
-          }}
-          className="max-w-sm dark:bg-slate-700/50 dark:border-slate-700"
-        />
-      ) : (
-        <div className="p-5 bg-white shadow-sm rounded-xl dark:bg-gray-800">
-          <div className="flex items-center gap-3 pb-5">
-            <div className="w-9 h-9 flex justify-center items-center border border-sky-500 rounded-full overflow-hidden">
-              <img src={getProfileImage()} alt="Profile" />
-            </div>
-            <div className="flex flex-col items-start min-w-0">
-              <span className="text-sm  text-slate-700 truncate font-black dark:text-gray-300">
-                Juluis Lorenzo Ramboy
-              </span>
-              <span className="text-xs text-slate-500 truncate dark:text-gray-400">
-                REf0-0909090
-              </span>
-            </div>
-          </div>
-          <div className="border-t border-slate-100 dark:border-gray-700 pt-3  grid grid-cols-2 gap-5">
-            <div className="flex flex-col">
-              <span className="text-xs text-slate-500 dark:text-gray-400">
-                Remaining Balance
-              </span>
-              <span className="text-xl text-sky-500 dark:text-sky-400 font-bold">
-                {formatCurrency("120000")}
-              </span>
-            </div>
-            <div className="flex flex-col border-l-2 border-slate-200 dark:border-gray-700 pl-5">
-              <span className="text-xs text-slate-500 dark:text-gray-400">
-                Weekly payment
-              </span>
-              <span className="text-xl text-sky-500 dark:text-sky-400 font-bold">
-                {formatCurrency("5000")}
-              </span>
-            </div>
-          </div>
+
+      <SearchInput
+        placeholder="Search recipient..."
+        value={searchInput}
+        onChange={(e) => setSearchInput(e.target.value)}
+        className={`${selectedUser ? "hidden" : ""} max-w-sm dark:bg-slate-700/50 dark:border-slate-700`}
+      />
+
+      {loadingSearch ? (
+        <div className="p-10 text-center text-slate-400 text-sm animate-pulse">
+          Searching for "{searchInput}"...
         </div>
+      ) : (
+        !selectedUser && (
+          <>
+            {searchFundsMap && searchFundsMap.length > 0 ? (
+              searchFundsMap.map((user) => (
+                <UserLoanCard
+                  key={user.applicationId || user.savingsId}
+                  user={user}
+                  isLoan={isLoan}
+                  onClick={() => {
+                    setSelectedUser(user);
+                    setSearchInput("");
+                  }}
+                />
+              ))
+            ) : (
+              <div className="p-10 text-center text-slate-400 text-sm italic">
+                No results found
+              </div>
+            )}
+          </>
+        )
+      )}
+
+      {selectedUser && (
+        <UserLoanCard
+          user={selectedUser}
+          key={searchFundsMap?.applicationId || searchFundsMap?.savingsId}
+          isSelected={true}
+          isLoan={isLoan}
+        />
       )}
 
       {selectedUser ? (
@@ -135,7 +221,18 @@ function LoanCardPayment() {
                     <span className="text-xs text-slate-600 font-black dark:text-slate-300">
                       Payment amount
                     </span>
-                    <Inputform placeholder="Enter payment amount" />
+                    <Inputform
+                      name="amount"
+                      value={formData.amount || ""}
+                      onChange={handleChange}
+                      placeholder="Enter payment amount"
+                      className={`${formErrors.amount ? "border-red-500" : ""}`}
+                    />
+                    {formErrors?.amount && (
+                      <span className="text-red-500 text-xs mt-1 font-medium animate-in fade-in slide-in-from-top-1">
+                        {formErrors?.amount}
+                      </span>
+                    )}
                   </div>
                 </div>
               ) : (
@@ -144,31 +241,63 @@ function LoanCardPayment() {
                     <span className="text-xs text-slate-600 font-black dark:text-slate-300">
                       Payment amount
                     </span>
-                    <Inputform placeholder="Enter payment amount" />
+                    <Inputform
+                      name="amount"
+                      placeholder="Enter payment amount"
+                      value={formData.amount || ""}
+                      onChange={handleChange}
+                      className={`${formErrors.amount ? "border-red-500" : ""}`}
+                    />
+                    {formErrors?.amount && (
+                      <span className="text-red-500 text-xs mt-1 font-medium animate-in fade-in slide-in-from-top-1">
+                        {formErrors?.amount}
+                      </span>
+                    )}
                   </div>
                   <div className="flex flex-col gap-2">
                     <span className="text-xs text-slate-600 font-black dark:text-slate-300">
                       Mode of payment
                     </span>
                     <SelectDropdown
-                      name="modeOfpayment"
-                      vvalue={paymentMode}
+                      name="paymentMethod"
+                      value={formData.paymentMethod}
                       label={"Select Bank"}
-                      options={["GCash", "Paymaya", "Bank Transfer"]}
-                      onChange={(e) => setPaymentMode(e.target.value)}
+                      options={["GCASH", "MAYA"]}
+                      onChange={handleChange}
+                      className={`${formErrors.paymentMethod ? "border-red-500" : ""}`}
                     />
+                    {formErrors.paymentMethod && (
+                      <span className="text-red-500 text-xs mt-1 font-medium animate-in fade-in slide-in-from-top-1">
+                        {formErrors.paymentMethod}
+                      </span>
+                    )}
                   </div>
                   <div className="flex flex-col gap-2">
                     <span className="text-xs text-slate-600 font-black dark:text-slate-300">
                       Reference ID
                     </span>
-                    <Inputform placeholder="Enter reference id" />
+                    <Inputform
+                      name="bankReference"
+                      placeholder="Enter reference id"
+                      value={formData.bankReference || ""}
+                      onChange={handleChange}
+                      className={`${formErrors.bankReference ? "border-red-500" : ""}`}
+                    />
+                    {formErrors.bankReference && (
+                      <span className="text-red-500 text-xs mt-1 font-medium animate-in fade-in slide-in-from-top-1">
+                        {formErrors.bankReference}
+                      </span>
+                    )}
                   </div>
                 </div>
               )}
             </div>
           </div>
-          <button className=" w-full bg-gradient-to-r from-sky-400 to-sky-600 py-3 text-white rounded-xl shadow flex items-center justify-center gap-2 dark:from-sky-600 dark:to-sky-400">
+          <button
+            type="button"
+            onClick={(e) => paymentHandler(e)}
+            className=" w-full bg-gradient-to-r from-sky-400 to-sky-600 py-3 text-white rounded-xl shadow flex items-center justify-center gap-2 dark:from-sky-600 dark:to-sky-400"
+          >
             Submit Payment
           </button>
         </>

@@ -20,20 +20,24 @@ function Loan_management() {
   const [currentStatus, setCurrentStatus] = useState("PENDING");
   const { token, isLoadingAuth } = useAuth();
   //SSE ni juls na di ko magets
-  useLoanSSE();
+  useLoanSSE(true, null);
 
   //DYNAMIC ENDPOINTS
-  const statusEndpoint =
-    currentStatus === "PENDING"
-      ? API_ENDPOINTS.ADMIN_PENDING
-      : currentStatus === "APPROVED"
-        ? API_ENDPOINTS.ADMIN_APPROVED
-        : API_ENDPOINTS.ADMIN_REJECTED;
+  // const statusEndpoint =
+  //   currentStatus === "PENDING"
+  //     ? API_ENDPOINTS.ADMIN_PENDING
+  //     : currentStatus === "APPROVED"
+  //       ? API_ENDPOINTS.ADMIN_APPROVED
+  //       : API_ENDPOINTS.ADMIN_REJECTED;
+
+  const status = "APPROVED";
 
   const { data: admin_data } = useFetchData(
-    `admin-loans-${currentStatus}`,
-    statusEndpoint,
+    ["admin-loans", currentStatus],
+    API_ENDPOINTS.ADMIN_STATUS(currentStatus),
   );
+
+  const cardData = admin_data?.applicants;
 
   const { mutate: admin_change_status, loading: change_status } = usePutData(
     "api/admin/loan/change-status",
@@ -143,7 +147,7 @@ function Loan_management() {
       <CardStatus
         searchrefPending={searchrefPending}
         setSearchrefPending={setSearchrefPending}
-        admin_data={admin_data}
+        cardData={cardData}
         approveStatus={approveStatus}
         rejectStatus={rejectStatus}
         currentStatus={currentStatus}

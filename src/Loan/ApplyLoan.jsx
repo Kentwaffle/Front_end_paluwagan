@@ -114,6 +114,10 @@ function ApplyLoan() {
             await queryClient.invalidateQueries({
               queryKey: ["user-status-key"],
             });
+            await queryClient.invalidateQueries({
+              queryKey: ["admin-loans"],
+            });
+            await queryClient.invalidateQueries({});
 
             navigate("/pending_status");
           },

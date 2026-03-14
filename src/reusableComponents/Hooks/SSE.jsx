@@ -6,21 +6,18 @@ export const useLoanSSE = (shouldConnect, savingsId) => {
   const queryClient = useQueryClient();
 
   useEffect(() => {
+    console.log("SSE Hook URL:", API_ENDPOINTS.SSE);
     if (!shouldConnect) return;
 
     let eventSource;
     let reconnectTimeout;
 
-    // 1. I-define ang handleUpdate sa labas ng connect()
-    // para ma-access siya ng cleanup function sa ibaba.
     const handleUpdate = (event) => {
       console.log("Realtime update received!", event.data);
 
-      // Opsyonal: Magdagdag ng maliit na delay para hindi sumabog ang requests
       setTimeout(() => {
         queryClient.invalidateQueries({
           predicate: (query) => {
-            // Kunin ang key, siguraduhing string ito
             const queryKey = query.queryKey;
             const keyString = JSON.stringify(queryKey);
 
@@ -77,5 +74,5 @@ export const useLoanSSE = (shouldConnect, savingsId) => {
         console.log("SSE Connection closed");
       }
     };
-  }, [shouldConnect, savingsId]);
+  }, [shouldConnect, savingsId, queryClient]);
 };

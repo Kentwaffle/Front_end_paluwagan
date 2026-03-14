@@ -19,7 +19,6 @@ function Saving_management() {
 
   const hanldeShowMemberPayment = (id) => {
     navigate(`${id}`);
-    w;
   };
 
   const ApiTO = 100;
