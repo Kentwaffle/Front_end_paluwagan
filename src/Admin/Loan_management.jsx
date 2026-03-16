@@ -22,14 +22,6 @@ function Loan_management() {
   //SSE ni juls na di ko magets
   useLoanSSE(true, null);
 
-  //DYNAMIC ENDPOINTS
-  // const statusEndpoint =
-  //   currentStatus === "PENDING"
-  //     ? API_ENDPOINTS.ADMIN_PENDING
-  //     : currentStatus === "APPROVED"
-  //       ? API_ENDPOINTS.ADMIN_APPROVED
-  //       : API_ENDPOINTS.ADMIN_REJECTED;
-
   const status = "APPROVED";
 
   const { data: admin_data } = useFetchData(

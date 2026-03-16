@@ -13,6 +13,7 @@ import UserLoanCard from "./UserLoanCard";
 import { useForm } from "../../reusableComponents/Hooks/HandleChange&Submit";
 import { showAlert } from "../../reusableComponents/Alerts/SweetAlerts";
 import { ValidateFundsAdmin } from "../../validations/CredentialValidation";
+import { generateUUID } from "../../reusableComponents/GeneratedIDS";
 
 function LoanCardPayment() {
   const { type } = useParams();
@@ -21,6 +22,7 @@ function LoanCardPayment() {
   const [selectedPanel, setSelectedPanel] = useState("cash");
   const [paymentMode, setPaymentMode] = useState("");
   const [searchInput, setSearchInput] = useState("");
+  const genId = generateUUID();
 
   const loanFunds = [
     { label: "Cash", value: "cash" },
@@ -72,6 +74,7 @@ function LoanCardPayment() {
         applicationId: formdataMap,
         amount: currentAmount,
         paymentMethod: "CASH",
+        genId: genId,
       });
     } else {
       setFormData({
@@ -79,13 +82,13 @@ function LoanCardPayment() {
         amount: currentAmount,
         paymentMethod: "",
         bankReference: "",
+        genId: genId,
       });
     }
   }, [selectedPanel, isLoan, selectedUser]);
 
   const paymentHandler = (e) => {
     if (e) e.preventDefault();
-    console.log("Current Errors:", formErrors);
     handleSubmit(e, () => {
       console.log("Eto ang ipapasa ko:", formData);
       FundsData(formData, {

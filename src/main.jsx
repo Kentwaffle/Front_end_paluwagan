@@ -58,6 +58,9 @@ import Auth from "./auth/Auth";
 import Notification from "./MainComponents/Notification";
 import LoanCardPayment from "./Admin/FundsAdmin/LoanCardPayment";
 import SavingsMemberFilter from "./Admin/SavingsAdmin/SavingsMemberFilter";
+import MemberCard from "./Admin/SavingsAdmin/MemberCard";
+import Memberlist from "./Admin/MemberList/Memberlist";
+import AddAdmin from "./Admin/MemberList/AddAdmin";
 const queryClient = new QueryClient();
 
 const UserIndexRedirect = ({ isStatus }) => {
@@ -253,6 +256,13 @@ const Main = () => {
             { path: ":type", element: <LoanCardPayment /> },
           ],
         },
+        {
+          path: "memberlist",
+          children: [
+            { index: true, element: <Memberlist /> },
+            { path: "addAdmin", element: <AddAdmin /> },
+          ],
+        },
       ],
     },
     { path: "*", element: <Eror404 /> },
@@ -262,7 +272,6 @@ const Main = () => {
     <div className="relative">
       <RouterProvider router={router} />
 
-      {/* Dito papasok yung blurred pop-up */}
       {isTokenExpired ? (
         <Error error={{ response: { data: { error: "EXPIRED_TOKEN" } } }} />
       ) : isBackendDown ? (
