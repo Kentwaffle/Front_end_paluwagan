@@ -256,3 +256,52 @@ export const ValidateFundsAdmin = (formData) => {
     errors,
   };
 };
+
+export const ValidateAdmin = (formData, step) => {
+  let errors = {};
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phoneRegex = /^(09|\+639)\d{9}$/;
+  const nameRegex = /^[a-zA-Z\s.-]+$/;
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+  if (step === 1) {
+    if (!formData.firstName?.trim()) {
+      errors.firstName = "First name is required";
+    } else if (!nameRegex.test(formData.firstName)) {
+      errors.firstName = "Invalid characters in name";
+    }
+
+    if (!formData.lastName?.trim()) {
+      errors.lastName = "Last name is required";
+    } else if (!nameRegex.test(formData.lastName)) {
+      errors.lastName = "Invalid characters in name";
+    }
+
+    if (!formData.phoneNumber?.trim()) {
+      errors.phoneNumber = "Phone number is required";
+    } else if (!phoneRegex.test(formData.phoneNumber)) {
+      errors.phoneNumber = "Invalid PH phone number (e.g. 09123456789)";
+    }
+  }
+
+  if (step === 2) {
+    if (!formData.email?.trim()) {
+      errors.email = "Email is required";
+    } else if (!emailRegex.test(formData.email)) {
+      errors.email = "Invalid email address";
+    }
+
+    if (!formData.password) {
+      errors.password = "Password is required";
+    } else if (!passwordRegex.test(formData.password)) {
+      errors.password =
+        "Password must be at least 8 characters with uppercase and lowercase Ex. Admin123";
+    }
+  }
+
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors,
+  };
+};

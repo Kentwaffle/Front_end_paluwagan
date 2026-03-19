@@ -44,7 +44,6 @@ function Loan_management() {
     e.preventDefault();
     e.stopPropagation();
 
-    console.log("Mutation Triggered! ID:", id);
     const confirm = await swalModal({
       title: "Approve this application?",
       text: `You are about to approved this application ID: ${id}`,

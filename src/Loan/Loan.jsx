@@ -53,7 +53,7 @@ function Loan() {
     activeEndpoint,
   );
 
-  const loan = loanData?.payload?.loans?.[0];
+  const loan = loanData?.payload?.loans;
   const appID =
     loanData?.payload?.applications?.[0]?.applicationNumber || "N/A";
 

@@ -11,6 +11,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { showAlert } from "../reusableComponents/Alerts/SweetAlerts";
 import { useInfiniteFetch } from "../serviceToApi/InfiniteScroll";
 import { useDeleteData } from "../serviceToApi/DeleteData";
+import { useInfiniteAutoScroll } from "../reusableComponents/Hooks/automaticScroll";
+
 function Notification() {
   const navigate = useNavigate();
   const { user, isLoadingAuth } = useAuth();
@@ -20,7 +22,6 @@ function Notification() {
   const isAdmin = user?.role === "ROLE_ADMIN";
   const userID = user?.userId;
   const queryClient = useQueryClient();
-  const sentinelRef = useRef();
 
   const endpoints = {
     list: isAdmin
@@ -52,22 +53,12 @@ function Notification() {
   } = useInfiniteFetch(["notification_list", userID], endpoints.list, {
     enabled: !!userID,
   });
-
+  const sentinelRef = useInfiniteAutoScroll(
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  );
   const allNotifs = data?.pages.flatMap((page) => page.content) || [];
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-          fetchNextPage();
-        }
-      },
-      { threshold: 0.5 },
-    );
-
-    if (sentinelRef.current) observer.observe(sentinelRef.current);
-    return () => observer.disconnect();
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleReadOnce = (notif) => {
     const targetUrl = isAdmin

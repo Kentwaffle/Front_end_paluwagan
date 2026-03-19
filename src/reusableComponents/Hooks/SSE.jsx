@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { API_ENDPOINTS } from "../../serviceToApi/ApiEndpoint";
 
-export const useLoanSSE = (shouldConnect, savingsId) => {
+export const useLoanSSE = (shouldConnect, savingsId, isLoan) => {
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -14,7 +14,7 @@ export const useLoanSSE = (shouldConnect, savingsId) => {
 
     const handleUpdate = (event) => {
       console.log("Realtime update received!", event.data);
-
+      const currentSearchKey = isLoan ? "searchLoan" : "searchSavings";
       setTimeout(() => {
         queryClient.invalidateQueries({
           predicate: (query) => {
@@ -22,12 +22,14 @@ export const useLoanSSE = (shouldConnect, savingsId) => {
             const keyString = JSON.stringify(queryKey);
 
             return (
+              keyString.includes(currentSearchKey) ||
               keyString.includes("api/admin/loan") ||
               keyString.includes("admin-loans") ||
               keyString.includes("api/admin/savings/members") ||
               keyString.includes("/api/savings/summary") ||
               keyString.includes("user-status-key") ||
               keyString.includes("admin-loan-counts") ||
+              keyString.includes("payments") ||
               (savingsId &&
                 keyString.includes(
                   `/api/admin/savings/payment/filter/${savingsId}`,
@@ -74,5 +76,5 @@ export const useLoanSSE = (shouldConnect, savingsId) => {
         console.log("SSE Connection closed");
       }
     };
-  }, [shouldConnect, savingsId, queryClient]);
+  }, [shouldConnect, savingsId, queryClient, isLoan]);
 };

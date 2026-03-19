@@ -14,16 +14,17 @@ import { useForm } from "../../reusableComponents/Hooks/HandleChange&Submit";
 import { showAlert } from "../../reusableComponents/Alerts/SweetAlerts";
 import { ValidateFundsAdmin } from "../../validations/CredentialValidation";
 import { generateUUID } from "../../reusableComponents/GeneratedIDS";
-
+import { useQueryClient } from "@tanstack/react-query";
+import { swalModal } from "../../reusableComponents/Alerts/SweetAlerts";
+import { useLoanSSE } from "../../reusableComponents/Hooks/SSE";
 function LoanCardPayment() {
   const { type } = useParams();
   const isLoan = type === "loanAddPayment";
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedPanel, setSelectedPanel] = useState("cash");
-  const [paymentMode, setPaymentMode] = useState("");
   const [searchInput, setSearchInput] = useState("");
-  const genId = generateUUID();
-
+  const queryClient = useQueryClient();
+  useLoanSSE(true, selectedUser?.savingsId, isLoan);
   const loanFunds = [
     { label: "Cash", value: "cash" },
     { label: "Online payment", value: "online" },
@@ -74,7 +75,6 @@ function LoanCardPayment() {
         applicationId: formdataMap,
         amount: currentAmount,
         paymentMethod: "CASH",
-        genId: genId,
       });
     } else {
       setFormData({
@@ -82,35 +82,52 @@ function LoanCardPayment() {
         amount: currentAmount,
         paymentMethod: "",
         bankReference: "",
-        genId: genId,
       });
     }
   }, [selectedPanel, isLoan, selectedUser]);
 
+  const modalAlertPayment = (e) => {
+    handleSubmit(e, async () => {
+      const paymentSubmit = await swalModal({
+        title: "Payment?",
+        html: `You are about to pay <b>${formatCurrency(formData.amount)} </b> to ${selectedUser.firstName}. <br/> Do you want to proceed?`,
+        confirmButtonText: "Yes, pay now",
+        icon: "question",
+      });
+      if (paymentSubmit) paymentHandler(e);
+    });
+  };
   const paymentHandler = (e) => {
     if (e) e.preventDefault();
-    handleSubmit(e, () => {
-      console.log("Eto ang ipapasa ko:", formData);
-      FundsData(formData, {
-        onSuccess: (response) => {
-          if (response.success) {
-            showAlert.success(
-              "Successfully paid!",
-              `You've successfully paid ₱${formData.amount} to ${selectedUser.firstName}`,
-            );
+    const genId = generateUUID();
+    const finalFormdata = {
+      ...formData,
+      genId: genId,
+    };
+    console.log("Eto ang ipapasa ko:", finalFormdata);
 
-            setFormData((prev) => ({ ...prev, amount: "" }));
-          } else {
-            showAlert.warning("Failed " + response.message);
-          }
-        },
-        onError: (err) => {
-          showAlert.error(
-            "Error",
-            "Something went wrong with the transaction.",
+    FundsData(finalFormdata, {
+      onSuccess: (response) => {
+        if (response.success) {
+          showAlert.success(
+            "Successfully paid!",
+            `You've successfully paid ₱${formData.amount} to ${selectedUser.firstName}`,
           );
-        },
-      });
+          queryClient.invalidateQueries({
+            queryKey: [isLoan ? "searchLoan" : "searchSavings"],
+          });
+
+          queryClient.invalidateQueries({
+            queryKey: ["payments"],
+          });
+          setFormData((prev) => ({ ...prev, amount: "" }));
+        } else {
+          showAlert.warning("Failed ", response.message);
+        }
+      },
+      onError: (err) => {
+        showAlert.error("Error", "Something went wrong with the transaction.");
+      },
     });
   };
 
@@ -172,7 +189,14 @@ function LoanCardPayment() {
 
       {selectedUser && (
         <UserLoanCard
-          user={selectedUser}
+          user={
+            searchFundsMap?.find(
+              (u) =>
+                (u.applicationId || u.savingsId) ===
+                (selectedUser.applicationId || selectedUser.savingsId),
+            ) || selectedUser
+          }
+          isS
           key={searchFundsMap?.applicationId || searchFundsMap?.savingsId}
           isSelected={true}
           isLoan={isLoan}
@@ -298,7 +322,7 @@ function LoanCardPayment() {
           </div>
           <button
             type="button"
-            onClick={(e) => paymentHandler(e)}
+            onClick={(e) => modalAlertPayment(e)}
             className=" w-full bg-gradient-to-r from-sky-400 to-sky-600 py-3 text-white rounded-xl shadow flex items-center justify-center gap-2 dark:from-sky-600 dark:to-sky-400"
           >
             Submit Payment

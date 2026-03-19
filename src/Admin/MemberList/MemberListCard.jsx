@@ -1,9 +1,9 @@
 import React from "react";
 import { getProfileImage } from "../../reusableComponents/Hooks/ImageGet";
-
-function MemberListCard() {
+import { formatDate } from "../../reusableComponents/formatter";
+function MemberListCard({ content }) {
   return (
-    <button className="p-5 bg-white dark:bg-slate-900 my-3 rounded-2xl shadow-sm w-full active:scale-95 border border-transparent dark:border-slate-800">
+    <button className="p-5 bg-white dark:bg-slate-900 rounded-2xl shadow-sm w-full active:scale-95 border border-transparent dark:border-slate-800">
       <div className="flex justify-center ">
         <div className="flex items-start flex-1 gap-3 justify-between">
           <div className="flex items-center gap-2">
@@ -18,43 +18,52 @@ function MemberListCard() {
             <div className="flex flex-col flex-1 items-start min-w-0">
               <div className="flex flex-wrap gap-1 truncate w-full font-bold">
                 <span className="text-slate-800 dark:text-slate-200">
-                  Full name
+                  {`${content.first_name} ${content.last_name}` ||
+                    "No data found"}
                 </span>
               </div>
               <div className="text-xs text-slate-400 dark:text-slate-500">
-                Date have joined
+                {formatDate(content.verified_date) || "No data found"}
               </div>
             </div>
           </div>
         </div>
-        <div>
-          <span className="border border-gray-300 dark:border-slate-600 text-gray-500 dark:text-slate-400 text-[10px] px-2 py-0.5 rounded-full">
-            USER
+        <div className="flex items-center gap-1">
+          <span
+            className={`text-[10px] px-2 py-0.5 rounded-full border ${
+              content.role_name === "ROLE_ADMIN"
+                ? "bg-indigo-100 text-indigo-700 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-400 dark:border-indigo-800 font-bold tracking-wider"
+                : "text-gray-500 border-gray-300 dark:text-slate-400 dark:border-slate-600"
+            }`}
+          >
+            {content.role_name === "ROLE_ADMIN" ? "ADMIN" : "USER"}
           </span>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 mt-5">
-        <div className="flex flex-col items-start p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-300 dark:border-slate-700">
-          <label className="text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500 font-bold mb-1 text-left w-full">
-            Active Loan
-          </label>
-          <span className="text-sm font-semibold text-success flex items-center gap-1">
-            <div className="w-2 h-2 rounded-full bg-success"></div>
-            Yes
-          </span>
-        </div>
+      {content.role_name === "ROLE_USER" && (
+        <div className="grid grid-cols-2 gap-3 mt-5">
+          <div className="flex flex-col items-start p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-300 dark:border-slate-700">
+            <label className="text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500 font-bold mb-1 text-left w-full">
+              Active Loan
+            </label>
+            <span className="text-sm font-semibold text-success flex items-center gap-1">
+              <div className="w-2 h-2 rounded-full bg-success"></div>
+              Yes
+            </span>
+          </div>
 
-        <div className="flex flex-col items-start p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-300 dark:border-slate-700">
-          <label className="text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500 font-bold mb-1 text-left w-full">
-            Active Loan
-          </label>
-          <span className="text-sm font-semibold text-base-content/40 dark:text-slate-400 flex items-center gap-1">
-            <div className="w-2 h-2 rounded-full bg-base-300 dark:bg-slate-600"></div>
-            No
-          </span>
+          <div className="flex flex-col items-start p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-300 dark:border-slate-700">
+            <label className="text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500 font-bold mb-1 text-left w-full">
+              Active Loan
+            </label>
+            <span className="text-sm font-semibold text-base-content/40 dark:text-slate-400 flex items-center gap-1">
+              <div className="w-2 h-2 rounded-full bg-base-300 dark:bg-slate-600"></div>
+              No
+            </span>
+          </div>
         </div>
-      </div>
+      )}
     </button>
   );
 }

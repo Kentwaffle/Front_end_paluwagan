@@ -26,6 +26,7 @@ import { formatDistanceToNow } from "date-fns";
 import { useQueryClient } from "@tanstack/react-query";
 import { SavingsLoading } from "../reusableComponents/loading";
 import TransactionList from "./CardPayment/TransactionList";
+
 function Savings() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("deposit");
