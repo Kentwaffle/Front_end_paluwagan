@@ -13,6 +13,7 @@ import api from "../../serviceToApi/ApiInstance";
 import { API_ENDPOINTS } from "../../serviceToApi/ApiEndpoint";
 import { jwtDecode } from "jwt-decode";
 import { usePostData } from "../../serviceToApi/PostData";
+import { useFetchData } from "../../serviceToApi/fetchData";
 
 function SignIn() {
   const { formData, formErrors, handleChange, setFormErrors, handleSubmit } =
@@ -29,14 +30,16 @@ function SignIn() {
   const { timer, isCounting, sendOtp } = useOtpTimer(30);
   const passwordField = usePasswordToggle();
   const [hasSent, setHasSent] = useState(false);
-  const { userId } = location.state || {};
+
   const { mutate: loginMutate } = usePostData(API_ENDPOINTS.LOGIN);
+
   const handleSendOtpTrigger = async () => {
     showAlert.loading("Sending", "Please wait");
 
     try {
       await api.post(API_ENDPOINTS.SEND_OTP, {
         email: formData.email,
+        password: formData.password,
       });
       sendOtp(formData.email, formData.password);
       setHasSent(true);
@@ -46,68 +49,51 @@ function SignIn() {
     }
   };
 
-  const onSigninSuccess = () => {
-    showAlert.loading("Loading...", "Please wait");
+  // const { data: isStatusLogin, refetch: fetchStatus } = useFetchData(
+  //   "/api/loan/status",
+  //   API_ENDPOINTS.APPLY_STATUS,
+  //   { enabled: false },
+  // );
 
+  const onSigninSuccess = async () => {
+    showAlert.loading("Loading...", "Please wait");
     if (!formData.otp) {
       showAlert.warning("Wait!", "Please enter the OTP sent to your email.");
       return;
     }
 
     loginMutate(formData, {
-      onSuccess: (data) => {
+      onSuccess: async (data) => {
         if (data.token) {
           localStorage.setItem("token", data.token);
           showAlert.success("Success!", "Logged in successfully!").then(() => {
-            const decodedToken = jwtDecode(data.token);
-            if (decodedToken.hasLoan) {
-              navigate("/loan");
-            } else {
-              navigate("/apply_loan");
-            }
+            // Refresh at balik sa root. Hayaan ang App.js ang mag-redirect.
+            window.location.href = "/";
           });
         }
       },
       onError: (error) => {
-        const errorMessage = error.response?.data?.message;
+        const errorData = error.response?.data;
+        const errorMessage = errorData?.message || "Something went wrong";
+        const errorStatus = errorData?.status;
 
-        if (error.response?.data?.status === "failed - OTP expired") {
-          showAlert.error("Failed", "OTP expired");
+        if (errorStatus === "failed - OTP expired") {
+          showAlert.error("Expired", "Your One Time Password has expired.");
+        } else if (errorStatus === "failed - invalid OTP") {
+          showAlert.error(
+            "Invalid OTP",
+            "Wrong One Time Password. Please try again.",
+          );
         } else {
           showAlert.error("Login Failed", errorMessage);
         }
       },
     });
-
-    // try {
-    //   if (response.data.token) {
-    //     const token = response.data.token;
-    //     localStorage.setItem("token", token);
-
-    //     showAlert.success("Success!", "Logged in successfully!").then(() => {
-    //       console.log("Navigating to Dashboard...");
-    //       navigate("/loan");
-    //     });
-    //   }
-    // } catch (error) {
-    //   console.error("Login failed", error);
-    //   const errorMessage =
-    //     error.response?.data?.message || "Invalid email or password";
-    //   showAlert.error("Login Failed", errorMessage);
-
-    //   if (error.response) {
-    //     const statusMessage = error.response.data.status;
-
-    //     if (statusMessage === "failed - OTP expired") {
-    //       showAlert.error("Failed", "OTP expired");
-    //     }
-    //   }
-    // }
   };
 
   return (
-    <div className="w-full max-w-lg flex flex-col gap-3 bg-white-300 md:px-5 md:py-0">
-      <h2 className="text-center font-semibold text-2xl font-sans mb-3  text-stone-700 md:mb-5">
+    <div className="w-full max-w-lg flex flex-col gap-3 bg-slate-50 md:px-5 md:py-0 dark:bg-slate-950">
+      <h2 className="text-center font-semibold text-2xl font-sans mb-3  text-stone-700 md:mb-5 dark:text-slate-50">
         Sign in to your account
       </h2>
 
@@ -127,10 +113,14 @@ function SignIn() {
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className={formErrors.email ? "input-error border-red-500" : ""}
+            className={
+              formErrors.email
+                ? "input-error border-red-500 dark:border-red-500  "
+                : ""
+            }
           />
           {formErrors.email && (
-            <span className="text-red-500 text-xs mt-1">
+            <span className="text-red-500 text-xs mt-1 dark:text-red-400">
               {formErrors.email}
             </span>
           )}
@@ -140,8 +130,8 @@ function SignIn() {
           <div
             className={`flex items-center border rounded-md px-3 transition-all duration-200 ${
               formErrors.password
-                ? "border-red-500 "
-                : "border-gray-300 focus-within:border-sky-500 focus-within:ring-1 focus-within:ring-sky-500"
+                ? "border-red-500  dark:border-red-500"
+                : "border-gray-300 focus-within:border-sky-500 focus-within:ring-1 focus-within:ring-sky-500 dark:focus-within:border-sky-400 dark:focus-within:ring-sky-400"
             }`}
           >
             <div className="flex items-center justify-between w-full">
@@ -151,7 +141,7 @@ function SignIn() {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="!border-none !outline-none !ring-0 !focus:ring-0 !focus:outline-none w-full px-0 shadow-none bg-transparent"
+                className="!border-none !outline-none !ring-0 !focus:ring-0 !focus:outline-none w-full px-0 shadow-none bg-transparent dark:text-slate-200  dark:placeholder:text-slate-400"
               />
               <div onClick={passwordField.toggle} className="cursor-pointer">
                 {passwordField.show ? <Eye /> : <EyeClosed />}
@@ -159,7 +149,7 @@ function SignIn() {
             </div>
           </div>
           {formErrors.password && (
-            <span className="text-red-500 text-xs mt-1">
+            <span className="text-red-500 text-xs mt-1 dark:text-red-400">
               {formErrors.password}
             </span>
           )}
@@ -169,8 +159,8 @@ function SignIn() {
           <div
             className={`flex items-center border rounded-md px-3 transition-all duration-200 ${
               formErrors.otp
-                ? "border-red-500"
-                : "border-gray-300 focus-within:border-sky-500 focus-within:ring-1 focus-within:ring-sky-500"
+                ? "border-red-500 dark:border-red-500"
+                : "border-gray-300 focus-within:border-sky-500 focus-within:ring-1 focus-within:ring-sky-500 dark:focus-within:border-sky-400 dark:focus-within:ring-sky-400"
             }`}
           >
             <Inputform
@@ -179,7 +169,7 @@ function SignIn() {
               name="otp"
               value={formData.otp}
               onChange={handleChange}
-              className="!border-none !outline-none !ring-0 !focus:ring-0 !focus:outline-none w-full px-0 shadow-none bg-transparent"
+              className="!border-none !outline-none !ring-0 !focus:ring-0 !focus:outline-none w-full px-0 shadow-none bg-transparent dark:text-slate-200 dark:placeholder:text-slate-400"
             />
             <span className="text-stone-400 px-3">|</span>
             <button
@@ -189,7 +179,7 @@ function SignIn() {
               className={`whitespace-nowrap text-sm font-semibold transition-colors duration-200 ${
                 isCounting
                   ? "text-gray-400 cursor-not-allowed"
-                  : "text-sky-600 hover:text-sky-500 cursor-pointer"
+                  : "text-sky-600 hover:text-sky-500 cursor-pointer dark:text-sky-400 dark:hover:text-sky-300"
               }`}
             >
               {isCounting
@@ -200,11 +190,15 @@ function SignIn() {
             </button>
           </div>
           {formErrors.otp && (
-            <span className="text-red-500 text-xs mt-1">{formErrors.otp}</span>
+            <span className="text-red-500 text-xs mt-1 dark:text-red-400">
+              {formErrors.otp}
+            </span>
           )}
         </div>
         <span className="text-sm text-center">
-          Forgot password?
+          <label className="text-slate-700 dark:text-slate-300">
+            Forgot password?
+          </label>
           <Link
             to="/forgot-password"
             className="text-sky-600 text-sm font-semibold hover:underline cursor-pointer underline ml-1"
@@ -220,10 +214,12 @@ function SignIn() {
         </button>
       </form>
       <span className="text-sm text-center">
-        Dont have an account?{" "}
+        <label className="text-slate-700 dark:text-slate-300">
+          Don't have an account?
+        </label>
         <Link
-          to="/register"
-          className="text-sky-600 font-semibold hover:underline cursor-pointer underline"
+          to="/auth/register"
+          className="text-sky-600 font-semibold hover:underline cursor-pointer underline dark:text-sky-400"
         >
           Register here
         </Link>

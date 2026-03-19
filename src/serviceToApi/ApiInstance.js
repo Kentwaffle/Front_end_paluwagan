@@ -17,7 +17,17 @@ api.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
+// api.interceptors.response.use(
+//   (response) => response,
+//   (error) => {
+//     if (error.code === "ERR_NETWORK" || !error.response) {
+//       window.dispatchEvent(new CustomEvent("SERVER_DOWN_ERROR"));
+//     }
+
+//     return Promise.reject(error);
+//   },
+// );
 export default api;

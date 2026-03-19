@@ -11,12 +11,57 @@ export const API_ENDPOINTS = {
   FORGOT_PASSWORD_OTP: `${BASE_URL}/api/auth/forgot-password`,
   VERIFY_OTP_FORGOT_PASSWORD: `${BASE_URL}/api/auth/verify-forgotPass`,
 
-  LOAN_GET: `${BASE_URL}/api/loan/user-details`,
+  STATUS: `${BASE_URL}/api/user/status`,
+
   PROFILE_GET: `${BASE_URL}/api/profile/info`,
   PROFILE_POST: `${BASE_URL}/api/profile/update`,
+  IMAGE_UPLOAD: `${BASE_URL}/api/profile/upload`,
 
+  LOAN_GET: `${BASE_URL}/api/loan/user-details`,
   APPLY_LOAN: `${BASE_URL}/api/loan/calculate-loan`,
   APPLY_LOAN_POST: `${BASE_URL}/api/loan/apply-loan`,
-  APPLY_STATUS: `${BASE_URL}/api/loan/status`,
   APPLICATION_DETAILS: `${BASE_URL}/api/loan/status/details`,
+  ADMIN_CHANGE_STATUS: `${BASE_URL}/api/admin/loan/change-status`,
+  GET_PAYMENT: `${BASE_URL}/api/loan/payment/filter`,
+
+  ADMIN_STATUS: (status) => `${BASE_URL}/api/admin/loan/${status}`,
+  // ADMIN_APPROVED: `${BASE_URL}/api/admin/loan/approve`,
+  // ADMIN_REJECTED: `${BASE_URL}/api/admin/loan/rejected`,
+  ADMIN_COUNT: `${BASE_URL}/api/admin/loan/status-counts`,
+  SSE: `${BASE_URL}/api/loan/updates`,
+
+  APPLY_SAVINGS: `${BASE_URL}/api/savings/apply`,
+  SAVINGS_DEPOSIT: `${BASE_URL}/api/savings/remit`,
+  SAVINGS_DETAILS: `${BASE_URL}/api/savings/summary`,
+  SAVINGS_OFFSET: `${BASE_URL}/api/savings/withdraw`,
+  SAVINGS_PAYMENT_FILTER: `${BASE_URL}/api/savings/payment/filter`,
+  SAVINGS_ADMIN_MEMBERS: `${BASE_URL}/api/admin/savings/members`,
+  SAVINGS_MEMBER_URL: `${BASE_URL}/api/admin/savings/members/{savingsId}`,
+  SAVINGS_FILTER_APPROVED: `${BASE_URL}/api/admin/savings/payment/filter/{savingsId}`,
+  SAVINGS_ACCEPT_PAYMENT: `${BASE_URL}/api/admin/savings/payment`,
+
+  FUNDS_PAYMENT_LOAN_POST: `${BASE_URL}/api/admin/payment/loan`,
+  FUNDS_PAYMENT_LOAN_SEARCH: `${BASE_URL}/api/admin/payment/loan/search`,
+
+  FUNDS_PAYMENT_SAVINGS_POST: `${BASE_URL}/api/admin/payment/savings`,
+  FUNDS_PAYMENT_SAVINGS_SEARCH: `${BASE_URL}/api/admin/payment/savings/search`,
+
+  NOTIFICATIONS_USER: (userId) =>
+    `${BASE_URL}/api/notifications/user/${userId}`,
+  NOTIFICATIONS_ADMIN: `${BASE_URL}/api/notifications/admin`,
+  NOTIFICATIONS_USER_UNREAD_COUNT: (userId) =>
+    `${BASE_URL}/api/notifications/user/${userId}/unread-count`,
+  NOTIFICATIONS_ADMIN_UNREAD_COUNT: `${BASE_URL}/api/notifications/admin/unread-count`,
+  NOTIFICATIONS_MARK_SINGLE_USER: (notificationId) =>
+    `${BASE_URL}/api/notifications/user/${notificationId}/read`,
+  NOTIFICATIONS_MARK_SINGLE_ADMIN: (notificationId) =>
+    `${BASE_URL}/api/notifications/admin/${notificationId}/read`,
+  NOTIFICATIONS_MARK_ALL_USER: `${BASE_URL}/api/notifications/user/read-selected`,
+  NOTIFICATIONS_MARK_ALL_ADMIN: `${BASE_URL}/api/notifications/admin/read-selected`,
+  NOTIFICATIONS_DELETE: `${BASE_URL}/api/notifications/clear-all`,
+
+  ADMIN_MEMBERLIST: `${BASE_URL}/api/admin/memberlist/search`,
+  ADD_ADMIN: `${BASE_URL}/api/admin/memberlist/register-admin`,
+
+  LOGOUT: `${BASE_URL}/api/auth/logout`,
 };

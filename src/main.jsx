@@ -1,9 +1,8 @@
 import { StrictMode } from "react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./index.css";
 import ReactDOM from "react-dom/client";
-import { Navigate } from "react-router-dom";
-
+import { Navigate, useLocation } from "react-router-dom";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -17,150 +16,282 @@ import ForgotPassword from "./LandingPage/registrationComponents/ForgotPassword"
 import ChangePassword from "./LandingPage/registrationComponents/ChangePassword";
 
 //Main
+import MainLayout from "./MainComponents/MainLayout";
+//Loan
 import Loan from "./Loan/Loan";
-import Savings from "./Savings/Savings";
+import ApplyLoan from "./Loan/ApplyLoan";
+import PendingStatus from "./Loan/PendingStatus";
+
+//Profile
 import Profile from "./Profile/Profile";
 import Edit_Profile from "./Profile/Edit_Profile";
-import ApplyLoan from "./Loan/ApplyLoan";
+
+//Savings
+import Savings from "./Savings/Savings";
+import Apply_savings from "./Savings/Apply_savings";
+import SavingsPayment from "./Savings/SavingsPayment";
+
 //404
 import Eror404 from "./Eror404/404";
 
 //OTP
 import Otp from "./LandingPage/registrationComponents/Otp";
-import { jwtDecode } from "jwt-decode";
+
+//API
 import { useFetchData } from "./serviceToApi/fetchData";
 import { API_ENDPOINTS } from "./serviceToApi/ApiEndpoint";
 
+//Loading
+import { LoadingServer } from "./reusableComponents/loading";
+import Error from "./reusableComponents/Error";
+
+//Admin
+import Loan_management from "./Admin/Loan_management";
+import Saving_management from "./Admin/SavingsAdmin/Saving_management";
+import PaymentList from "./Admin/SavingsAdmin/PaymentList";
+import LoanFundsMain from "./Admin/FundsAdmin/LoanFundsMain";
+//SSE
+import { useLoanSSE } from "./reusableComponents/Hooks/SSE";
+//Auth
+import { useAuth } from "./auth/Auth";
+import Auth from "./auth/Auth";
+import Notification from "./MainComponents/Notification";
+import LoanCardPayment from "./Admin/FundsAdmin/LoanCardPayment";
+import SavingsMemberFilter from "./Admin/SavingsAdmin/SavingsMemberFilter";
+import MemberCard from "./Admin/SavingsAdmin/MemberCard";
+import Memberlist from "./Admin/MemberList/Memberlist";
+import AddAdmin from "./Admin/MemberList/AddAdmin";
 const queryClient = new QueryClient();
 
-//Pagwalang token ibabalik nya sa main route
-const ProtectedRoute = ({ children, requireLoan = false }) => {
-  const { data, loading } = useFetchData(
-    "/api/loan/status",
-    API_ENDPOINTS.APPLY_STATUS,
+const UserIndexRedirect = ({ isStatus }) => {
+  const payload = isStatus?.payload;
+  if (!payload) return <LoadingServer />;
+
+  if (payload.hasApprovedApplication) return <Navigate to="/loan" replace />;
+  if (payload.hasPendingApplication)
+    return <Navigate to="/pending_status" replace />;
+  return <Navigate to="/apply_loan" replace />;
+};
+
+//Pagwalang token ibabalik nya sa main
+const ProtectedRoute = ({
+  children,
+  userRole,
+  isStatus,
+  isStatusLoading,
+  isLoadingAuth,
+}) => {
+  const location = useLocation();
+  if (isLoadingAuth || isStatusLoading) return <LoadingServer />;
+  if (!userRole) return <Navigate to="/auth" replace />;
+  if (userRole === "ROLE_ADMIN") return children;
+
+  const payload = isStatus?.payload;
+  const currentPath = location.pathname;
+  console.log("Gatekeeper checking path:", currentPath);
+
+  // Kung wala pang payload data, wag munang papasukin sa kahit anong path
+  if (!payload && userRole === "ROLE_USER") return <LoadingServer />;
+
+  if (userRole === "ROLE_USER") {
+    // Approved User logic
+    if (payload.hasApprovedApplication) {
+      if (["/apply_loan", "/pending_status"].includes(currentPath)) {
+        return <Navigate to="/loan" replace />;
+      }
+    }
+    // Pending User logic
+    else if (payload.hasPendingApplication) {
+      if (["/apply_loan", "/loan", "/"].includes(currentPath)) {
+        return <Navigate to="/pending_status" replace />;
+      }
+    }
+    // New User logic
+    else {
+      if (["/loan", "/pending_status"].includes(currentPath)) {
+        return <Navigate to="/apply_loan" replace />;
+      }
+    }
+
+    //Savings\
+    if (currentPath.startsWith("/savings")) {
+      if (payload.hasSavingsAccount) {
+        if (currentPath === "/savings/apply_savings") {
+          return <Navigate to="/savings" replace />;
+        }
+      } else {
+        // Kung walang savings account, dapat lagi siyang nasa apply_savings
+        if (currentPath === "/savings") {
+          return <Navigate to="/savings/apply_savings" replace />;
+        }
+      }
+    }
+  }
+
+  return children;
+};
+
+const PublicRoute = ({ children, userRole }) => {
+  if (userRole) {
+    // Kung naka-login na at pilit pumasok sa Login page, i-redirect base sa role
+    const destination =
+      userRole === "ROLE_ADMIN" ? "/admin/loan_management" : "/loan";
+    return <Navigate to={destination} replace />;
+  }
+  return children;
+};
+
+const Main = () => {
+  const [isBackendDown, setIsBackendDown] = useState(false);
+  const { user, isTokenExpired, token, isLoadingAuth } = useAuth();
+  const roles = user?.role;
+  useLoanSSE(!!token && !isLoadingAuth);
+
+  const { data: isStatus, isLoading: isStatusLoading } = useFetchData(
+    "user-status-key",
+    API_ENDPOINTS.STATUS,
+    { enabled: !!token && !isLoadingAuth && roles === "ROLE_USER" },
   );
 
-  const token = localStorage.getItem("token");
-  if (!token) {
-    return <Navigate to="/" replace />;
-  }
+  useEffect(() => {
+    const handleServerError = () => setIsBackendDown(true);
 
-  if (loading || data === undefined) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <span className="loading loading-spinner loading-lg text-sky-500"></span>
-      </div>
-    );
-  }
+    window.addEventListener("SERVER_DOWN_ERROR", handleServerError);
+    return () =>
+      window.removeEventListener("SERVER_DOWN_ERROR", handleServerError);
+  }, []);
 
-  const hasApproved = data?.payload?.hasApprovedApplication;
-  const hasPending = data?.payload?.hasPendingApplication;
-  const currentPath = window.location.pathname;
-  const hasActiveLoan = data?.payload?.hasActiveLoan;
+  const router = createBrowserRouter([
+    {
+      path: "/auth",
+      element: (
+        <PublicRoute userRole={roles}>
+          <PaluwaganMain />
+        </PublicRoute>
+      ),
+      children: [
+        { index: true, element: <SignIn /> },
+        { path: "register", element: <Register /> },
+      ],
+    },
+    { path: "/register/otp", element: <Otp /> },
+    {
+      path: "forgot-password",
+      children: [
+        { index: true, element: <ForgotPassword /> },
+        { path: "changepassword", element: <ChangePassword /> },
+      ],
+    },
 
-  if (currentPath === "/apply_loan") {
-    if (hasActiveLoan) return <Navigate to="/loan" replace />;
-  }
+    // USER ROUTES
+    {
+      path: "/",
+      element: (
+        <ProtectedRoute
+          userRole={roles}
+          isStatus={isStatus}
+          isStatusLoading={isStatusLoading}
+          isLoadingAuth={isLoadingAuth}
+        >
+          <MainLayout isStatus={isStatus} isStatusLoading={isStatusLoading} />
+        </ProtectedRoute>
+      ),
+      children: [
+        {
+          index: true,
+          element:
+            roles === "ROLE_ADMIN" ? (
+              <Navigate to="/admin/loan_management" replace />
+            ) : (
+              <UserIndexRedirect isStatus={isStatus} />
+            ),
+        },
 
-  if (requireLoan) {
-    if (hasApproved || hasActiveLoan) {
-      return children;
-    }
-    return <Navigate to="/apply_loan" replace />;
-  }
+        { path: "profile", element: <Profile /> },
+        { path: "profile/edit_profile", element: <Edit_Profile /> },
 
-  // if (requireLoan) {
-  //   if (hasApproved) return <div className="route-wrapper">{children}</div>;
-  //   if (hasPending) return <Navigate to="/apply_loan" replace />;
-  //   return <Navigate to="/apply_loan" replace />;
-  // }
+        { path: "notification", element: <Notification /> },
+        { path: "loan", element: <Loan /> },
+        { path: "apply_loan", element: <ApplyLoan /> },
+        { path: "pending_status", element: <PendingStatus /> },
+        //Savings
+        {
+          path: "savings",
 
-  return <div className="route-wrapper">{children}</div>;
+          children: [
+            { index: true, element: <Savings /> },
+            { path: "apply_savings", element: <Apply_savings /> },
+            { path: "savings_payments", element: <SavingsPayment /> },
+          ],
+        },
+      ],
+    },
+    // ADMIN ROUTES
+    {
+      path: "/admin",
+      element: (
+        <ProtectedRoute
+          userRole={roles}
+          isLoadingAuth={isLoadingAuth}
+          isStatusLoading={false}
+        >
+          <MainLayout />
+        </ProtectedRoute>
+      ),
+      children: [
+        { index: true, element: <Navigate to="loan_management" replace /> },
+        { path: "loan_management", element: <Loan_management /> },
+        {
+          path: "savings_management",
+          children: [
+            { index: true, element: <Saving_management /> },
+            { path: ":savingsId", element: <PaymentList /> },
+            { path: "savingsmembers", element: <SavingsMemberFilter /> },
+          ],
+        },
+        {
+          path: "funds_management",
+          children: [
+            { index: true, element: <LoanFundsMain /> },
+            { path: ":type", element: <LoanCardPayment /> },
+          ],
+        },
+        {
+          path: "memberlist",
+          children: [
+            { index: true, element: <Memberlist /> },
+            { path: "addAdmin", element: <AddAdmin /> },
+          ],
+        },
+      ],
+    },
+    { path: "*", element: <Eror404 /> },
+  ]);
+
+  return (
+    <div className="relative">
+      <RouterProvider router={router} />
+
+      {isTokenExpired ? (
+        <Error error={{ response: { data: { error: "EXPIRED_TOKEN" } } }} />
+      ) : isBackendDown ? (
+        <Error
+          error={{
+            message:
+              "Server connection failed. Please contact us for support or return to the login page to refresh your session.",
+          }}
+        />
+      ) : null}
+    </div>
+  );
 };
-
-//Pag meron token psok para smooth ang tete
-const PublicRoute = ({ children }) => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    return <Navigate to="/loan" replace />;
-  }
-  return <div className="route-wrapper">{children}</div>;
-};
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: (
-      <PublicRoute>
-        <PaluwaganMain />
-      </PublicRoute>
-    ),
-    children: [
-      { path: "/", element: <SignIn /> },
-      { path: "register", element: <Register /> },
-    ],
-  },
-  {
-    path: "/register/otp",
-    element: <Otp />,
-  },
-  {
-    path: "forgot-password",
-    children: [
-      { index: true, element: <ForgotPassword /> },
-      { path: "changepassword", element: <ChangePassword /> },
-    ],
-  },
-  {
-    path: "/loan",
-    element: (
-      <ProtectedRoute requireLoan={true}>
-        <Loan />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/savings",
-    element: (
-      <ProtectedRoute requireLoan={false}>
-        <Savings />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/profile",
-    element: (
-      <ProtectedRoute requireLoan={false}>
-        <Profile />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/profile/edit_profile",
-    element: (
-      <ProtectedRoute requireLoan={false}>
-        <Edit_Profile />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "apply_loan",
-    element: (
-      <ProtectedRoute requireLoan={false}>
-        <ApplyLoan />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "*",
-    element: <Eror404 />,
-  },
-]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
+      <Auth>
+        <Main />
+      </Auth>
     </QueryClientProvider>
   </StrictMode>,
 );

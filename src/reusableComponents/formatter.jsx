@@ -1,6 +1,6 @@
 export const formatDate = (dateString) => {
   // 1. Check if actually empty or null
-  if (!dateString) return "N/A";
+  if (!dateString) return null;
 
   try {
     const date = new Date(dateString);
@@ -16,7 +16,7 @@ export const formatDate = (dateString) => {
     }).format(date);
   } catch (error) {
     console.error("Date formatting error:", error);
-    return "N/A";
+    return null;
   }
 };
 
@@ -34,4 +34,12 @@ export const formatMonthDay = (dateString) => {
     month: "short",
     day: "numeric",
   });
+};
+
+export const formatDateForAPI = (date) => {
+  if (!date) return "";
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return "";
+
+  return d.toLocaleDateString("en-CA");
 };

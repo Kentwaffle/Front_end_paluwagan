@@ -15,7 +15,7 @@ function ForgotPassword() {
     {
       email: "",
     },
-    ValidateForgotPassword
+    ValidateForgotPassword,
   );
   const navigate = useNavigate();
 
@@ -29,7 +29,7 @@ function ForgotPassword() {
 
       await showAlert.success(
         "Verified Email!",
-        "OTP has been send to your inbox or spam"
+        "OTP has been send to your inbox or spam",
       );
 
       navigate("/forgot-password/changepassword", {
@@ -48,7 +48,7 @@ function ForgotPassword() {
     <div className="p-5 w-full md:min-h-screen md:flex md:items-center md:justify-center ">
       <form
         onSubmit={(e) => handleSubmit(e, handleSendForgotPassword)}
-        className="flex flex-col gap-3 w-full md:max-w-xl md:border md:border-stone-300 md:py-2 md:px-3 md:pb-5 md:rounded-md md:shadow-md"
+        className="flex flex-col gap-3 w-full md:max-w-xl md:border md:border-stone-300 md:py-2 md:px-3 md:pb-5 md:rounded-md md:shadow-md dark:bg-slate-950 dark:border-slate-700"
       >
         <div className="w-full  flex justify-end">
           <button>
