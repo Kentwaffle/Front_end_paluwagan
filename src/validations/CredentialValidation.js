@@ -337,11 +337,11 @@ export const ValidateEditMemberAdmin = (formData) => {
     errors.phoneNumber = "Invalid PH phone number (09XXXXXXXXX)";
   }
 
-  // if (!formData.email) {
-  //   errors.email = "Email is required";
-  // } else if (!emailRegex.test(formData.email)) {
-  //   errors.email = "Invalid email format";
-  // }
+  if (!formData.email) {
+    errors.email = "Email is required";
+  } else if (!emailRegex.test(formData.email)) {
+    errors.email = "Invalid email format";
+  }
 
   return {
     isValid: Object.keys(errors).length === 0,

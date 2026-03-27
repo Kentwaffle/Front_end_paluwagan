@@ -33,6 +33,7 @@ import {
 } from "../../reusableComponents/Alerts/SweetAlerts";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
+import { calculateAge } from "../../reusableComponents/CalculateAge";
 
 function ProfileOverview() {
   const { user_id } = useParams();
@@ -133,6 +134,7 @@ function ProfileOverview() {
       color: "bg-indigo-500",
     },
   ];
+  const age = calculateAge(profileData?.birthday);
 
   const profileInfo = [
     {
@@ -143,7 +145,7 @@ function ProfileOverview() {
     },
     {
       label: "Age",
-      // content: ,
+      content: age,
       icon: <Fingerprint size={20} />,
       color: "bg-sky-500",
     },

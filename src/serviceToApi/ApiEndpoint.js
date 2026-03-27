@@ -61,8 +61,10 @@ export const API_ENDPOINTS = {
   ADMIN_MEMBERLIST: `${BASE_URL}/api/admin/memberlist/search`,
   ADD_ADMIN: `${BASE_URL}/api/admin/memberlist/register-admin`,
   ADD_USER_OVERVIEW: (userId) => `${BASE_URL}/api/admin/memberlist/${userId}`,
+
   ADMIN_DELETE_MEMBER: (userId) =>
     `${BASE_URL}/api/admin/memberlist/member/${userId}`,
+
   ADMIN_EDIT_MEMBER: (userId) =>
     `${BASE_URL}/api/admin/memberlist/member/${userId}/edit`,
   LOGOUT: `${BASE_URL}/api/auth/logout`,

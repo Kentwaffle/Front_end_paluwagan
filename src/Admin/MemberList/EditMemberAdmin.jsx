@@ -12,26 +12,32 @@ import {
   swalModal,
 } from "../../reusableComponents/Alerts/SweetAlerts";
 import SelectDropdown from "../../reusableComponents/selectdropdown";
+import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 
 function EditMemberAdmin() {
+  const queryClient = useQueryClient();
+
   const location = useLocation();
+  const navigate = useNavigate();
   const { user_id } = useParams();
   const { initialData, fullName } = location.state || {};
   const { formData, handleChange, handleSubmit, formErrors } = useForm(
     {
-      firstName: "",
-      middleName: "",
-      lastName: "",
-      suffix: "",
-      gender: "",
-      birthDay: "",
-      address: "",
-      phoneNumber: "",
-      // email: "",
+      firstName: initialData?.firstName || "",
+      middleName: initialData?.middlleName || "",
+      lastName: initialData?.lastName || "",
+      suffix: initialData?.suffix || "",
+      gender: initialData?.gender || "",
+      birthDay: initialData?.birthday || "",
+      address: initialData?.address || "",
+      phoneNumber: initialData?.phoneNumber || "",
+      email: initialData?.email || "",
     },
 
     ValidateEditMemberAdmin,
   );
+
   //  {
   //     firstName: "",
   //     middleName: "",
@@ -44,18 +50,6 @@ function EditMemberAdmin() {
   //     email: "",
   //   },
 
-  //   {
-  //   firstName: initialData?.firstName || "",
-  //   middleName: initialData?.middlleName || "",
-  //   lastName: initialData?.lastName || "",
-  //   suffix: initialData?.suffix || "",
-  //   gender: initialData?.gender || "",
-  //   birthDay: formatDate(initialData?.birthday) || "",
-  //   address: initialData?.address || "",
-  //   phoneNumber: initialData?.phoneNumber || "",
-  //   email: initialData?.email || "",
-  // },
-
   const fieldMap = [
     { label: "First name", name: "firstName" },
     { label: "Middle name", name: "middleName" },
@@ -66,16 +60,17 @@ function EditMemberAdmin() {
       type: "dropdown",
       options: ["Jr.", "Sr.", "III", "IV"],
     },
+
     {
       label: "Gender",
       name: "gender",
       type: "dropdown",
       options: ["Male", "Female"],
     },
-    { label: "Birthday", name: "birthDay" },
+    { label: "Birthday", name: "birthDay", type: "date" },
     { label: "Address", name: "address" },
     { label: "Phone Number", name: "phoneNumber" },
-    // { label: "Email", name: "email" },
+    { label: "Email", name: "email" },
   ];
 
   const { mutate: editData } = usePatchData(
@@ -96,10 +91,17 @@ function EditMemberAdmin() {
   };
 
   const handleEdit = () => {
-    console.log(formData);
+    showAlert.loading("Loading", "Please wait");
     editData(formData, {
       onSuccess: () => {
         showAlert.success("Success", "Updated successfully");
+        queryClient.invalidateQueries(["/api/profile/info"]);
+        queryClient.invalidateQueries(["/edit_profile"]);
+        queryClient.invalidateQueries(["/header"]);
+        queryClient.invalidateQueries({
+          queryKey: ["memberList-overview"],
+        });
+        navigate(`/admin/memberlist/${user_id}`);
       },
 
       onError: (err) => {
