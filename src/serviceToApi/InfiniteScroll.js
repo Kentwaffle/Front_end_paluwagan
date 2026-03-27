@@ -2,22 +2,30 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import api from "./ApiInstance";
 
 export const useInfiniteFetch = (queryKey, endpoint, options = {}) => {
+  const apiKey = Array.isArray(queryKey) ? queryKey : [queryKey];
   return useInfiniteQuery({
-    queryKey: Array.isArray(queryKey) ? queryKey : [queryKey],
+    queryKey: apiKey,
     queryFn: async ({ pageParam = 0 }) => {
-      // 1. Check kung may '?' na sa endpoint (halimbawa: search?name=kent)
       const separator = endpoint.includes("?") ? "&" : "?";
 
-      // 2. Dito natin idudugtong yung page params nang tama
       const res = await api.get(
         `${endpoint}${separator}page=${pageParam}&size=10`,
       );
 
-      console.log(`Payload for page ${pageParam}:`, res.data);
+      console.log(`Payload for page ${pageParam}: ${apiKey}`, res.data);
       return res.data;
     },
     getNextPageParam: (lastPage) => {
-      return lastPage.last ? undefined : lastPage.number + 1;
+      const pagination = lastPage.allPayments ? lastPage.allPayments : lastPage;
+
+      if (!pagination || pagination.last === true) {
+        return undefined;
+      }
+
+      // Siguraduhin na number ang kukunin at may fallback na 0
+      const currentPage =
+        typeof pagination.number === "number" ? pagination.number : 0;
+      return currentPage + 1;
     },
     ...options,
   });

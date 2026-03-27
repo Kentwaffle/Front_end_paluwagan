@@ -51,15 +51,18 @@ function Notification() {
     isFetchingNextPage,
     isLoading: isLoadingNotification,
   } = useInfiniteFetch(["notification_list", userID], endpoints.list, {
-    enabled: !!userID,
+    enabled: !!userID && !!endpoints.list,
+    staleTime: 5000,
+    gcTime: 0,
   });
+
+  const allNotifs = data?.pages.flatMap((page) => page.content) || [];
   const sentinelRef = useInfiniteAutoScroll(
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    allNotifs.length, // Eto yung itemCount natin
   );
-  const allNotifs = data?.pages.flatMap((page) => page.content) || [];
-
   const handleReadOnce = (notif) => {
     const targetUrl = isAdmin
       ? API_ENDPOINTS.NOTIFICATIONS_MARK_SINGLE_ADMIN(notif.id)
@@ -245,14 +248,16 @@ function Notification() {
           </div>
         )}
       </div>
-      <div ref={sentinelRef} className="p-4 flex justify-center">
+      <div ref={sentinelRef} className="flex justify-center items-center">
         {isFetchingNextPage ? (
-          <span className="loading loading-dots"></span>
+          <span className="loading loading-dots text-slate-500"></span>
         ) : hasNextPage ? (
-          <p className="text-xs italic">Loading more...</p>
-        ) : (
-          <p className="text-xs italic">End of notifications</p>
-        )}
+          <span className="text-[10px] text-slate-300 uppercase tracking-widest animate-pulse">
+            Scroll for more
+          </span>
+        ) : allNotifs.length > 0 ? (
+          <p className="text-xs italic text-slate-400">— End of list —</p>
+        ) : null}
       </div>
       {showSelected && (
         <div

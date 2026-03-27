@@ -52,6 +52,7 @@ function AddAdmin() {
       }
     } else {
       handleSubmit(e, () => {
+        showAlert.loading("Submitting", "Please wait");
         addAdmin(formData, {
           onSuccess: (data) => {
             if (data) {
@@ -59,11 +60,28 @@ function AddAdmin() {
               queryClient.invalidateQueries({
                 queryKey: ["memberlist"],
               });
-              navigate("memberlist");
+              navigate("/admin/memberlist");
             }
           },
           onError: (error) => {
-            showAlert.warning("Failed", error.message);
+            2;
+            const responseData = error.response?.data;
+            let finalMessage = "Something went wrong";
+            if (responseData) {
+              if (
+                responseData.payload &&
+                typeof responseData.payload === "object"
+              ) {
+                const errorKeys = Object.keys(responseData.payload);
+                if (errorKeys.length > 0) {
+                  finalMessage = responseData.payload[errorKeys[0]];
+                }
+              } else if (responseData.message) {
+                finalMessage = responseData.message;
+              }
+            }
+
+            showAlert.warning("Failed", finalMessage);
           },
         });
       });
@@ -89,6 +107,8 @@ function AddAdmin() {
                 name={item.name}
                 label={"Suffix"}
                 options={item.options}
+                onChange={handleChange}
+                value={formData[item.name]}
               />
             ) : (
               <>

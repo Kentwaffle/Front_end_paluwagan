@@ -25,8 +25,6 @@ export const API_ENDPOINTS = {
   GET_PAYMENT: `${BASE_URL}/api/loan/payment/filter`,
 
   ADMIN_STATUS: (status) => `${BASE_URL}/api/admin/loan/${status}`,
-  // ADMIN_APPROVED: `${BASE_URL}/api/admin/loan/approve`,
-  // ADMIN_REJECTED: `${BASE_URL}/api/admin/loan/rejected`,
   ADMIN_COUNT: `${BASE_URL}/api/admin/loan/status-counts`,
   SSE: `${BASE_URL}/api/loan/updates`,
 
@@ -62,6 +60,10 @@ export const API_ENDPOINTS = {
 
   ADMIN_MEMBERLIST: `${BASE_URL}/api/admin/memberlist/search`,
   ADD_ADMIN: `${BASE_URL}/api/admin/memberlist/register-admin`,
-
+  ADD_USER_OVERVIEW: (userId) => `${BASE_URL}/api/admin/memberlist/${userId}`,
+  ADMIN_DELETE_MEMBER: (userId) =>
+    `${BASE_URL}/api/admin/memberlist/member/${userId}`,
+  ADMIN_EDIT_MEMBER: (userId) =>
+    `${BASE_URL}/api/admin/memberlist/member/${userId}/edit`,
   LOGOUT: `${BASE_URL}/api/auth/logout`,
 };

@@ -5,20 +5,20 @@ import SelectDropdown from "../../reusableComponents/selectdropdown";
 import MemberListCard from "./MemberListCard";
 import { useNavigate } from "react-router-dom";
 import { API_ENDPOINTS } from "../../serviceToApi/ApiEndpoint";
-import { useFetchData } from "../../serviceToApi/fetchData";
 import { useInfiniteFetch } from "../../serviceToApi/InfiniteScroll";
 import { useInfiniteAutoScroll } from "../../reusableComponents/Hooks/automaticScroll";
 import { useDebounce } from "../../reusableComponents/Hooks/useBounce";
+
 function Memberlist() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState("All");
+  const [filter, setFilter] = useState("User");
   const debouncedSearch = useDebounce(search, 500);
   const params = new URLSearchParams();
 
   const roleMap = { User: "ROLE_USER", Admin: "ROLE_ADMIN" };
 
-  if (debouncedSearch) params.append("name", debouncedSearch);
+  if (debouncedSearch) params.append("fullName", debouncedSearch);
   if (filter !== "All") params.append("role", roleMap[filter]);
 
   const queryString = params.toString();
@@ -26,17 +26,29 @@ function Memberlist() {
     ? `${API_ENDPOINTS.ADMIN_MEMBERLIST}?${queryString}`
     : API_ENDPOINTS.ADMIN_MEMBERLIST;
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteFetch(["memberlist", debouncedSearch, filter], activeEndpoint);
-
+  const {
+    data: adminData,
+    fetchNextPage: loadMoreAdmins,
+    hasNextPage: hasMoreAdmins,
+    isFetchingNextPage: loadingAdmins,
+  } = useInfiniteFetch(["adminList", debouncedSearch, filter], activeEndpoint, {
+    enabled: !!activeEndpoint,
+    staleTime: 5000,
+    gcTime: 0,
+  });
+  const cardContent = adminData?.pages.flatMap((page) => page.content) || [];
   const sentinel = useInfiniteAutoScroll(
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
+    loadMoreAdmins,
+    hasMoreAdmins,
+    loadingAdmins,
+    cardContent.length,
   );
 
-  const cardContent = data?.pages.flatMap((page) => page.content) || [];
-  const totalElements = data?.pages?.[0]?.totalElements || 0;
+  const totalElements = adminData?.pages?.[0]?.totalElements || 0;
+
+  const memberHandle = (user_id) => {
+    navigate(`/admin/memberlist/${user_id}`);
+  };
 
   return (
     <div className="p-5 min-h-screen">
@@ -78,7 +90,11 @@ function Memberlist() {
       <div className="space-y-2">
         {cardContent && cardContent.length > 0 ? (
           cardContent.map((content, index) => (
-            <MemberListCard content={content} key={index} />
+            <MemberListCard
+              content={content}
+              key={index}
+              memberHandle={() => memberHandle(content.user_id)}
+            />
           ))
         ) : (
           <div className="flex flex-col items-center justify-center p-12 bg-slate-50/50 dark:bg-slate-800/20 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-700 my-5">
@@ -88,13 +104,14 @@ function Memberlist() {
           </div>
         )}
       </div>
-
-      <div ref={sentinel} className="flex items-center justify-center ">
-        {isFetchingNextPage ? (
-          <span className="loading loading-dots"></span>
-        ) : (
-          hasNextPage && <p className="text-xs italic">Loading more...</p>
-        )}
+      <div ref={sentinel} className=" flex items-center justify-center">
+        {loadingAdmins ? (
+          <span className="loading loading-dots text-sky-500"></span>
+        ) : hasMoreAdmins ? (
+          <p className="text-[10px] text-slate-300 uppercase tracking-widest animate-pulse">
+            Scroll to load more
+          </p>
+        ) : null}
       </div>
     </div>
   );

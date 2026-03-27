@@ -61,6 +61,8 @@ import SavingsMemberFilter from "./Admin/SavingsAdmin/SavingsMemberFilter";
 import MemberCard from "./Admin/SavingsAdmin/MemberCard";
 import Memberlist from "./Admin/MemberList/Memberlist";
 import AddAdmin from "./Admin/MemberList/AddAdmin";
+import ProfileOverview from "./Admin/MemberList/ProfileOverview";
+import EditMemberAdmin from "./Admin/MemberList/EditMemberAdmin";
 const queryClient = new QueryClient();
 
 const UserIndexRedirect = ({ isStatus }) => {
@@ -261,6 +263,14 @@ const Main = () => {
           children: [
             { index: true, element: <Memberlist /> },
             { path: "addAdmin", element: <AddAdmin /> },
+            {
+              path: ":user_id",
+              children: [
+                { index: true, element: <ProfileOverview /> },
+
+                { path: "editAdmin", element: <EditMemberAdmin /> },
+              ],
+            },
           ],
         },
       ],
