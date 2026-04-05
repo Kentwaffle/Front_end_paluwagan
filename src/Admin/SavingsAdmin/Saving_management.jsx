@@ -17,11 +17,16 @@ function Saving_management() {
     API_ENDPOINTS.SAVINGS_ADMIN_MEMBERS,
   );
 
+  const { data: savingsCardData, isLoading: savingsCardLoading } = useFetchData(
+    "api/admin/savings/total",
+    API_ENDPOINTS.SAVINGS_CARD_OVERVIEW,
+  );
+
   const hanldeShowMemberPayment = (id) => {
     navigate(`${id}`);
   };
 
-  const ApiTO = 100;
+  const ApiTO = savingsCardData?.overAllSavings || 0;
   const overAllTotalSavings = formatCurrency(ApiTO || 0);
   const displaySavingsOverall = show
     ? overAllTotalSavings
@@ -55,14 +60,16 @@ function Saving_management() {
             <span className="text-slate-400 dark:text-slate-500">
               Total Members
             </span>
-            <span className=" font-semibold dark:text-slate-200">100</span>
+            <span className=" font-semibold dark:text-slate-200">
+              {savingsCardData?.totalMembers || 0}
+            </span>
           </div>
           <div className="flex justify-between text-xs">
             <span className="text-slate-400 dark:text-slate-500">
-              Total Pending
+              Total Pending Payment
             </span>
             <span className=" font-semibold text-amber-500 dark:text-amber-400">
-              100
+              {savingsCardData?.totalPending || 0}
             </span>
           </div>
         </div>

@@ -135,7 +135,7 @@ function SummaryLoan({
         <div className="flex gap-1 mt-5">
           <button
             onClick={isClose}
-            className="bg-red-200 text-white w-full py-2 rounded-lg dark:bg-red-700 "
+            className="bg-red-300 text-red-500  dark:text-800 w-full py-2 rounded-lg dark:bg-red-700 "
           >
             Cancel
           </button>

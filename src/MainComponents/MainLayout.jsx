@@ -4,7 +4,7 @@ import { jwtDecode } from "jwt-decode";
 import Sidebar from "./sidebar";
 import Header from "./Header";
 import { useAuth } from "../auth/Auth";
-
+import { MessageSquare } from "lucide-react";
 function MainLayout({ isStatus, isStatusLoading }) {
   const [isOpen, setIsOpen] = useState(false);
   const { user, token } = useAuth();
@@ -32,6 +32,12 @@ function MainLayout({ isStatus, isStatusLoading }) {
       <main className={`${!hideLayout ? "w-full min-h-screen" : "p-5"}`}>
         <Outlet context={{ roles, isStatus, isStatusLoading }} />
       </main>
+
+      <div className="fixed bottom-6 right-6 z-50">
+        <button className="bg-blue-500 text-white p-3 rounded-full shadow-lg hover:bg-blue-600 transition-colors">
+          <MessageSquare size={18} />
+        </button>
+      </div>
     </div>
   );
 }

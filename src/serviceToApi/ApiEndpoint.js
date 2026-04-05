@@ -1,4 +1,5 @@
 export const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+export const PAYMENT_URL = import.meta.env.VITE_PAYMENT_URL;
 
 export const API_ENDPOINTS = {
   LOGIN: `${BASE_URL}/api/auth/login`,
@@ -37,6 +38,7 @@ export const API_ENDPOINTS = {
   SAVINGS_MEMBER_URL: `${BASE_URL}/api/admin/savings/members/{savingsId}`,
   SAVINGS_FILTER_APPROVED: `${BASE_URL}/api/admin/savings/payment/filter/{savingsId}`,
   SAVINGS_ACCEPT_PAYMENT: `${BASE_URL}/api/admin/savings/payment`,
+  SAVINGS_CARD_OVERVIEW: `${BASE_URL}/api/admin/savings/total`,
 
   FUNDS_PAYMENT_LOAN_POST: `${BASE_URL}/api/admin/payment/loan`,
   FUNDS_PAYMENT_LOAN_SEARCH: `${BASE_URL}/api/admin/payment/loan/search`,
@@ -67,5 +69,12 @@ export const API_ENDPOINTS = {
 
   ADMIN_EDIT_MEMBER: (userId) =>
     `${BASE_URL}/api/admin/memberlist/member/${userId}/edit`,
+
+  ONLINE_PAYMENT: `${PAYMENT_URL}/api/create-intent`,
+  ATTACHMENT: (intentId, methodType) =>
+    `${PAYMENT_URL}/api/attach-method?intentId=${intentId}&methodType=${methodType}`,
+
+  QRTIMER: (intentId) => `${BASE_URL}/api/payment/status/${intentId}`,
+
   LOGOUT: `${BASE_URL}/api/auth/logout`,
 };

@@ -83,8 +83,8 @@ function Apply_savings() {
           <h1 className="text-2xl font-bold text-slate-800">
             Apply for Savings
           </h1>
-          <div className="flex flex-col gap-3 mt-3">
-            <div className="flex flex-col">
+          <div className="flex flex-col gap-5 mt-3">
+            <div className="flex flex-col gap-2">
               <span className="text-sm font-medium text-slate-600">
                 Target Amount/ Inaasahang Ipon
               </span>
@@ -101,7 +101,7 @@ function Apply_savings() {
                 </span>
               )}
             </div>
-            <div className="flex flex-col">
+            <div className="flex flex-col gap-2">
               <span className="text-sm font-medium text-slate-600">
                 Source of Funds/ Pinagkunan ng Pondo
               </span>

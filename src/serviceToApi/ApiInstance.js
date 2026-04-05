@@ -30,4 +30,19 @@ api.interceptors.request.use(
 //     return Promise.reject(error);
 //   },
 // );
+
+export const paymentApi = axios.create({
+  baseURL: import.meta.env.VITE_PAYMENT_URL,
+  headers: {
+    "ngrok-skip-browser-warning": "true",
+    "Content-Type": "application/json",
+  },
+});
+
+paymentApi.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
 export default api;

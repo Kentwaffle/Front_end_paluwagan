@@ -63,6 +63,7 @@ import Memberlist from "./Admin/MemberList/Memberlist";
 import AddAdmin from "./Admin/MemberList/AddAdmin";
 import ProfileOverview from "./Admin/MemberList/ProfileOverview";
 import EditMemberAdmin from "./Admin/MemberList/EditMemberAdmin";
+import QRCODE from "./Savings/QRCODE";
 const queryClient = new QueryClient();
 
 const UserIndexRedirect = ({ isStatus }) => {
@@ -116,15 +117,15 @@ const ProtectedRoute = ({
     }
 
     //Savings\
-    if (currentPath.startsWith("/savings")) {
+    if (currentPath === "/savings" || currentPath === "/apply_savings") {
       if (payload.hasSavingsAccount) {
-        if (currentPath === "/savings/apply_savings") {
+        if (currentPath === "/apply_savings") {
           return <Navigate to="/savings" replace />;
         }
       } else {
         // Kung walang savings account, dapat lagi siyang nasa apply_savings
         if (currentPath === "/savings") {
-          return <Navigate to="/savings/apply_savings" replace />;
+          return <Navigate to="/apply_savings" replace />;
         }
       }
     }
@@ -222,10 +223,12 @@ const Main = () => {
 
           children: [
             { index: true, element: <Savings /> },
-            { path: "apply_savings", element: <Apply_savings /> },
+            // { path: "apply_savings", element: <Apply_savings /> },
             { path: "savings_payments", element: <SavingsPayment /> },
+            { path: "qrpayment", element: <QRCODE /> },
           ],
         },
+        { path: "apply_savings", element: <Apply_savings /> },
       ],
     },
     // ADMIN ROUTES

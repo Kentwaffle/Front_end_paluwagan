@@ -212,8 +212,21 @@ export const ValidateSavings = (formData) => {
 
 export const ValidateSavingsDeposit = (formData) => {
   let errors = {};
-  if (!formData.amountDeposit) {
-    errors.amountDeposit = "Please enter a deposit amount";
+  if (Object.prototype.hasOwnProperty.call(formData, "amountDeposit")) {
+    if (!formData.amountDeposit || Number(formData.amountDeposit) <= 0) {
+      errors.amountDeposit = "Please enter a deposit amount";
+    }
+  }
+
+  // Kung ang formData ay may 'amount', ibig sabihin Online Form ito
+  if (Object.prototype.hasOwnProperty.call(formData, "amount")) {
+    if (!formData.amount || Number(formData.amount) <= 0) {
+      errors.amount = "Please enter a valid amount";
+    }
+  }
+
+  if (!formData.methodType) {
+    errors.methodType = "Please select a payment method";
   }
 
   return {

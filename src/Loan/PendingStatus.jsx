@@ -2,7 +2,15 @@ import React from "react";
 import Sidebar from "../MainComponents/sidebar";
 import Header from "../MainComponents/Header";
 import { useState } from "react";
-import { CircleAlert, Copy } from "lucide-react";
+import {
+  CircleAlert,
+  Copy,
+  PhilippinePeso,
+  CalendarRange,
+  CalendarClock,
+  Percent,
+  Wallet,
+} from "lucide-react";
 import { useFetchData } from "../serviceToApi/fetchData";
 import { API_ENDPOINTS } from "../serviceToApi/ApiEndpoint";
 import { showAlert } from "../reusableComponents/Alerts/SweetAlerts";
@@ -26,9 +34,13 @@ function PendingStatus({ applicationId }) {
     "/api/loan/status/details",
     API_ENDPOINTS.APPLICATION_DETAILS,
   );
+  const finalId = applicationId || statusData?.payload?.latestApplicationId;
+  const isStartDate = detailsData?.startDate;
+  const isEndDate = detailsData?.endDate;
 
-  const handleCopy = (textCopy) => {
-    if (!textCopy) return;
+  const handleCopy = async () => {
+    if (!detailsData || !finalId) return;
+
     const content = `
 Application ID: ${String(finalId)}
 Date range: ${formatMonthDay(isStartDate)} - ${formatMonthDay(isEndDate)}
@@ -39,17 +51,60 @@ Interest: ${formatCurrency(detailsData?.interest)}
 --------------------------
 Total repay: ${formatCurrency(detailsData?.totalRepayable)}
   `.trim();
-    navigator.clipboard.writeText(content);
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      try {
+        await navigator.clipboard.writeText(content);
+        triggerToast();
+      } catch (err) {
+        fallbackCopy(content);
+      }
+    } else {
+      fallbackCopy(content);
+    }
+  };
+
+  const fallbackCopy = (text) => {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.select();
+    try {
+      triggerToast();
+    } catch (err) {
+      console.error("Fallback copy failed", err);
+    }
+    document.body.removeChild(textArea);
+  };
+
+  const triggerToast = () => {
     setShowToast(false);
-    setTimeout(() => {
-      setShowToast(true);
-    }, 10);
+    setTimeout(() => setShowToast(true), 50);
     setTimeout(() => setShowToast(false), 2000);
   };
 
-  const finalId = applicationId || statusData?.payload?.latestApplicationId;
-  const isStartDate = detailsData?.startDate;
-  const isEndDate = detailsData?.endDate;
+  const viewDetails = [
+    {
+      label: "Loan Amount",
+      value: `${formatCurrency(detailsData?.requestedAmount)}`,
+      icon: <PhilippinePeso size={14} />,
+    },
+    {
+      label: "Date Range",
+      value: `${formatMonthDay(isStartDate)} - ${formatMonthDay(isEndDate)}`,
+      icon: <CalendarRange size={14} />,
+    },
+    {
+      label: "Weekly Pay",
+      value: `${formatCurrency(detailsData?.weeklyPay)}`,
+      icon: <CalendarClock size={14} />,
+    },
+    {
+      label: "Interest",
+      value: `${formatCurrency(detailsData?.interest)}`,
+      icon: <Percent size={14} />,
+    },
+  ];
 
   return (
     <div key="apply-form-container">
@@ -77,11 +132,11 @@ Total repay: ${formatCurrency(detailsData?.totalRepayable)}
             <h3 className="text-slate-600 text-center dark:text-slate-400">
               Reviewing status
             </h3>
-            <div className="bg-slate-50 border border-slate-100 p-3 shadow rounded-lg mt-5 flex flex-col dark:bg-slate-700 dark:border-slate-600">
+            <div className="bg-slate-50 border border-slate-100 p-5 shadow rounded-xl mt-5 flex flex-col dark:bg-slate-700 dark:border-slate-600">
               <div className="flex justify-between items-center">
                 <div className="flex flex-col">
-                  <span className="text-slate-500 text-sm dark:text-slate-400">
-                    Application ID:
+                  <span className="text-slate-400 text-xs font-semibold dark:text-slate-200 uppercase tracking-wide">
+                    Application ID
                   </span>
                   <span className="font-semibold text-slate-800 dark:text-slate-200">
                     {finalId}
@@ -92,7 +147,7 @@ Total repay: ${formatCurrency(detailsData?.totalRepayable)}
                   data-tip="Copy to clipboard"
                 >
                   <button
-                    onClick={() => handleCopy(finalId)}
+                    onClick={handleCopy}
                     className="text-sky-500 bg-sky-200 p-2 rounded-lg dark:bg-sky-500/20 dark:text-sky-400"
                     title="Copy to clipboard"
                   >
@@ -102,50 +157,40 @@ Total repay: ${formatCurrency(detailsData?.totalRepayable)}
               </div>
 
               <div className="mt-1">
-                <div tabIndex={0} className="collapse group focus:outline-none">
-                  <div className="collapse-title font-semibold px-1 pb-0 pt-0 text-sm text-slate-500 dark:text-slate-400">
+                <div
+                  tabIndex={0}
+                  className="collapse collapse-plus group  mt-3 focus:outline-none bg-slate-100 border border-slate-200 rounded-xl dark:bg-slate-600 dark:border-slate-500"
+                >
+                  <div className="collapse-title text-[11px]  font-bold text-slate-400 uppercase tracking-widest px-5 flex items-center min-h-0 py-4 peer-checked:text-sky-500 transition-colors">
                     View details
                   </div>
                   <div className="collapse-content text-sm p-0">
-                    <div className="border-t border-slate-200 py-2 px-1 grid grid-cols-2 gap-2">
-                      <div className="flex flex-col">
-                        <span className="text-sky-600 text-xs dark:text-sky-400 font-black">
-                          Loan Amount
-                        </span>
-                        <span className="font-semibold text-slate-700 dark:text-slate-200">
-                          {formatCurrency(detailsData?.requestedAmount)}
-                        </span>
-                      </div>
-
-                      <div className="flex flex-col">
-                        <span className="text-sky-600 text-xs dark:text-sky-400">
-                          Date range
-                        </span>
-                        <span className="font-semibold text-slate-700 dark:text-slate-200">{`${formatMonthDay(isStartDate)} - ${formatMonthDay(isEndDate)}`}</span>
-                      </div>
-
-                      <div className="flex flex-col">
-                        <span className="text-sky-600 text-xs dark:text-sky-400">
-                          Weekly pay
-                        </span>
-                        <span className="font-semibold text-slate-700 dark:text-slate-200">
-                          {formatCurrency(detailsData?.weeklyPay)}
-                        </span>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-sky-600 text-xs dark:text-sky-400">
-                          Interest
-                        </span>
-                        <span className="font-semibold text-slate-700 dark:text-slate-200">
-                          {formatCurrency(detailsData?.interest)}
-                        </span>
-                      </div>
-
-                      <div className="flex flex-col">
-                        <span className="text-sky-600 text-xs dark:text-sky-400">
-                          Total repay
-                        </span>
-                        <span className="font-semibold text-slate-700 dark:text-slate-200">
+                    <div className="flex flex-col gap-3 py-5 px-1 rounded-b-3xl border-t border-gray-200 dark:border-gray-700">
+                      {viewDetails.map((detail, index) => (
+                        <div
+                          key={index}
+                          className="flex justify-between  items-center mx-3 "
+                        >
+                          <div className="flex items-center gap-3 ">
+                            <span className=" bg-sky-100 p-2 text-sky-500 rounded dark:bg-sky-950/50 dark:text-sky-400">
+                              {detail.icon}
+                            </span>
+                            <span className="text-slate-400 text-sm dark:text-slate-300">
+                              {detail.label}
+                            </span>
+                          </div>
+                          <span className="font-semibold text-center text-slate-800 dark:text-slate-200">
+                            {detail.value}
+                          </span>
+                        </div>
+                      ))}
+                      <div className="flex flex-col justify-between gap-1 bg-sky-50 items-center p-3 mx-3 rounded-xl border border-sky-500">
+                        <div className="flex items-center gap-3 ">
+                          <span className="text-sky-500 text-sm font-extrabold dark:text-slate-300">
+                            Total repay
+                          </span>
+                        </div>
+                        <span className="font-extrabold text-lg text-center text-sky-800  dark:text-slate-200">
                           {formatCurrency(detailsData?.totalRepayable)}
                         </span>
                       </div>
