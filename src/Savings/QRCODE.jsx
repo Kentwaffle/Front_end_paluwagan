@@ -1,8 +1,7 @@
 import React, { useEffect } from "react";
-import { QRCodeSVG } from "qrcode.react";
 import { useLocation } from "react-router-dom";
 import { Download } from "lucide-react";
-import { formatCurrency } from "../reusableComponents/formatter";
+import { formatCurrency } from "../reusableComponents/Utils/formatter";
 import { useFetchData } from "../serviceToApi/fetchData";
 import { API_ENDPOINTS } from "../serviceToApi/ApiEndpoint";
 import { useCountdown } from "../reusableComponents/Hooks/Timer";

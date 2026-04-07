@@ -1,12 +1,18 @@
 import React, { useState } from "react";
 import { CircleAlert, PlusCircle, MinusCircle } from "lucide-react";
-import TransactionList from "./CardPayment/TransactionList";
+// import TransactionList from "./CardPayment/TransactionList";
 import QRCODE from "./QRCODE";
-import DepositForm from "./componentSavings/DepositForm";
+import PaymentForm from "../reusableComponents/Forms/PaymentForm";
 import OffsetForm from "./componentSavings/OffsetForm";
 import SavingsSummary from "./componentSavings/SavingsSummary";
 import { useSavings } from "./hooksForSavings/useSavings";
-
+import TransactionList from "../reusableComponents/Display/TransactionList";
+import { formatTimeAgo } from "../reusableComponents/Utils/TimeDateformat";
+import { formatDate } from "../reusableComponents/Utils/formatter";
+import {
+  statusColorPayments,
+  statusIconPayments,
+} from "../reusableComponents/Feedbacks/StatusHelper";
 function Savings() {
   const {
     handleOnlineDeposit,
@@ -83,21 +89,28 @@ function Savings() {
                   </span>
                 </div>
               ) : activeTab === "deposit" ? (
-                <DepositForm
-                  //Hooks
-                  setPaymentMode={setPaymentMode}
-                  paymentMode={paymentMode}
-                  //Deposit Cash
-                  depositData={depositForm.formData}
-                  handleDepositChange={depositForm.handleChange}
-                  depositErrors={depositForm.formErrors}
-                  agreeDeposit={agreeDeposit}
-                  //Deposit Online
-                  cashPaymentData={cashPaymentForm.formData}
-                  handleCashPaymentChange={cashPaymentForm.handleChange}
-                  cashPaymentErrors={cashPaymentForm.formErrors}
-                  handleOnlineDeposit={handleOnlineDeposit}
-                />
+                <div className="flex flex-col mt-3 gap-3 bg-white p-5 rounded-xl border shadow-sm border-slate-100 dark:bg-slate-800 dark:border-slate-700">
+                  <PaymentForm
+                    //Props
+                    label="Deposit Amount"
+                    buttonName="Deposit"
+                    classNameOnline={"mt-5"}
+                    classNameCash={"mt-5"}
+                    //Hooks
+                    setPaymentMode={setPaymentMode}
+                    paymentMode={paymentMode}
+                    //Deposit Cash
+                    depositData={depositForm.formData}
+                    handleDepositChange={depositForm.handleChange}
+                    depositErrors={depositForm.formErrors}
+                    agreeDeposit={agreeDeposit}
+                    //Deposit Online
+                    cashPaymentData={cashPaymentForm.formData}
+                    handleCashPaymentChange={cashPaymentForm.handleChange}
+                    cashPaymentErrors={cashPaymentForm.formErrors}
+                    handleOnlineDeposit={handleOnlineDeposit}
+                  />
+                </div>
               ) : userStatusPayload?.hasActiveSavings ? (
                 <OffsetForm
                   activeContent={activeContent}
@@ -133,13 +146,22 @@ function Savings() {
                 See all
               </button>
             </div>
-            <TransactionList
+            {/* <TransactionList
               transactions={depositHistory?.slice(0, 5)}
               hasSearched={true}
               isLoading={loadingSummary}
               NoRecord={
                 "No transaction history available. Deposit now to see your transactions here."
               }
+            /> */}
+            <TransactionList
+              transactions={depositHistory?.slice(0, 5)}
+              statusColor={statusColorPayments}
+              statusIcon={statusIconPayments}
+              formatCurrency={formatCurrency}
+              formatDate={formatDate}
+              formatTimeAgo={formatTimeAgo}
+              emptyMessage="No transactions yet. Start making payments!"
             />
           </div>
         </div>

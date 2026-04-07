@@ -1,5 +1,5 @@
 import React from "react";
-import SeeAllPayments from "../../reusableComponents/SeeAllPayments";
+import SeeAllPayments from "../../reusableComponents/Forms/SeeAllPayments";
 import MemberCard from "./MemberCard";
 function SavingsMemberFilter() {
   return (

@@ -5,7 +5,7 @@ import {
   tabsColor,
   statusIcon,
   tabsBorder,
-} from "../reusableComponents/StatusHelper";
+} from "../reusableComponents/Feedbacks/StatusHelper";
 import { usePutData } from "../serviceToApi/PutData";
 import { showAlert } from "../reusableComponents/Alerts/SweetAlerts";
 import { useLoanSSE } from "../reusableComponents/Hooks/SSE";
@@ -13,7 +13,7 @@ import CardStatus from "./CardStatus";
 import { Search } from "lucide-react";
 import { swalModal } from "../reusableComponents/Alerts/SweetAlerts";
 import { useAuth } from "../auth/Auth";
-import SearchInput from "../reusableComponents/SearchInput";
+import SearchInput from "../reusableComponents/Forms/SearchInput";
 
 function Loan_management() {
   const [searchrefPending, setSearchrefPending] = useState("");

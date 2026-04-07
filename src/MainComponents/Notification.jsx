@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/Auth";
 import { API_ENDPOINTS } from "../serviceToApi/ApiEndpoint";
 import { useFetchData } from "../serviceToApi/fetchData";
-import { formatTimeAgo } from "../reusableComponents/TimeDateformat";
+import { formatTimeAgo } from "../reusableComponents/Utils/TimeDateformat";
 import { CheckSquare, X } from "lucide-react";
 import { usePatchData } from "../serviceToApi/PatchData";
 import { useQueryClient } from "@tanstack/react-query";

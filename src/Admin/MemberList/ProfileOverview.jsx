@@ -22,10 +22,13 @@ import { API_ENDPOINTS } from "../../serviceToApi/ApiEndpoint";
 import { useInfiniteFetch } from "../../serviceToApi/InfiniteScroll";
 import { useParams } from "react-router-dom";
 import { getProfileImage } from "../../reusableComponents/Hooks/ImageGet";
-import { formatCurrency, formatDate } from "../../reusableComponents/formatter";
+import {
+  formatCurrency,
+  formatDate,
+} from "../../reusableComponents/Utils/formatter";
 import { useState } from "react";
 import { useInfiniteAutoScroll } from "../../reusableComponents/Hooks/automaticScroll";
-import { formatTimeAgo } from "../../reusableComponents/TimeDateformat";
+import { formatTimeAgo } from "../../reusableComponents/Utils/TimeDateformat";
 import { useDeleteData } from "../../serviceToApi/DeleteData";
 import {
   showAlert,
@@ -33,7 +36,7 @@ import {
 } from "../../reusableComponents/Alerts/SweetAlerts";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import { calculateAge } from "../../reusableComponents/CalculateAge";
+import { calculateAge } from "../../reusableComponents/Utils/CalculateAge";
 
 function ProfileOverview() {
   const { user_id } = useParams();

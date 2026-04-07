@@ -1,15 +1,14 @@
 import React, { useState } from "react";
 import { Camera, Eye, EyeClosed } from "lucide-react";
-import { getProfileImage } from "../../reusableComponents/Hooks/ImageGet";
-import Inputform from "../../reusableComponents/Inputform";
-import SelectDropdown from "../../reusableComponents/selectdropdown";
+import Inputform from "../../reusableComponents/Forms/Inputform";
+import SelectDropdown from "../../reusableComponents/Forms/selectdropdown";
 import { personalInformation, accountInformation } from "./InformationsFields";
 import { usePostData } from "../../serviceToApi/PostData";
 import { useForm } from "../../reusableComponents/Hooks/HandleChange&Submit";
 import { ValidateAdmin } from "../../validations/CredentialValidation";
 import { set } from "date-fns";
 import { API_ENDPOINTS } from "../../serviceToApi/ApiEndpoint";
-import { usePasswordToggle } from "../../reusableComponents/Hooks/ToggleEye";
+import { usePasswordToggle } from "../../reusableComponents/Forms/ToggleEye";
 import { showAlert } from "../../reusableComponents/Alerts/SweetAlerts";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";

@@ -1,0 +1,82 @@
+import React from "react";
+
+function TransactionList({
+  transactions = [],
+  isLoading = false,
+  statusColor,
+  statusIcon,
+  formatCurrency,
+  formatDate,
+  formatTimeAgo,
+  emptyMessage = "No transactions yet.",
+}) {
+  if (isLoading) {
+    return <div className="text-center py-10">Loading history...</div>;
+  }
+
+  return (
+    <div className="space-y-3">
+      {transactions?.length > 0 ? (
+        transactions.map((item, index) => {
+          const currentStatus = item.status || item.paymentStatus;
+          const currentRef = item.reference || item.referenceNumber;
+          const currentDate =
+            item.remitDate || item.paymentDate || item.createdAt;
+          const currentAmount =
+            item.amountRemit || item.amountPaid || item.amount;
+          const currentMethod = item.method || item.paymentMethod || "CASH";
+
+          return (
+            <div
+              key={`${currentRef}-${index}`}
+              className="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div
+                    className={`p-2 rounded-xl bg-opacity-10 ${statusColor?.(currentStatus)}`}
+                  >
+                    {statusIcon?.(currentStatus) || "No Icon"}
+                  </div>
+
+                  <div className="flex flex-col text-left">
+                    <span className="font-black text-slate-900 text-xs dark:text-white uppercase">
+                      {currentRef || "No Reference"}
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                      {formatDate(currentDate) || "No Date"}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex flex-col items-end gap-1">
+                  <span className="font-black text-emerald-500 text-sm">
+                    {`+ ${formatCurrency(currentAmount) || "0.00"}`}
+                  </span>
+                  <span className="text-[10px] font-bold tracking-wider text-slate-400 dark:text-slate-300">
+                    {currentMethod}
+                  </span>
+                </div>
+              </div>
+
+              {/* Time Ago Footer */}
+              <div className="flex justify-end items-end border-t border-slate-50 dark:border-slate-800 mt-2 pt-1">
+                <span className="text-[9px] font-mono text-slate-400 dark:text-slate-500 uppercase">
+                  {formatTimeAgo(currentDate)}
+                </span>
+              </div>
+            </div>
+          );
+        })
+      ) : (
+        <div className="text-center py-20 bg-white/50 dark:bg-slate-900/50 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-800">
+          <p className="text-slate-400 italic text-sm font-medium">
+            {emptyMessage}
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default TransactionList;

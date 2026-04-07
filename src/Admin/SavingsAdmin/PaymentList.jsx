@@ -1,6 +1,9 @@
 import React, { useState } from "react";
-import { formatCurrency, formatDate } from "../../reusableComponents/formatter";
-import SearchInput from "../../reusableComponents/SearchInput";
+import {
+  formatCurrency,
+  formatDate,
+} from "../../reusableComponents/Utils/formatter";
+import SearchInput from "../../reusableComponents/Forms/SearchInput";
 import { API_ENDPOINTS } from "../../serviceToApi/ApiEndpoint";
 import { useFetchData } from "../../serviceToApi/fetchData";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
@@ -12,10 +15,10 @@ import { showAlert } from "../../reusableComponents/Alerts/SweetAlerts";
 import { swalModal } from "../../reusableComponents/Alerts/SweetAlerts";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLoanSSE } from "../../reusableComponents/Hooks/SSE";
-import { PaymentListLoading } from "../../reusableComponents/loading";
+import { PaymentListLoading } from "../../reusableComponents/Feedbacks/loading";
 import { getProfileImage } from "../../reusableComponents/Hooks/ImageGet";
 import { handleTransactionAction } from "./handleStatusChange";
-import { formatTimeAgo } from "../../reusableComponents/TimeDateformat";
+import { formatTimeAgo } from "../../reusableComponents/Utils/TimeDateformat";
 function PaymentList() {
   const { savingsId } = useParams();
   useLoanSSE(true, savingsId);

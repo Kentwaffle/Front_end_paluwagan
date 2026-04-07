@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Plus, Database } from "lucide-react";
-import SearchInput from "../../reusableComponents/SearchInput";
-import SelectDropdown from "../../reusableComponents/selectdropdown";
+import SearchInput from "../../reusableComponents/Forms/SearchInput";
+import SelectDropdown from "../../reusableComponents/Forms/selectdropdown";
 import MemberListCard from "./MemberListCard";
 import { useNavigate } from "react-router-dom";
 import { API_ENDPOINTS } from "../../serviceToApi/ApiEndpoint";

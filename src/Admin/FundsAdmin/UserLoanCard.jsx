@@ -1,6 +1,6 @@
 import React from "react";
 import { getProfileImage } from "../../reusableComponents/Hooks/ImageGet";
-import { formatCurrency } from "../../reusableComponents/formatter";
+import { formatCurrency } from "../../reusableComponents/Utils/formatter";
 
 const UserLoanCard = ({ user, onClick, isSelected = false, isLoan = true }) => {
   if (!user) return null;

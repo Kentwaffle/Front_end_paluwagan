@@ -1,6 +1,6 @@
 import React from "react";
-import Inputform from "../reusableComponents/Inputform";
-import SelectDropdown from "../reusableComponents/selectdropdown";
+import Inputform from "../reusableComponents/Forms/Inputform";
+import SelectDropdown from "../reusableComponents/Forms/selectdropdown";
 import { useForm } from "../reusableComponents/Hooks/HandleChange&Submit";
 import { ValidateSavings } from "../validations/CredentialValidation";
 import { usePostData } from "../serviceToApi/PostData";

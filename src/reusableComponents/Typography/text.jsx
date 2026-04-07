@@ -1,4 +1,4 @@
-import { formatCurrency } from "./formatter";
+import { formatCurrency } from "../Utils/formatter";
 
 export const OFFSET_CONTENT = ({ responseData, isMature }) => {
   const balance = responseData?.totalSavingsBalance || 0;

@@ -42,8 +42,8 @@ import { useFetchData } from "./serviceToApi/fetchData";
 import { API_ENDPOINTS } from "./serviceToApi/ApiEndpoint";
 
 //Loading
-import { LoadingServer } from "./reusableComponents/loading";
-import Error from "./reusableComponents/Error";
+import { LoadingServer } from "./reusableComponents/Feedbacks/loading";
+import Error from "./reusableComponents/Feedbacks/Error";
 
 //Admin
 import Loan_management from "./Admin/Loan_management";
@@ -64,6 +64,7 @@ import AddAdmin from "./Admin/MemberList/AddAdmin";
 import ProfileOverview from "./Admin/MemberList/ProfileOverview";
 import EditMemberAdmin from "./Admin/MemberList/EditMemberAdmin";
 import QRCODE from "./Savings/QRCODE";
+
 const queryClient = new QueryClient();
 
 const UserIndexRedirect = ({ isStatus }) => {
@@ -214,7 +215,13 @@ const Main = () => {
         { path: "profile/edit_profile", element: <Edit_Profile /> },
 
         { path: "notification", element: <Notification /> },
-        { path: "loan", element: <Loan /> },
+        {
+          path: "loan",
+          children: [
+            { index: true, element: <Loan /> },
+            { path: "qrpayment", element: <QRCODE /> },
+          ],
+        },
         { path: "apply_loan", element: <ApplyLoan /> },
         { path: "pending_status", element: <PendingStatus /> },
         //Savings

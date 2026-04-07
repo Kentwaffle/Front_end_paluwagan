@@ -1,9 +1,9 @@
-import Inputform from "../../reusableComponents/Inputform";
+import Inputform from "../../reusableComponents/Forms/Inputform";
 import { data, Link, Outlet, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { showAlert } from "../../reusableComponents/Alerts/SweetAlerts";
 import { Eye, EyeClosed } from "lucide-react";
-import { usePasswordToggle } from "../../reusableComponents/Hooks/ToggleEye";
+import { usePasswordToggle } from "../../reusableComponents/Forms/ToggleEye";
 import { ValidateLogIn } from "../../validations/CredentialValidation";
 import { useForm } from "../../reusableComponents/Hooks/HandleChange&Submit";
 import { useOtpTimer } from "../../reusableComponents/Hooks/SendOTPhook";
@@ -11,9 +11,7 @@ import { useOtpTimer } from "../../reusableComponents/Hooks/SendOTPhook";
 //Api
 import api from "../../serviceToApi/ApiInstance";
 import { API_ENDPOINTS } from "../../serviceToApi/ApiEndpoint";
-import { jwtDecode } from "jwt-decode";
 import { usePostData } from "../../serviceToApi/PostData";
-import { useFetchData } from "../../serviceToApi/fetchData";
 
 function SignIn() {
   const { formData, formErrors, handleChange, setFormErrors, handleSubmit } =

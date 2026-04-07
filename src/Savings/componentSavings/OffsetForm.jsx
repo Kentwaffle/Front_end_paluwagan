@@ -1,6 +1,6 @@
 import React from "react";
 import { ShieldAlert, ArrowRight } from "lucide-react";
-import Inputform from "../../reusableComponents/Inputform";
+import Inputform from "../../reusableComponents/Forms/Inputform";
 function OffsetForm({
   activeContent,
   offsetData,

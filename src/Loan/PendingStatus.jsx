@@ -1,6 +1,3 @@
-import React from "react";
-import Sidebar from "../MainComponents/sidebar";
-import Header from "../MainComponents/Header";
 import { useState } from "react";
 import {
   CircleAlert,
@@ -14,11 +11,11 @@ import {
 import { useFetchData } from "../serviceToApi/fetchData";
 import { API_ENDPOINTS } from "../serviceToApi/ApiEndpoint";
 import { showAlert } from "../reusableComponents/Alerts/SweetAlerts";
-import { LoadingApply } from "../reusableComponents/loading";
+import { LoadingApply } from "../reusableComponents/Feedbacks/loading";
 import {
   formatCurrency,
   formatMonthDay,
-} from "../reusableComponents/formatter";
+} from "../reusableComponents/Utils/formatter";
 
 function PendingStatus({ applicationId }) {
   const [isOpen, setIsOpen] = useState(false);

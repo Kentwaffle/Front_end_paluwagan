@@ -1,9 +1,9 @@
 import React from "react";
-import DatePickerField from "./Hooks/Datepicker";
+import DatePickerField from "./Datepicker";
 import SearchInput from "./SearchInput";
 import { Search } from "lucide-react";
-import { useFetchData } from "../serviceToApi/fetchData";
-import { API_ENDPOINTS } from "../serviceToApi/ApiEndpoint";
+import { useFetchData } from "../../serviceToApi/fetchData";
+import { API_ENDPOINTS } from "../../serviceToApi/ApiEndpoint";
 
 function SeeAllPayments({
   refSearch,

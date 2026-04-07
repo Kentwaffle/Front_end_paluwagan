@@ -1,6 +1,6 @@
 import React from "react";
 import { getProfileImage } from "../../reusableComponents/Hooks/ImageGet";
-import { formatDate } from "../../reusableComponents/formatter";
+import { formatDate } from "../../reusableComponents/Utils/formatter";
 function MemberListCard({ content, memberHandle }) {
   return (
     <button

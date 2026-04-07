@@ -20,11 +20,9 @@ export const useCountdown = (expiryDate) => {
         return;
       }
 
-      // Kalkulahin ang minutes at seconds
       const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-      // Format: 00:00
       setTimeLeft(
         `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`,
       );

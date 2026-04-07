@@ -1,5 +1,5 @@
 import React from "react";
-import { formatCurrency } from "../reusableComponents/formatter";
+import { formatCurrency } from "../../reusableComponents/Utils/formatter";
 import {
   Calendar,
   Calendars,
@@ -9,7 +9,7 @@ import {
   Receipt,
   IdCard,
 } from "lucide-react";
-import { swalModal } from "../reusableComponents/Alerts/SweetAlerts";
+import { swalModal } from "../../reusableComponents/Alerts/SweetAlerts";
 function SummaryLoan({
   isOpen,
   isClose,

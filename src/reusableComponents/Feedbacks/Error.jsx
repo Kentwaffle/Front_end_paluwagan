@@ -1,4 +1,4 @@
-import Error_img from "../assets/images/Error_img.png";
+import Error_img from "../../assets/images/Error_img.png";
 
 function Error({ error }) {
   const handlerelogin = () => {

@@ -6,19 +6,19 @@ import { usePostData } from "../../serviceToApi/PostData";
 import { API_ENDPOINTS } from "../../serviceToApi/ApiEndpoint";
 import { useForm } from "../../reusableComponents/Hooks/HandleChange&Submit";
 import { useTodayDate } from "../../reusableComponents/Hooks/CurrentDate";
-import { usePasswordToggle } from "../../reusableComponents/Hooks/ToggleEye";
-import { formatCurrency } from "../../reusableComponents/formatter";
-
+import { usePasswordToggle } from "../../reusableComponents/Forms/ToggleEye";
+import { formatCurrency } from "../../reusableComponents/Utils/formatter";
+import { useOnlinePayment } from "../../reusableComponents/Hooks/useOnlinepayment";
 import {
   showAlert,
   swalModal,
 } from "../../reusableComponents/Alerts/SweetAlerts";
-import { OFFSET_CONTENT } from "../../reusableComponents/text";
+import { OFFSET_CONTENT } from "../../reusableComponents/Typography/text";
 import {
   ValidateOffset,
   ValidateSavingsDeposit,
 } from "../../validations/CredentialValidation";
-import { generateUUID } from "../../reusableComponents/GeneratedIDS";
+import { generateUUID } from "../../reusableComponents/Utils/GeneratedIDS";
 import { usePostDynamic } from "../../serviceToApi/DynamicPost";
 
 export const useSavings = () => {
@@ -29,6 +29,7 @@ export const useSavings = () => {
   const { show, toggle } = usePasswordToggle();
   const [activeTab, setActiveTab] = useState("deposit");
   const [paymentMode, setPaymentMode] = useState("online");
+  const { processOnlinePayment } = useOnlinePayment();
 
   //API CALLS
   const { data: savingData, isLoading: loadingSummary } = useFetchData(
@@ -190,86 +191,11 @@ export const useSavings = () => {
       if (ok) handleOffsetAction(e);
     });
   };
-  const { mutate: paymentIntent } = usePostDynamic(
-    API_ENDPOINTS.ONLINE_PAYMENT,
-    "api/create-intent",
-  );
 
-  const { mutate: attachMethod } = usePostDynamic("api/attach-method");
-
+  //Payment Intent and Attach Method for Online Deposit
   const handleOnlineDeposit = (e) => {
     cashPaymentForm.handleSubmit(e, () => {
-      showAlert.loading("Processing Payment", "Please wait...");
-      const submissionData = {
-        ...cashPaymentForm.formData,
-        amount: Number(cashPaymentForm.formData.amount),
-      };
-
-      paymentIntent(
-        {
-          endpoint: API_ENDPOINTS.ONLINE_PAYMENT,
-          data: submissionData,
-          isPayment: true,
-        },
-        {
-          onSuccess: (res) => {
-            const intentId = res?.payload?.intentId || res?.payload?.id;
-
-            if (res?.success && intentId) {
-              attachMethod(
-                {
-                  endpoint: API_ENDPOINTS.ATTACHMENT(
-                    intentId,
-                    submissionData.methodType,
-                  ),
-                  data: {},
-                  isPayment: true,
-                },
-                {
-                  onSuccess: (attachRes) => {
-                    const testQr = attachRes?.payload?.testUrl;
-                    const redirectUrl = attachRes?.payload?.redirectUrl;
-                    const qrImageURL =
-                      attachRes?.payload?.qrCodeImage ||
-                      attachRes?.payload?.attributes?.next_action?.show_qr_code
-                        ?.image_url;
-
-                    if (qrImageURL) {
-                      showAlert.close();
-                      navigate("qrpayment", {
-                        state: {
-                          paymentDetails: {
-                            ...submissionData,
-                            qrImageURL,
-                            testQr,
-                            intentId,
-                          },
-                        },
-                      });
-                    } else if (redirectUrl) {
-                      showAlert.close();
-                      window.open(redirectUrl, "_blank");
-                    }
-                  },
-                  onError: (err) => {
-                    showAlert.error(
-                      "Payment Failed",
-                      err.message ||
-                        "An error occurred while attaching payment method",
-                    );
-                  },
-                },
-              );
-            }
-          },
-          onError: (err) => {
-            showAlert.error(
-              "Payment Failed",
-              err.message || "An error occurred",
-            );
-          },
-        },
-      );
+      processOnlinePayment(cashPaymentForm.formData);
     });
   };
 
