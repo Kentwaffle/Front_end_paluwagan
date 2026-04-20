@@ -1,34 +1,44 @@
-import { useEffect, useRef } from "react";
+// automaticScroll.js
+import { useCallback, useRef } from "react";
 
 export const useInfiniteAutoScroll = (
   fetchNextPage,
   hasNextPage,
   isFetchingNextPage,
+  itemCount,
 ) => {
-  const sentinelRef = useRef(null);
+  // Gagamit tayo ng useRef para itago ang IntersectionObserver instance
+  const observer = useRef();
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-          fetchNextPage();
-        }
-      },
-      { threshold: 0.1 },
-    );
+  // Ito ang "callback ref"
+  const sentinelRef = useCallback(
+    (node) => {
+      // 1. Kung naglo-load pa, wag muna
+      if (isFetchingNextPage) return;
 
-    const currentSentinel = sentinelRef.current;
-    if (currentSentinel) {
-      observer.observe(currentSentinel);
-    }
+      // 2. Linisin ang dating observer kung meron man
+      if (observer.current) observer.current.disconnect();
 
-    return () => {
-      if (currentSentinel) {
-        observer.unobserve(currentSentinel);
-      }
-      observer.disconnect();
-    };
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+      // 3. Gumawa ng bagong observer
+      observer.current = new IntersectionObserver(
+        (entries) => {
+          // 4. Trigger logic
+          if (entries[0].isIntersecting && hasNextPage) {
+            console.log("Sentinel seen! Loading more...");
+            fetchNextPage();
+          }
+        },
+        {
+          threshold: 0.1,
+          rootMargin: "150px", // Mas malayo, mas smooth
+        },
+      );
+
+      if (node) observer.current.observe(node);
+    },
+    // Dependency array: re-create ang callback pag nagbago ang mga 'to
+    [fetchNextPage, hasNextPage, isFetchingNextPage, itemCount],
+  );
 
   return sentinelRef;
 };

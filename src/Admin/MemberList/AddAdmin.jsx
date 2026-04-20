@@ -1,15 +1,14 @@
 import React, { useState } from "react";
 import { Camera, Eye, EyeClosed } from "lucide-react";
-import { getProfileImage } from "../../reusableComponents/Hooks/ImageGet";
-import Inputform from "../../reusableComponents/Inputform";
-import SelectDropdown from "../../reusableComponents/selectdropdown";
+import Inputform from "../../reusableComponents/Forms/Inputform";
+import SelectDropdown from "../../reusableComponents/Forms/selectdropdown";
 import { personalInformation, accountInformation } from "./InformationsFields";
 import { usePostData } from "../../serviceToApi/PostData";
 import { useForm } from "../../reusableComponents/Hooks/HandleChange&Submit";
 import { ValidateAdmin } from "../../validations/CredentialValidation";
 import { set } from "date-fns";
 import { API_ENDPOINTS } from "../../serviceToApi/ApiEndpoint";
-import { usePasswordToggle } from "../../reusableComponents/Hooks/ToggleEye";
+import { usePasswordToggle } from "../../reusableComponents/Forms/ToggleEye";
 import { showAlert } from "../../reusableComponents/Alerts/SweetAlerts";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
@@ -52,6 +51,7 @@ function AddAdmin() {
       }
     } else {
       handleSubmit(e, () => {
+        showAlert.loading("Submitting", "Please wait");
         addAdmin(formData, {
           onSuccess: (data) => {
             if (data) {
@@ -59,11 +59,28 @@ function AddAdmin() {
               queryClient.invalidateQueries({
                 queryKey: ["memberlist"],
               });
-              navigate("memberlist");
+              navigate("/admin/memberlist");
             }
           },
           onError: (error) => {
-            showAlert.warning("Failed", error.message);
+            2;
+            const responseData = error.response?.data;
+            let finalMessage = "Something went wrong";
+            if (responseData) {
+              if (
+                responseData.payload &&
+                typeof responseData.payload === "object"
+              ) {
+                const errorKeys = Object.keys(responseData.payload);
+                if (errorKeys.length > 0) {
+                  finalMessage = responseData.payload[errorKeys[0]];
+                }
+              } else if (responseData.message) {
+                finalMessage = responseData.message;
+              }
+            }
+
+            showAlert.warning("Failed", finalMessage);
           },
         });
       });
@@ -89,6 +106,8 @@ function AddAdmin() {
                 name={item.name}
                 label={"Suffix"}
                 options={item.options}
+                onChange={handleChange}
+                value={formData[item.name]}
               />
             ) : (
               <>

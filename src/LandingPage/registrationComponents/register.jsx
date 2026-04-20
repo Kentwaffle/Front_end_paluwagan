@@ -1,13 +1,13 @@
-import Inputform from "../../reusableComponents/Inputform";
+import Inputform from "../../reusableComponents/Forms/Inputform";
 import { Link } from "react-router-dom";
 import { useState, useRef } from "react";
 import TermsModal from "../termModal";
-import SelectDropdown from "../../reusableComponents/selectdropdown";
+import SelectDropdown from "../../reusableComponents/Forms/selectdropdown";
 import { ValidateRegister } from "../../validations/CredentialValidation";
 import { Eye, EyeClosed } from "lucide-react";
 import { showAlert } from "../../reusableComponents/Alerts/SweetAlerts";
 import { useNavigate } from "react-router-dom";
-import { usePasswordToggle } from "../../reusableComponents/Hooks/ToggleEye";
+import { usePasswordToggle } from "../../reusableComponents/Forms/ToggleEye";
 import { useForm } from "../../reusableComponents/Hooks/HandleChange&Submit";
 
 //Api

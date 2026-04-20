@@ -42,8 +42,8 @@ import { useFetchData } from "./serviceToApi/fetchData";
 import { API_ENDPOINTS } from "./serviceToApi/ApiEndpoint";
 
 //Loading
-import { LoadingServer } from "./reusableComponents/loading";
-import Error from "./reusableComponents/Error";
+import { LoadingServer } from "./reusableComponents/Feedbacks/loading";
+import Error from "./reusableComponents/Feedbacks/Error";
 
 //Admin
 import Loan_management from "./Admin/Loan_management";
@@ -61,6 +61,10 @@ import SavingsMemberFilter from "./Admin/SavingsAdmin/SavingsMemberFilter";
 import MemberCard from "./Admin/SavingsAdmin/MemberCard";
 import Memberlist from "./Admin/MemberList/Memberlist";
 import AddAdmin from "./Admin/MemberList/AddAdmin";
+import ProfileOverview from "./Admin/MemberList/ProfileOverview";
+import EditMemberAdmin from "./Admin/MemberList/EditMemberAdmin";
+import QRCODE from "./Savings/QRCODE";
+
 const queryClient = new QueryClient();
 
 const UserIndexRedirect = ({ isStatus }) => {
@@ -114,15 +118,15 @@ const ProtectedRoute = ({
     }
 
     //Savings\
-    if (currentPath.startsWith("/savings")) {
+    if (currentPath === "/savings" || currentPath === "/apply_savings") {
       if (payload.hasSavingsAccount) {
-        if (currentPath === "/savings/apply_savings") {
+        if (currentPath === "/apply_savings") {
           return <Navigate to="/savings" replace />;
         }
       } else {
         // Kung walang savings account, dapat lagi siyang nasa apply_savings
         if (currentPath === "/savings") {
-          return <Navigate to="/savings/apply_savings" replace />;
+          return <Navigate to="/apply_savings" replace />;
         }
       }
     }
@@ -211,7 +215,13 @@ const Main = () => {
         { path: "profile/edit_profile", element: <Edit_Profile /> },
 
         { path: "notification", element: <Notification /> },
-        { path: "loan", element: <Loan /> },
+        {
+          path: "loan",
+          children: [
+            { index: true, element: <Loan /> },
+            { path: "qrpayment", element: <QRCODE /> },
+          ],
+        },
         { path: "apply_loan", element: <ApplyLoan /> },
         { path: "pending_status", element: <PendingStatus /> },
         //Savings
@@ -220,10 +230,12 @@ const Main = () => {
 
           children: [
             { index: true, element: <Savings /> },
-            { path: "apply_savings", element: <Apply_savings /> },
+            // { path: "apply_savings", element: <Apply_savings /> },
             { path: "savings_payments", element: <SavingsPayment /> },
+            { path: "qrpayment", element: <QRCODE /> },
           ],
         },
+        { path: "apply_savings", element: <Apply_savings /> },
       ],
     },
     // ADMIN ROUTES
@@ -261,6 +273,14 @@ const Main = () => {
           children: [
             { index: true, element: <Memberlist /> },
             { path: "addAdmin", element: <AddAdmin /> },
+            {
+              path: ":user_id",
+              children: [
+                { index: true, element: <ProfileOverview /> },
+
+                { path: "editAdmin", element: <EditMemberAdmin /> },
+              ],
+            },
           ],
         },
       ],

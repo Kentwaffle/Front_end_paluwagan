@@ -39,7 +39,7 @@ export const statusIconPayments = (status) => {
         </div>
       );
     default:
-      return "none";
+      return "No status";
   }
 };
 

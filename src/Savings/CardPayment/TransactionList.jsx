@@ -1,6 +1,9 @@
 import { formatDistanceToNow } from "date-fns";
 import { Search } from "lucide-react";
-import { formatCurrency, formatDate } from "../../reusableComponents/formatter";
+import {
+  formatCurrency,
+  formatDate,
+} from "../../reusableComponents/Utils/formatter";
 import { X, Check } from "lucide-react";
 const TransactionList = ({
   transactions,

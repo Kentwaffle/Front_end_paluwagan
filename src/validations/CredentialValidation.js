@@ -212,8 +212,21 @@ export const ValidateSavings = (formData) => {
 
 export const ValidateSavingsDeposit = (formData) => {
   let errors = {};
-  if (!formData.amountDeposit) {
-    errors.amountDeposit = "Please enter a deposit amount";
+  if (Object.prototype.hasOwnProperty.call(formData, "amountDeposit")) {
+    if (!formData.amountDeposit || Number(formData.amountDeposit) <= 0) {
+      errors.amountDeposit = "Please enter a deposit amount";
+    }
+  }
+
+  // Kung ang formData ay may 'amount', ibig sabihin Online Form ito
+  if (Object.prototype.hasOwnProperty.call(formData, "amount")) {
+    if (!formData.amount || Number(formData.amount) <= 0) {
+      errors.amount = "Please enter a valid amount";
+    }
+  }
+
+  if (!formData.methodType) {
+    errors.methodType = "Please select a payment method";
   }
 
   return {
@@ -298,6 +311,49 @@ export const ValidateAdmin = (formData, step) => {
       errors.password =
         "Password must be at least 8 characters with uppercase and lowercase Ex. Admin123";
     }
+  }
+
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors,
+  };
+};
+
+export const ValidateEditMemberAdmin = (formData) => {
+  let errors = {};
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phoneRegex = /^09\d{9}$/;
+
+  if (!formData.firstName?.trim()) {
+    errors.firstName = "First name is required";
+  }
+
+  if (!formData.lastName?.trim()) {
+    errors.lastName = "Last name is required";
+  }
+
+  if (!formData.gender) {
+    errors.gender = "Gender is required";
+  }
+
+  if (!formData.birthDay) {
+    errors.birthDay = "Birthday is required";
+  }
+
+  if (!formData.address?.trim()) {
+    errors.address = "Address is required";
+  }
+
+  if (!formData.phoneNumber) {
+    errors.phoneNumber = "Phone number is required";
+  } else if (!phoneRegex.test(formData.phoneNumber)) {
+    errors.phoneNumber = "Invalid PH phone number (09XXXXXXXXX)";
+  }
+
+  if (!formData.email) {
+    errors.email = "Email is required";
+  } else if (!emailRegex.test(formData.email)) {
+    errors.email = "Invalid email format";
   }
 
   return {

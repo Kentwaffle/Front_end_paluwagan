@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useFetchData } from "../serviceToApi/fetchData";
 import { API_ENDPOINTS } from "../serviceToApi/ApiEndpoint";
 import { Download, Search, SlidersHorizontal, ListCheck } from "lucide-react";
@@ -6,14 +6,21 @@ import {
   formatDate,
   formatCurrency,
   formatMonthDay,
-} from "../reusableComponents/formatter";
-import { LoadingLoan } from "../reusableComponents/loading";
+} from "../reusableComponents/Utils/formatter";
+import { LoadingLoan } from "../reusableComponents/Feedbacks/loading";
 import Filter from "./Filter";
 import { useDebounce } from "../reusableComponents/Hooks/useBounce";
 import {
   statusColorPayments,
   statusIconPayments,
-} from "../reusableComponents/StatusHelper";
+} from "../reusableComponents/Feedbacks/StatusHelper";
+import PaymentForm from "../reusableComponents/Forms/PaymentForm";
+import { useForm } from "../reusableComponents/Hooks/HandleChange&Submit";
+import { ValidateSavingsDeposit } from "../validations/CredentialValidation";
+import { generateUUID } from "../reusableComponents/Utils/GeneratedIDS";
+import { useOnlinePayment } from "../reusableComponents/Hooks/useOnlinepayment";
+import TransactionList from "../reusableComponents/Display/TransactionList";
+import { formatTimeAgo } from "../reusableComponents/Utils/TimeDateformat";
 
 function Loan() {
   const [isFilterOpen, setFilterOpen] = useState(false);
@@ -23,6 +30,9 @@ function Loan() {
   const debouncedSearch = useDebounce(searchRef, 500);
   const [startDateFilter, setStartdateFilter] = useState("");
   const [endDateFilter, setEnddateFilter] = useState("");
+
+  const [paymentMode, setPaymentMode] = useState("online");
+  const { processOnlinePayment } = useOnlinePayment();
 
   const { data: loanData, isLoading: isLoanLoading } = useFetchData(
     "/loan",
@@ -56,6 +66,38 @@ function Loan() {
   const loan = loanData?.payload?.loans;
   const appID =
     loanData?.payload?.applications?.[0]?.applicationNumber || "N/A";
+
+  const initialOnlineValues = useMemo(
+    () => ({
+      // genId: generateUUID(),
+      description: "Online deposit for loan payment",
+      amount: 0,
+      paymentType: "LOAN",
+      referenceId: appID || "",
+      methodType: "",
+    }),
+    [appID],
+  );
+
+  //useEffect para sa ID
+  const cashPaymentLoan = useForm(initialOnlineValues, ValidateSavingsDeposit);
+
+  // 4. Update Reference ID separately
+  useEffect(() => {
+    const sId = appID;
+    if (sId && !cashPaymentLoan.formData.referenceId) {
+      cashPaymentLoan.setFormData((prev) => ({
+        ...prev,
+        referenceId: sId,
+      }));
+    }
+  }, [appID]);
+
+  const handlePayment = (e) => {
+    cashPaymentLoan.handleSubmit(e, () => {
+      processOnlinePayment(cashPaymentLoan.formData);
+    });
+  };
 
   return (
     <>
@@ -162,11 +204,45 @@ function Loan() {
           </div>
 
           <div className="space-y-4">
-            <div className="flex flex-col gap-4">
+            <h3 className="font-black text-xl mx-1 text-slate-900 dark:text-white tracking-tight">
+              Pay here
+            </h3>
+            <PaymentForm
+              // Props for PaymentForm
+              label="Payment Amount"
+              buttonName="Payment"
+              paymentMode={paymentMode}
+              setPaymentMode={setPaymentMode}
+              classNameOnline="bg-white p-5 mt-5 rounded-xl border border-slate-100 dark:bg-slate-800 dark:border-slate-700"
+              classNameCash="bg-white p-5 mt-5 rounded-xl border border-slate-100 dark:bg-slate-800 dark:border-slate-700"
+              //Hooks
+              //Deposit Cash
+              // depositData={depositForm.formData}
+              // handleDepositChange={depositForm.handleChange}
+              // depositErrors={depositForm.formErrors}
+              // agreeDeposit={agreeDeposit}
+              //Deposit Online
+              cashPaymentData={cashPaymentLoan.formData}
+              handleCashPaymentChange={cashPaymentLoan.handleChange}
+              cashPaymentErrors={cashPaymentLoan.formErrors}
+              handleOnlineDeposit={handlePayment}
+            />
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex justify-between mx-1 items-center">
               <h3 className="font-black text-xl text-slate-900 dark:text-white tracking-tight">
-                Activity
+                Transactions
               </h3>
-              <div className="flex gap-2">
+
+              <button
+                type="button"
+                // onClick={() => navigate("savings_payments")}
+                className="text-sky-500 dark:text-sky-400 font-semibold flex items-center gap-1"
+              >
+                See all
+              </button>
+              {/* <div className="flex gap-2">
                 <div className="relative grow">
                   <Search
                     className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
@@ -186,65 +262,31 @@ function Loan() {
                 >
                   <SlidersHorizontal size={20} />
                 </button>
-              </div>
+              </div> */}
             </div>
 
             {/* LIST: Modern "Flat" Card style */}
-            <div className="space-y-3 pb-20">
-              {paymentData?.payment?.length > 0 ? (
-                paymentData?.payment?.map((payment, index) => (
-                  <div
-                    key={`${payment.paymentId}-${index}`}
-                    className="flex items-center justify-between p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div
-                        className={`p-1 rounded-xl bg-opacity-10 ${statusColorPayments(payment.paymentStatus)}`}
-                      >
-                        {statusIconPayments(payment.paymentStatus)}
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="font-black text-slate-900 dark:text-white">
-                          {formatCurrency(payment.amountPaid)}
-                        </span>
-                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
-                          {formatDate(payment.paymentDate)} •{" "}
-                          {payment.paymentMethod}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-end gap-1">
-                      <span
-                        className={`badge badge-sm font-bold rounded-lg ${statusColorPayments(payment.paymentStatus)}`}
-                      >
-                        {payment.paymentStatus}
-                      </span>
-                      <span className="text-xs font-mono text-slate-400 dark:text-slate-300">
-                        {payment.referenceNumber.slice(-6)}
-                      </span>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="text-center py-20 bg-white/50 dark:bg-slate-900/50 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-800">
-                  <p className="text-slate-400 italic text-sm font-medium">
-                    No transactions yet.
-                  </p>
-                </div>
-              )}
-            </div>
+            <TransactionList
+              transactions={paymentData?.payment}
+              statusColor={statusColorPayments}
+              statusIcon={statusIconPayments}
+              formatCurrency={formatCurrency}
+              formatDate={formatDate}
+              formatTimeAgo={formatTimeAgo}
+              emptyMessage="No transactions yet. Start making payments!"
+            />
           </div>
         </div>
       )}
 
-      <Filter
+      {/* <Filter
         isFilterOpen={isFilterOpen}
         setFilterOpen={() => setFilterOpen(false)}
         setStatus={setStatus}
         setmethod={setmethod}
         setStartdateFilter={setStartdateFilter}
         setEnddateFilter={setEnddateFilter}
-      />
+      /> */}
     </>
   );
 }

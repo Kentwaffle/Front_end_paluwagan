@@ -1,4 +1,4 @@
-import Inputform from "../../reusableComponents/Inputform";
+import Inputform from "../../reusableComponents/Forms/Inputform";
 import { useForm } from "../../reusableComponents/Hooks/HandleChange&Submit";
 import { showAlert } from "../../reusableComponents/Alerts/SweetAlerts";
 import { ValidateForgotPassword } from "../../validations/CredentialValidation";

@@ -1,7 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import Inputform from "../../reusableComponents/Inputform";
+import Inputform from "../../reusableComponents/Forms/Inputform";
 import { X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { showAlert } from "../../reusableComponents/Alerts/SweetAlerts";

@@ -1,23 +1,23 @@
 import {
   formatCurrency,
   formatMonthDay,
-} from "../reusableComponents/formatter";
+} from "../reusableComponents/Utils/formatter";
 import { useState, useEffect } from "react";
 import { API_ENDPOINTS } from "../serviceToApi/ApiEndpoint";
-import Inputform from "../reusableComponents/Inputform";
+import Inputform from "../reusableComponents/Forms/Inputform";
 import { CalendarRange, FileText, PhilippinePeso } from "lucide-react";
 import { useForm } from "../reusableComponents/Hooks/HandleChange&Submit";
 import { ValidateLoan } from "../validations/CredentialValidation";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import SummaryLoan from "./SummaryLoan";
+import SummaryLoan from "./ComponentForLoan/SummaryLoan";
 import { usePostData } from "../serviceToApi/PostData";
 import { showAlert } from "../reusableComponents/Alerts/SweetAlerts";
 import { useNavigate } from "react-router-dom";
 import { useFetchData } from "../serviceToApi/fetchData";
-import { LoadingApply } from "../reusableComponents/loading";
+import { LoadingApply } from "../reusableComponents/Feedbacks/loading";
 import { useQueryClient, useIsFetching } from "@tanstack/react-query";
-import DatePickerField from "../reusableComponents/Hooks/Datepicker";
+import DatePickerField from "../reusableComponents/Forms/Datepicker";
 
 function ApplyLoan() {
   console.log("ApplyLoan Component Rendered!");

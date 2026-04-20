@@ -1,15 +1,10 @@
-import DatePickerField from "../reusableComponents/Hooks/Datepicker";
-import SearchInput from "../reusableComponents/SearchInput";
-import { Search } from "lucide-react";
 import { useFetchData } from "../serviceToApi/fetchData";
 import { useState } from "react";
 import { API_ENDPOINTS } from "../serviceToApi/ApiEndpoint";
-import { formatDistanceToNow } from "date-fns";
-import { formatCurrency, formatDate } from "../reusableComponents/formatter";
-import { ChevronLeft } from "lucide-react";
+
 import { useNavigate } from "react-router-dom";
 import TransactionList from "./CardPayment/TransactionList";
-import SeeAllPayments from "../reusableComponents/SeeAllPayments";
+import SeeAllPayments from "../reusableComponents/Forms/SeeAllPayments";
 
 function SavingsPayment() {
   const navigate = useNavigate();

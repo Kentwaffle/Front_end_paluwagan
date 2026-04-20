@@ -12,10 +12,10 @@ import { getProfileImage } from "../reusableComponents/Hooks/ImageGet";
 import { Link, useNavigate } from "react-router-dom";
 import { useFetchData } from "../serviceToApi/fetchData";
 import { API_ENDPOINTS } from "../serviceToApi/ApiEndpoint";
-import { formatDate } from "../reusableComponents/formatter";
+import { formatDate } from "../reusableComponents/Utils/formatter";
 import { swalModal } from "../reusableComponents/Alerts/SweetAlerts";
 import { useAuth } from "../auth/Auth";
-import { ProfileLoading } from "../reusableComponents/loading";
+import { ProfileLoading } from "../reusableComponents/Feedbacks/loading";
 import { useEffect, useState } from "react";
 
 function Profile() {

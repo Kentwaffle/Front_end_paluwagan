@@ -1,5 +1,5 @@
 import React from "react";
-import Inputform from "../../reusableComponents/Inputform";
+import Inputform from "../../reusableComponents/Forms/Inputform";
 import { useForm } from "../../reusableComponents/Hooks/HandleChange&Submit";
 import { useState, useEffect } from "react";
 import { showAlert } from "../../reusableComponents/Alerts/SweetAlerts";
@@ -7,7 +7,7 @@ import { useOtpTimer } from "../../reusableComponents/Hooks/SendOTPhook";
 import { ValidateChangePassword } from "../../validations/CredentialValidation";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Eye, EyeClosed } from "lucide-react";
-import { usePasswordToggle } from "../../reusableComponents/Hooks/ToggleEye";
+import { usePasswordToggle } from "../../reusableComponents/Forms/ToggleEye";
 
 //Api
 import api from "../../serviceToApi/ApiInstance";
@@ -28,7 +28,7 @@ function ChangePassword() {
       password: "",
       confirmPassword: "",
     },
-    ValidateChangePassword
+    ValidateChangePassword,
   );
 
   useEffect(() => {
@@ -52,7 +52,7 @@ function ChangePassword() {
           userId: passedUserId,
           otp: formData.otp,
           password: formData.password,
-        }
+        },
       );
 
       if (response.status === 200) {

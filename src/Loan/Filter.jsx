@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import SelectDropdown from "../reusableComponents/selectdropdown";
-import { formatDateForAPI } from "../reusableComponents/formatter";
+import SelectDropdown from "../reusableComponents/Forms/selectdropdown";
+import { formatDateForAPI } from "../reusableComponents/Utils/formatter";
 
 function Filter({
   isFilterOpen,
