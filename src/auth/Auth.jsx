@@ -2,63 +2,54 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import api from "../serviceToApi/ApiInstance";
 import { API_ENDPOINTS } from "../serviceToApi/ApiEndpoint";
+import { useQueryClient } from "@tanstack/react-query";
 
 const AuthContext = createContext();
 
 function Auth({ children }) {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem("token"));
-  const [isTokenExpired, setIsTokenExpired] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
+  const queryClient = useQueryClient();
 
-  const getDecodedToken = (t) => {
+  const verifySession = async () => {
     try {
-      return jwtDecode(t);
-    } catch (e) {
-      return null;
+      const response = await api.get(API_ENDPOINTS.AUTH.VERIFY_SESSION);
+      setUser(response.data);
+      sessionStorage.setItem("user", JSON.stringify(response.data));
+    } catch (error) {
+      console.error("Session invalid");
+      setUser(null);
+      sessionStorage.removeItem("user");
+    } finally {
+      setIsLoadingAuth(false);
     }
   };
 
   useEffect(() => {
-    const initializeAuth = () => {
+    const initAuth = async () => {
+      if (window.location.pathname.startsWith("/auth")) {
+        setIsLoadingAuth(false);
+        return;
+      }
       try {
-        if (token) {
-          const decoded = getDecodedToken(token);
-          if (decoded) {
-            setUser(decoded);
-            const currentTime = Date.now() / 1000;
-            if (decoded.exp < currentTime) {
-              setIsTokenExpired(true);
-            } else {
-              const delay = (decoded.exp - currentTime) * 1000;
-              const timeout = setTimeout(() => setIsTokenExpired(true), delay);
-              return () => clearTimeout(timeout);
-            }
-          } else {
-            setUser(null);
-          }
-        } else {
-          setUser(null);
-        }
-      } catch (error) {
-        console.error("Auth initialization error:", error);
+        await verifySession();
+      } catch (err) {
+        console.error("No active session found.");
         setUser(null);
       } finally {
         setIsLoadingAuth(false);
       }
     };
-
-    initializeAuth();
-  }, [token]);
+    initAuth();
+  }, []);
 
   const logout = async () => {
     try {
-      await api.get(API_ENDPOINTS.LOGOUT);
+      await api.get(API_ENDPOINTS.AUTH.LOGOUT);
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
-      localStorage.removeItem("token");
-      setToken(null);
+      sessionStorage.removeItem("user");
       setUser(null);
       queryClient.clear();
       window.location.assign("/auth");
@@ -66,9 +57,7 @@ function Auth({ children }) {
   };
 
   return (
-    <AuthContext.Provider
-      value={{ user, token, setToken, isTokenExpired, logout, isLoadingAuth }}
-    >
+    <AuthContext.Provider value={{ user, setUser, logout, isLoadingAuth }}>
       {children}
     </AuthContext.Provider>
   );

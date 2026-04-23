@@ -1,11 +1,14 @@
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { API_ENDPOINTS } from "../../serviceToApi/ApiEndpoint";
-
+import { useAuth } from "../../auth/Auth";
 export const useLoanSSE = (shouldConnect, savingsId, isLoan) => {
   const queryClient = useQueryClient();
+  const authContext = useAuth();
+  const user = authContext?.user;
 
   useEffect(() => {
+    if (!user) return;
     console.log("SSE Hook URL:", API_ENDPOINTS.SSE);
     if (!shouldConnect) return;
 
@@ -77,5 +80,5 @@ export const useLoanSSE = (shouldConnect, savingsId, isLoan) => {
         console.log("SSE Connection closed");
       }
     };
-  }, [shouldConnect, savingsId, queryClient, isLoan]);
+  }, [shouldConnect, savingsId, queryClient, isLoan, user]);
 };

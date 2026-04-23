@@ -1,8 +1,15 @@
-export const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+export const BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 export const PAYMENT_URL = import.meta.env.VITE_PAYMENT_URL;
 
 export const API_ENDPOINTS = {
-  LOGIN: `${BASE_URL}/api/auth/login`,
+  AUTH: {
+    REFRESH: `${BASE_URL}/api/auth/refresh-token`,
+    LOGIN: `${BASE_URL}/api/auth/login`,
+    LOGOUT: `${BASE_URL}/api/auth/logout`,
+    VERIFY_SESSION: `${BASE_URL}/api/verify/session`,
+  },
+
+  // LOGIN: `${BASE_URL}/api/auth/login`,
   REGISTER: `${BASE_URL}/api/auth/register`,
 
   SEND_OTP: `${BASE_URL}/api/auth/login-send-otp`,
@@ -76,5 +83,6 @@ export const API_ENDPOINTS = {
 
   QRTIMER: (intentId) => `${BASE_URL}/api/payment/status/${intentId}`,
 
-  LOGOUT: `${BASE_URL}/api/auth/logout`,
+  //Instance Endpoints
+  REFRESH: `${BASE_URL}/api/auth/refresh-token`,
 };

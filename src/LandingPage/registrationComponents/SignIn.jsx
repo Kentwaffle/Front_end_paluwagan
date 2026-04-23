@@ -12,7 +12,7 @@ import { useOtpTimer } from "../../reusableComponents/Hooks/SendOTPhook";
 import api from "../../serviceToApi/ApiInstance";
 import { API_ENDPOINTS } from "../../serviceToApi/ApiEndpoint";
 import { usePostData } from "../../serviceToApi/PostData";
-
+import { useAuth } from "../../auth/Auth";
 function SignIn() {
   const { formData, formErrors, handleChange, setFormErrors, handleSubmit } =
     useForm(
@@ -25,11 +25,12 @@ function SignIn() {
     );
 
   const navigate = useNavigate();
+  const { setUser } = useAuth();
   const { timer, isCounting, sendOtp } = useOtpTimer(30);
   const passwordField = usePasswordToggle();
   const [hasSent, setHasSent] = useState(false);
 
-  const { mutate: loginMutate } = usePostData(API_ENDPOINTS.LOGIN);
+  const { mutate: loginMutate } = usePostData(API_ENDPOINTS.AUTH.LOGIN);
 
   const handleSendOtpTrigger = async () => {
     showAlert.loading("Sending", "Please wait");
@@ -52,22 +53,36 @@ function SignIn() {
   //   API_ENDPOINTS.APPLY_STATUS,
   //   { enabled: false },
   // );
-
   const onSigninSuccess = async () => {
-    showAlert.loading("Loading...", "Please wait");
+    showAlert.loading("Verifying OTP...", "Please wait");
+
     if (!formData.otp) {
       showAlert.warning("Wait!", "Please enter the OTP sent to your email.");
       return;
     }
 
     loginMutate(formData, {
-      onSuccess: async (data) => {
-        if (data.token) {
-          localStorage.setItem("token", data.token);
+      onSuccess: (data) => {
+        console.log("Mutation Data:", data);
+
+        if (data?.status === "success") {
+          const userData = {
+            userId: data.userId,
+            email: data.email,
+            role: data.role,
+            expiresAt: data.expiresAt,
+          };
+
+          sessionStorage.setItem("user", JSON.stringify(userData));
+          setUser(userData);
           showAlert.success("Success!", "Logged in successfully!").then(() => {
-            // Refresh at balik sa root. Hayaan ang App.js ang mag-redirect.
-            window.location.href = "/";
+            navigate("/");
           });
+        } else {
+          showAlert.error(
+            "Error",
+            data?.message || "Login was not successful.",
+          );
         }
       },
       onError: (error) => {

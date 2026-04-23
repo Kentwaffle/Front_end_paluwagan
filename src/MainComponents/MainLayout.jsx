@@ -7,7 +7,7 @@ import { useAuth } from "../auth/Auth";
 import { MessageSquare } from "lucide-react";
 function MainLayout({ isStatus, isStatusLoading }) {
   const [isOpen, setIsOpen] = useState(false);
-  const { user, token } = useAuth();
+  const { user } = useAuth();
 
   const location = useLocation();
   const isProfilePage = location.pathname === "/profile";
@@ -17,11 +17,9 @@ function MainLayout({ isStatus, isStatusLoading }) {
   const roles = user?.role;
 
   // Redirect kung walang token o invalid
-  if (!token || !roles) {
-    if (!token) localStorage.removeItem("token"); // Cleanup kung sakaling corrupted
+  if (!user || !roles) {
     return <Navigate to="/auth" replace />;
   }
-
   return (
     <div key={"main-app-layout"} className="min-h-screen">
       {!hideLayout && (
