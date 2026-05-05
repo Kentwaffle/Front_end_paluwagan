@@ -17,7 +17,7 @@ function Header({ openSideBar }) {
   const isAdmin = user?.role === "ROLE_ADMIN";
   const userID = user?.userId;
   const { data: headerData, isLoading } = useFetchData(
-    "/header",
+    "userProfile",
     API_ENDPOINTS.PROFILE_GET,
   );
 
@@ -28,7 +28,7 @@ function Header({ openSideBar }) {
       : null;
 
   const { data: notifCount, isLoading: notifCountLoading } = useFetchData(
-    "notifcount",
+    ["notifCount", userID],
     unreadCount,
   );
 

@@ -39,7 +39,7 @@ function Edit_Profile() {
   }, []);
 
   const { data: editData, isLoading: loadingEdit } = useFetchData(
-    "/edit_profile",
+    "userProfile",
     API_ENDPOINTS.PROFILE_GET,
   );
 

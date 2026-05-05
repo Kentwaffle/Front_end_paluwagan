@@ -37,9 +37,7 @@ export const useLoanSSE = (shouldConnect, savingsId, isLoan) => {
                 keyString.includes(
                   `/api/admin/savings/payment/filter/${savingsId}`,
                 )) ||
-              keyString.includes("/api/profile/info") ||
-              keyString.includes("/edit_profile") ||
-              keyString.includes("/header") ||
+              keyString.includes("/userProfile") ||
               keyString.includes("notification_list/markOnce") ||
               keyString.includes("notification_list") ||
               keyString.includes("notifcount") ||

@@ -12,3 +12,16 @@ export const formatTimeAgo = (date) => {
     return "Invalid date";
   }
 };
+
+export const formatDateTime = (isoString) => {
+  if (!isoString) return "";
+
+  const date = new Date(isoString);
+  return date
+    .toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    })
+    .toLowerCase();
+};

@@ -4,8 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./index.css";
 
 import Auth from "./auth/Auth";
-import App from "./App"; // Ito yung file na nilinis natin sa taas
-
+import App from "./App";
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")).render(

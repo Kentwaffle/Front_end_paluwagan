@@ -83,6 +83,24 @@ export const API_ENDPOINTS = {
 
   QRTIMER: (intentId) => `${BASE_URL}/api/payment/status/${intentId}`,
 
+  CS: {
+    USER: {
+      REQUEST_POST: `${BASE_URL}/api/chat/user/request`,
+
+      RESPONSE: (ticketId) =>
+        `${BASE_URL}/api/chat/user/ticket/${ticketId}/message`,
+    },
+
+    ADMIN: {
+      RESPONSE_REPLY: (ticketId) =>
+        `${BASE_URL}/api/chat/admin/ticket/${ticketId}/message`,
+
+      NEXT_QUEUE_TICKET: `${BASE_URL}/api/chat/admin/tickets`,
+    },
+
+    GET_MESSAGES: `${BASE_URL}/api/chat/ticket/messages`,
+  },
+
   //Instance Endpoints
   REFRESH: `${BASE_URL}/api/auth/refresh-token`,
 };

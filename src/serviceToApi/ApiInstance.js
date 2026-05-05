@@ -19,32 +19,22 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    const isRefreshRequest = originalRequest.url.includes(
-      "/api/auth/refresh-token",
-    );
 
-    if (error.response?.status === 401) {
-      if (isRefreshRequest) {
-        console.error("Refresh token failed. Redirecting...");
-        sessionStorage.removeItem("user");
-        window.location.href = "/auth";
-        return Promise.reject(error);
-      }
+    if (originalRequest.url === API_ENDPOINTS.AUTH.REFRESH) {
+      console.error("Refresh token failed, stopping loop.");
+      // window.location.href = "/auth";
+      return Promise.reject(error);
+    }
 
-      if (!originalRequest._retry) {
-        originalRequest._retry = true;
-        try {
-          await axios.post(
-            API_ENDPOINTS.AUTH.REFRESH,
-            {},
-            { withCredentials: true },
-          );
-          return api(originalRequest);
-        } catch (refreshError) {
-          console.error("Token refresh failed:", refreshError);
-          sessionStorage.removeItem("user");
-          return Promise.reject(refreshError);
-        }
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      try {
+        await api.post(API_ENDPOINTS.AUTH.REFRESH);
+        return api(originalRequest);
+      } catch (refreshError) {
+        // window.location.href = "/auth";
+        console.error("Refresh token failed, 401");
+        return Promise.reject(refreshError);
       }
     }
     return Promise.reject(error);

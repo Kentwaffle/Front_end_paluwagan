@@ -16,6 +16,7 @@ import {
 function Savings() {
   const {
     handleOnlineDeposit,
+    handleDeposit,
     navigate,
     isStatusLoading,
     userStatusPayload,

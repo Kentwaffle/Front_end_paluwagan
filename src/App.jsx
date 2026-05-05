@@ -64,7 +64,8 @@ import AddAdmin from "./Admin/MemberList/AddAdmin";
 import ProfileOverview from "./Admin/MemberList/ProfileOverview";
 import EditMemberAdmin from "./Admin/MemberList/EditMemberAdmin";
 import QRCODE from "./Savings/QRCODE";
-
+import Settings from "./Profile/Settings";
+import AI_mainlayout from "./AI_Main/AI_mainlayout";
 const queryClient = new QueryClient();
 
 const UserIndexRedirect = ({ isStatus }) => {
@@ -86,7 +87,11 @@ const ProtectedRoute = ({
   isLoadingAuth,
 }) => {
   const location = useLocation();
-  if (isLoadingAuth || isStatusLoading) return <LoadingServer />;
+  if (isLoadingAuth) {
+    return <LoadingServer />;
+  }
+
+  // if (isLoadingAuth || isStatusLoading) return <LoadingServer />;
   if (!userRole) return <Navigate to="/auth" replace />;
   if (userRole === "ROLE_ADMIN") return children;
 
@@ -217,8 +222,12 @@ const App = () => {
         },
 
         { path: "profile", element: <Profile /> },
+        { path: "Settings", element: <Settings /> },
         { path: "profile/edit_profile", element: <Edit_Profile /> },
-
+        {
+          path: "customer-service",
+          element: <AI_mainlayout />,
+        },
         { path: "notification", element: <Notification /> },
         {
           path: "loan",
