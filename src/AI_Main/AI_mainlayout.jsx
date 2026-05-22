@@ -10,6 +10,7 @@ function AI_mainlayout() {
   const role = user?.role;
   const navigate = useNavigate();
   console.log("Current User Role:", role);
+
   if (isLoadingAuth) {
     return (
       <div className="flex justify-center items-center h-screen">

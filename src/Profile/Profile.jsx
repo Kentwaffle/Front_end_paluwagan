@@ -263,16 +263,18 @@ function Profile() {
           </button> */}
         </div>
       )}
-      <div className="flex items-center justify-center pb-2 mt-10 text-sm text-slate-500 dark:text-slate-400">
-        <button
-          type="button"
-          onClick={() => navigate("/customer-service")}
-          className="flex gap-2 items-center hover:text-sky-500 transition-colors cursor-pointer hover:underline"
-        >
-          <Headset size={18} />
-          <span>Need help? Contact support</span>
-        </button>
-      </div>
+      {userRole !== "ROLE_ADMIN" && (
+        <div className="flex items-center justify-center pb-2 mt-10 text-sm text-slate-500 dark:text-slate-400">
+          <button
+            type="button"
+            onClick={() => navigate("/customer-service")}
+            className="flex gap-2 items-center hover:text-sky-500 transition-colors cursor-pointer hover:underline"
+          >
+            <Headset size={18} />
+            <span>Need help? Contact support</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 }

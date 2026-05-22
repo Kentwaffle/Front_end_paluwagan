@@ -5,6 +5,7 @@ import {
   PiggyBank,
   UsersRound,
   HandCoins,
+  Headset,
 } from "lucide-react";
 import White_PaluwaganLogo from "../assets/images/white_outline_SLP.png";
 import { Link, useLocation } from "react-router-dom";
@@ -30,6 +31,11 @@ const LINKS = {
       label: "Memberlist",
       path: "/admin/memberlist",
       icon: <UsersRound size={25} />,
+    },
+    {
+      label: "CS Admin",
+      path: "/admin/cs_admin",
+      icon: <Headset size={25} />,
     },
   ],
   ROLE_USER: [

@@ -89,18 +89,24 @@ export const API_ENDPOINTS = {
 
       RESPONSE: (ticketId) =>
         `${BASE_URL}/api/chat/user/ticket/${ticketId}/message`,
+
+      GET_MESSAGES_USER: `${BASE_URL}/api/chat/messages`,
     },
 
     ADMIN: {
       RESPONSE_REPLY: (ticketId) =>
         `${BASE_URL}/api/chat/admin/ticket/${ticketId}/message`,
 
-      NEXT_QUEUE_TICKET: `${BASE_URL}/api/chat/admin/tickets`,
+      NEXT_QUEUE_TICKET: (ticketId) =>
+        `${BASE_URL}/api/chat/admin/ticket/${ticketId}/claim`,
+
+      QUEUE_LIST: `${BASE_URL}/api/chat/admin/list/tickets`,
+
+      GET_MESSAGES_ADMIN: (ticketId) =>
+        `${BASE_URL}/api/chat/${ticketId}/messages`,
     },
-
-    GET_MESSAGES: `${BASE_URL}/api/chat/ticket/messages`,
   },
-
+  CHATSSE: (ticketId) => `${BASE_URL}/api/cs/ticket/${ticketId}/subscribe`,
   //Instance Endpoints
   REFRESH: `${BASE_URL}/api/auth/refresh-token`,
 };

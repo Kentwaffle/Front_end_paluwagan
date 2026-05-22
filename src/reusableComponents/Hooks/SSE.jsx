@@ -24,6 +24,14 @@ export const useLoanSSE = (shouldConnect, savingsId, isLoan) => {
             const queryKey = query.queryKey;
             const keyString = JSON.stringify(queryKey);
 
+            if (
+              queryKey.includes("cs_messages") ||
+              queryKey.includes("cs_messages_admin") ||
+              queryKey.includes("queue_list")
+            ) {
+              return false; // 👈 Huwag itong galawin ng Loan SSE! Ligtas dapat ang Chat!
+            }
+
             return (
               keyString.includes(currentSearchKey) ||
               keyString.includes("api/admin/loan") ||

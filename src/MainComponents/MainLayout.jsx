@@ -4,10 +4,12 @@ import { jwtDecode } from "jwt-decode";
 import Sidebar from "./sidebar";
 import Header from "./Header";
 import { useAuth } from "../auth/Auth";
-
+import { MessageSquare } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 function MainLayout({ isStatus, isStatusLoading }) {
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const location = useLocation();
   const isProfilePage = location.pathname === "/profile";
@@ -45,7 +47,7 @@ function MainLayout({ isStatus, isStatusLoading }) {
         <Outlet context={{ roles, isStatus, isStatusLoading }} />
       </main>
 
-      {!hideFooter && (
+      {!hideFooter && !roles === "ROLE_ADMIN" && (
         <footer className="mt-auto pb-5 flex flex-col items-center gap-1 opacity-60">
           <div className="flex items-center gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
             <button className="hover:text-sky-500 transition-colors">
@@ -61,11 +63,6 @@ function MainLayout({ isStatus, isStatusLoading }) {
           </span>
         </footer>
       )}
-      {/* <div className="fixed bottom-6 right-6 z-50">
-        <button className="bg-blue-500 text-white p-3 rounded-full shadow-lg hover:bg-blue-600 transition-colors">
-          <MessageSquare size={18} />
-        </button>
-      </div> */}
     </div>
   );
 }

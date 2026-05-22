@@ -66,6 +66,7 @@ import EditMemberAdmin from "./Admin/MemberList/EditMemberAdmin";
 import QRCODE from "./Savings/QRCODE";
 import Settings from "./Profile/Settings";
 import AI_mainlayout from "./AI_Main/AI_mainlayout";
+import AI_ADMIN_MAIN from "./AI_Main/AI_ADMIN/AI_ADMIN_MAIN";
 const queryClient = new QueryClient();
 
 const UserIndexRedirect = ({ isStatus }) => {
@@ -296,6 +297,10 @@ const App = () => {
               ],
             },
           ],
+        },
+        {
+          path: "cs_admin",
+          children: [{ index: true, element: <AI_ADMIN_MAIN /> }],
         },
       ],
     },

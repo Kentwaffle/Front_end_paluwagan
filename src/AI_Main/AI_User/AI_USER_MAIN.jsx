@@ -1,6 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ChatMessage from "../ChatMessage";
-import { SendHorizonal } from "lucide-react";
+import {
+  SendHorizonal,
+  ChevronLeft,
+  EllipsisVertical,
+  Bug,
+} from "lucide-react";
 import { getProfileImage } from "../../reusableComponents/Hooks/ImageGet";
 import { API_ENDPOINTS } from "../../serviceToApi/ApiEndpoint";
 import { usePostData } from "../../serviceToApi/PostData";
@@ -9,27 +14,28 @@ import { useFetchData } from "../../serviceToApi/fetchData";
 import { useQueryClient } from "@tanstack/react-query";
 import Beep from "../../assets/images/Cs/Beep.png";
 import { formatDateTime } from "../../reusableComponents/Utils/TimeDateformat";
+import { useChatSSE } from "../../reusableComponents/Hooks/ChatSSE";
 
 function AI_USER_MAIN() {
-  const [ticketId, setTicketId] = useState(null);
-  const [liveChat, setLiveChat] = useState(false);
+  const [ticketId, setTicketId] = useState("");
   const queryClient = useQueryClient();
+
+  // Patakbuhin ang SSE listener para sa User side
+  useChatSSE(ticketId);
 
   const { mutate: requestMutate, isPending } = usePostData(
     API_ENDPOINTS.CS.USER.REQUEST_POST,
     "cs_request",
   );
-  const {
-    formData: user,
-    handleChange: handleChangeUser,
-    handleSubmit: handleSubmitUser,
-  } = useForm({
+
+  const { formData: user, handleChange: handleChangeUser } = useForm({
     message: "",
   });
 
+  // 🎯 KOREKSYON: Ginawang Array Query Key para flexible sa SSE updates kahit may ticketId o wala
   const { data: messages } = useFetchData(
-    "cs_messages",
-    API_ENDPOINTS.CS.GET_MESSAGES,
+    ticketId ? ["cs_messages", ticketId] : ["cs_messages"],
+    API_ENDPOINTS.CS.USER.GET_MESSAGES_USER,
   );
 
   const handleSendMessage = async () => {
@@ -37,15 +43,34 @@ function AI_USER_MAIN() {
 
     requestMutate(user, {
       onSuccess: (data) => {
-        console.log(data);
-        queryClient.invalidateQueries(["cs_messages"]);
+        console.log("User Response Success payload:", data);
+        const actualTicketId = data?.ticketId || data?.data?.ticketId;
+
+        if (actualTicketId) {
+          setTicketId(actualTicketId);
+
+          // I-refetch agad pareho ang Admin at User data pools
+          queryClient.refetchQueries({
+            queryKey: ["cs_messages_admin", actualTicketId],
+          });
+          queryClient.refetchQueries({
+            queryKey: ["cs_messages", actualTicketId],
+          });
+        } else {
+          queryClient.refetchQueries({ queryKey: ["cs_messages"] });
+        }
+
+        queryClient.invalidateQueries({ queryKey: ["queue_list"] });
         user.message = "";
       },
       onError: (error) => {
-        console.error(error);
+        console.error("User Send Error:", error);
       },
     });
   };
+
+  const currentMessagesList =
+    messages?.messages || messages?.payload?.messages || [];
 
   return (
     <div className="h-screen flex flex-col bg-white dark:bg-slate-900">
@@ -53,21 +78,24 @@ function AI_USER_MAIN() {
         <ChatMessage
           isSender={false}
           message="Kamusta! Ako si Beep AI. Paano kita matutulungan sa iyong account?"
-          profile={getProfileImage(Beep)} // O yung bot icon mo
-          timeCurrent="System"
+          profile={getProfileImage(Beep)}
+          timeCurrent="Peep"
         />
-        {messages?.messages.map((msg, index) => (
+        {currentMessagesList.map((msg, index) => (
           <ChatMessage
-            key={index}
-            isSender={msg.sentBy === "USER" ? true : false}
-            message={msg.message}
+            key={msg?.id || msg?._id || index}
+            isSender={msg.sentBy === "USER"}
+            message={msg.message || msg.msg || ""}
             profile={
               msg.sentBy === "Peep" ? getProfileImage(Beep) : getProfileImage()
             }
-            timeCurrent={formatDateTime(messages?.messages?.[0]?.createdAt)}
+            timeCurrent={
+              msg.sentBy === "Peep" ? "Peep" : formatDateTime(msg.createdAt)
+            }
           />
         ))}
       </div>
+
       <div className="fixed bottom-0 w-full p-4 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-2 rounded-2xl">
           <input
@@ -81,7 +109,7 @@ function AI_USER_MAIN() {
           <button
             type="button"
             disabled={isPending}
-            onClick={() => handleSendMessage()}
+            onClick={handleSendMessage}
             className="bg-sky-500 text-white p-2 rounded-xl hover:bg-sky-600 transition-all"
           >
             {isPending ? (
