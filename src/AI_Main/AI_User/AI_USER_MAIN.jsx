@@ -17,11 +17,19 @@ import { formatDateTime } from "../../reusableComponents/Utils/TimeDateformat";
 import { useChatSSE } from "../../reusableComponents/Hooks/ChatSSE";
 
 function AI_USER_MAIN() {
-  const [ticketId, setTicketId] = useState("");
-  const queryClient = useQueryClient();
+  const [ticketId, setTicketId] = useState(() => {
+    return sessionStorage.getItem("user_active_ticket_id") || "";
+  });
 
-  // Patakbuhin ang SSE listener para sa User side
+  const queryClient = useQueryClient();
   useChatSSE(ticketId);
+  useEffect(() => {
+    if (ticketId) {
+      sessionStorage.setItem("user_active_ticket_id", ticketId);
+    } else {
+      sessionStorage.removeItem("user_active_ticket_id");
+    }
+  }, [ticketId]);
 
   const { mutate: requestMutate, isPending } = usePostData(
     API_ENDPOINTS.CS.USER.REQUEST_POST,
@@ -32,7 +40,6 @@ function AI_USER_MAIN() {
     message: "",
   });
 
-  // 🎯 KOREKSYON: Ginawang Array Query Key para flexible sa SSE updates kahit may ticketId o wala
   const { data: messages } = useFetchData(
     ticketId ? ["cs_messages", ticketId] : ["cs_messages"],
     API_ENDPOINTS.CS.USER.GET_MESSAGES_USER,
@@ -48,8 +55,6 @@ function AI_USER_MAIN() {
 
         if (actualTicketId) {
           setTicketId(actualTicketId);
-
-          // I-refetch agad pareho ang Admin at User data pools
           queryClient.refetchQueries({
             queryKey: ["cs_messages_admin", actualTicketId],
           });
