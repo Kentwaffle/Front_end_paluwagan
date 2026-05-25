@@ -14,11 +14,13 @@ import { Search } from "lucide-react";
 import { swalModal } from "../reusableComponents/Alerts/SweetAlerts";
 import { useAuth } from "../auth/Auth";
 import SearchInput from "../reusableComponents/Forms/SearchInput";
-
+import { useQueryClient } from "@tanstack/react-query";
 function Loan_management() {
   const [searchrefPending, setSearchrefPending] = useState("");
   const [currentStatus, setCurrentStatus] = useState("PENDING");
   const { token, isLoadingAuth } = useAuth();
+  const queryClient = useQueryClient();
+
   //SSE ni juls na di ko magets
   useLoanSSE(true, null);
 
@@ -32,7 +34,7 @@ function Loan_management() {
   const cardData = admin_data?.applicants;
 
   const { mutate: admin_change_status, loading: change_status } = usePutData(
-    "api/admin/loan/change-status",
+    "/api/admin/loan/change-status",
     API_ENDPOINTS.ADMIN_CHANGE_STATUS,
   );
   const { data: application_count } = useFetchData(
@@ -58,6 +60,9 @@ function Loan_management() {
       {
         onSuccess: () => {
           showAlert.success("Successfully approve", "User has been approved");
+          queryClient.invalidateQueries({
+            queryKey: ["user-status-key"],
+          });
         },
         onError: (error) => {
           showAlert.warning("Error", error);
@@ -81,6 +86,9 @@ function Loan_management() {
       { status: "REJECTED", applicationID: id },
       {
         onSuccess: () => {
+          queryClient.invalidateQueries({
+            queryKey: ["user-status-key"],
+          });
           showAlert.success("Successfully Rejected", "User has been Rejected");
         },
         onError: (error) => {

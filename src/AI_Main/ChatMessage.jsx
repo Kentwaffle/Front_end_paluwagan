@@ -15,7 +15,6 @@ function ChatMessage({ message, isSender, profile, timeCurrent }) {
           alt="Profile"
           className="w-full h-full object-cover"
         />
-        7
       </div>
 
       <div

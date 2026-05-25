@@ -19,7 +19,7 @@ import { getProfileImage } from "../../reusableComponents/Hooks/ImageGet";
 import { useForm } from "../../reusableComponents/Hooks/HandleChange&Submit";
 import { usePostData } from "../../serviceToApi/PostData";
 import { useChatSSE } from "../../reusableComponents/Hooks/ChatSSE";
-
+import { useAutoScroll } from "../../reusableComponents/Hooks/useAutoScroll";
 function AI_ADMIN_MAIN() {
   const [view, setView] = useState("queue");
   const [claimedTicketId, setClaimedTicketId] = useState(null);
@@ -111,7 +111,7 @@ function AI_ADMIN_MAIN() {
   const all_messages = Array.isArray(messagesAdmin)
     ? messagesAdmin
     : messagesAdmin?.messages || messagesAdmin?.payload?.messages || [];
-
+  const messagesEndRef = useAutoScroll([all_messages], view, "ticket");
   return (
     <div>
       {view === "queue" && currtentTicket && (
@@ -229,11 +229,11 @@ function AI_ADMIN_MAIN() {
       <div
         className={
           view === "ticket"
-            ? "flex flex-col flex-1 overflow-hidden min-h-screen"
+            ? "flex flex-col h-[calc(100vh-60px)] overflow-hidden"
             : "hidden"
         }
       >
-        <div className="flex justify-between">
+        <div className="sticky top-0 z-10 flex justify-between p-5 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800">
           <button
             onClick={() => setView("queue")}
             className="p-2 bg-white dark:bg-slate-900 shadow-sm rounded-xl text-slate-600"
@@ -280,7 +280,7 @@ function AI_ADMIN_MAIN() {
           </div>
         </div>
 
-        <div className="flex-1 mt-3 overflow-y-auto  py-6 space-y-6 pb-32 bg-slate-50/60 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-800/50 rounded-2xl shadow-inner scrollbar-thin">
+        <div className="flex-1 overflow-y-auto space-y-6 pb-32 scrollbar-thin">
           {all_messages.map((msg, index) => {
             const isFromAdminSide = msg?.sentBy?.toUpperCase() !== "USER";
 
@@ -329,6 +329,7 @@ function AI_ADMIN_MAIN() {
               </button>
             </div>
           </div>
+          <div ref={messagesEndRef} />
         </div>
       </div>
 
