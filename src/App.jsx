@@ -1,17 +1,327 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './index.css'
-import './App.css';
+import { StrictMode } from "react";
+import React, { useEffect, useState } from "react";
+import "./index.css";
+import ReactDOM from "react-dom/client";
+import { Navigate, useLocation } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-function App() {
-  const [count, setCount] = useState(0)
+//landing
+import PaluwaganMain from "./LandingPage/paluwaganMain";
+import SignIn from "./LandingPage/registrationComponents/SignIn";
+import Register from "./LandingPage/registrationComponents/register";
+
+//forgot pass
+import ForgotPassword from "./LandingPage/registrationComponents/ForgotPassword";
+import ChangePassword from "./LandingPage/registrationComponents/ChangePassword";
+
+//Main
+import MainLayout from "./MainComponents/MainLayout";
+//Loan
+import Loan from "./Loan/Loan";
+import ApplyLoan from "./Loan/ApplyLoan";
+import PendingStatus from "./Loan/PendingStatus";
+
+//Profile
+import Profile from "./Profile/Profile";
+import Edit_Profile from "./Profile/Edit_Profile";
+
+//Savings
+import Savings from "./Savings/Savings";
+import Apply_savings from "./Savings/Apply_savings";
+import SavingsPayment from "./Savings/SavingsPayment";
+
+//404
+import Eror404 from "./Eror404/404";
+
+//OTP
+import Otp from "./LandingPage/registrationComponents/Otp";
+
+//API
+import { useFetchData } from "./serviceToApi/fetchData";
+import { API_ENDPOINTS } from "./serviceToApi/ApiEndpoint";
+
+//Loading
+import { LoadingServer } from "./reusableComponents/Feedbacks/loading";
+import Error from "./reusableComponents/Feedbacks/Error";
+
+//Admin
+import Loan_management from "./Admin/Loan_management";
+import Saving_management from "./Admin/SavingsAdmin/Saving_management";
+import PaymentList from "./Admin/SavingsAdmin/PaymentList";
+import LoanFundsMain from "./Admin/FundsAdmin/LoanFundsMain";
+//SSE
+import { useLoanSSE } from "./reusableComponents/Hooks/SSE";
+//Auth
+import { useAuth } from "./auth/Auth";
+import Auth from "./auth/Auth";
+import Notification from "./MainComponents/Notification";
+import LoanCardPayment from "./Admin/FundsAdmin/LoanCardPayment";
+import SavingsMemberFilter from "./Admin/SavingsAdmin/SavingsMemberFilter";
+import MemberCard from "./Admin/SavingsAdmin/MemberCard";
+import Memberlist from "./Admin/MemberList/Memberlist";
+import AddAdmin from "./Admin/MemberList/AddAdmin";
+import ProfileOverview from "./Admin/MemberList/ProfileOverview";
+import EditMemberAdmin from "./Admin/MemberList/EditMemberAdmin";
+import QRCODE from "./Savings/QRCODE";
+import Settings from "./Profile/Settings";
+import AI_mainlayout from "./AI_Main/AI_mainlayout";
+import AI_ADMIN_MAIN from "./AI_Main/AI_ADMIN/AI_ADMIN_MAIN";
+const queryClient = new QueryClient();
+
+const UserIndexRedirect = ({ isStatus }) => {
+  const payload = isStatus?.payload;
+  if (!payload) return <LoadingServer />;
+
+  if (payload.hasApprovedApplication) return <Navigate to="/loan" replace />;
+  if (payload.hasPendingApplication)
+    return <Navigate to="/pending_status" replace />;
+  return <Navigate to="/apply_loan" replace />;
+};
+
+//Pagwalang token ibabalik nya sa main
+const ProtectedRoute = ({
+  children,
+  userRole,
+  isStatus,
+  isStatusLoading,
+  isLoadingAuth,
+}) => {
+  const location = useLocation();
+  if (isLoadingAuth) {
+    return <LoadingServer />;
+  }
+
+  // if (isLoadingAuth || isStatusLoading) return <LoadingServer />;
+  if (!userRole) return <Navigate to="/auth" replace />;
+  if (userRole === "ROLE_ADMIN") return children;
+
+  const payload = isStatus?.payload;
+  const currentPath = location.pathname;
+  console.log("Gatekeeper checking path:", currentPath);
+
+  // Kung wala pang payload data, wag munang papasukin sa kahit anong path
+  if (!payload && userRole === "ROLE_USER") return <LoadingServer />;
+
+  if (userRole === "ROLE_USER") {
+    // Approved User logic
+    if (payload.hasApprovedApplication) {
+      if (["/apply_loan", "/pending_status"].includes(currentPath)) {
+        return <Navigate to="/loan" replace />;
+      }
+    }
+    // Pending User logic
+    else if (payload.hasPendingApplication) {
+      if (["/apply_loan", "/loan", "/"].includes(currentPath)) {
+        return <Navigate to="/pending_status" replace />;
+      }
+    }
+    // New User logic
+    else {
+      if (["/loan", "/pending_status"].includes(currentPath)) {
+        return <Navigate to="/apply_loan" replace />;
+      }
+    }
+
+    //Savings\
+    if (currentPath === "/savings" || currentPath === "/apply_savings") {
+      if (payload.hasSavingsAccount) {
+        if (currentPath === "/apply_savings") {
+          return <Navigate to="/savings" replace />;
+        }
+      } else {
+        // Kung walang savings account, dapat lagi siyang nasa apply_savings
+        if (currentPath === "/savings") {
+          return <Navigate to="/apply_savings" replace />;
+        }
+      }
+    }
+  }
+
+  return children;
+};
+
+const PublicRoute = ({ children, userRole }) => {
+  if (userRole) {
+    // Kung naka-login na at pilit pumasok sa Login page, i-redirect base sa role
+    const destination =
+      userRole === "ROLE_ADMIN" ? "/admin/loan_management" : "/loan";
+    return <Navigate to={destination} replace />;
+  }
+  return children;
+};
+
+const App = () => {
+  const [isBackendDown, setIsBackendDown] = useState(false);
+  const { user, isTokenExpired, isLoadingAuth } = useAuth();
+  const roles = user?.role;
+
+  useLoanSSE(!!user && !isLoadingAuth);
+
+  const { data: isStatus, isLoading: isStatusLoading } = useFetchData(
+    "user-status-key",
+    API_ENDPOINTS.STATUS,
+    { enabled: !!user && !isLoadingAuth && roles === "ROLE_USER" },
+  );
+
+  useEffect(() => {
+    const handleServerError = () => setIsBackendDown(true);
+
+    window.addEventListener("SERVER_DOWN_ERROR", handleServerError);
+    return () =>
+      window.removeEventListener("SERVER_DOWN_ERROR", handleServerError);
+  }, []);
+
+  if (isLoadingAuth) {
+    return <LoadingServer />;
+  }
+
+  const router = createBrowserRouter([
+    {
+      path: "/auth",
+      element: (
+        <PublicRoute userRole={roles}>
+          <PaluwaganMain />
+        </PublicRoute>
+      ),
+      children: [
+        { index: true, element: <SignIn /> },
+        { path: "register", element: <Register /> },
+      ],
+    },
+    { path: "/register/otp", element: <Otp /> },
+    {
+      path: "forgot-password",
+      children: [
+        { index: true, element: <ForgotPassword /> },
+        { path: "changepassword", element: <ChangePassword /> },
+      ],
+    },
+
+    // USER ROUTES
+    {
+      path: "/",
+      element: (
+        <ProtectedRoute
+          userRole={roles}
+          isStatus={isStatus}
+          isStatusLoading={isStatusLoading}
+          isLoadingAuth={isLoadingAuth}
+        >
+          <MainLayout isStatus={isStatus} isStatusLoading={isStatusLoading} />
+        </ProtectedRoute>
+      ),
+      children: [
+        {
+          index: true,
+          element:
+            roles === "ROLE_ADMIN" ? (
+              <Navigate to="/admin/loan_management" replace />
+            ) : (
+              <UserIndexRedirect isStatus={isStatus} />
+            ),
+        },
+
+        { path: "profile", element: <Profile /> },
+        { path: "Settings", element: <Settings /> },
+        { path: "profile/edit_profile", element: <Edit_Profile /> },
+        {
+          path: "customer-service",
+          element: <AI_mainlayout />,
+        },
+        { path: "notification", element: <Notification /> },
+        {
+          path: "loan",
+          children: [
+            { index: true, element: <Loan /> },
+            { path: "qrpayment", element: <QRCODE /> },
+          ],
+        },
+        { path: "apply_loan", element: <ApplyLoan /> },
+        { path: "pending_status", element: <PendingStatus /> },
+        //Savings
+        {
+          path: "savings",
+
+          children: [
+            { index: true, element: <Savings /> },
+            // { path: "apply_savings", element: <Apply_savings /> },
+            { path: "savings_payments", element: <SavingsPayment /> },
+            { path: "qrpayment", element: <QRCODE /> },
+          ],
+        },
+        { path: "apply_savings", element: <Apply_savings /> },
+      ],
+    },
+    // ADMIN ROUTES
+    {
+      path: "/admin",
+      element: (
+        <ProtectedRoute
+          userRole={roles}
+          isLoadingAuth={isLoadingAuth}
+          isStatusLoading={false}
+        >
+          <MainLayout />
+        </ProtectedRoute>
+      ),
+      children: [
+        { index: true, element: <Navigate to="loan_management" replace /> },
+        { path: "loan_management", element: <Loan_management /> },
+        {
+          path: "savings_management",
+          children: [
+            { index: true, element: <Saving_management /> },
+            { path: ":savingsId", element: <PaymentList /> },
+            { path: "savingsmembers", element: <SavingsMemberFilter /> },
+          ],
+        },
+        {
+          path: "funds_management",
+          children: [
+            { index: true, element: <LoanFundsMain /> },
+            { path: ":type", element: <LoanCardPayment /> },
+          ],
+        },
+        {
+          path: "memberlist",
+          children: [
+            { index: true, element: <Memberlist /> },
+            { path: "addAdmin", element: <AddAdmin /> },
+            {
+              path: ":user_id",
+              children: [
+                { index: true, element: <ProfileOverview /> },
+
+                { path: "editAdmin", element: <EditMemberAdmin /> },
+              ],
+            },
+          ],
+        },
+        {
+          path: "cs_admin",
+          children: [{ index: true, element: <AI_ADMIN_MAIN /> }],
+        },
+      ],
+    },
+    { path: "*", element: <Eror404 /> },
+  ]);
 
   return (
-    <div class="chat text-3xl font-bold underline bg-amber-300">
-      asd
-  </div>
-  )
-}
+    <div className="relative">
+      <RouterProvider router={router} />
 
-export default App
+      {isTokenExpired ? (
+        <Error error={{ response: { data: { error: "EXPIRED_TOKEN" } } }} />
+      ) : isBackendDown ? (
+        <Error
+          error={{
+            message:
+              "Server connection failed. Please contact us for support or return to the login page to refresh your session.",
+          }}
+        />
+      ) : null}
+    </div>
+  );
+};
+export default App;

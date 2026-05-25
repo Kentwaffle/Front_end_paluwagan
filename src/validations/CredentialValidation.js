@@ -223,10 +223,10 @@ export const ValidateSavingsDeposit = (formData) => {
     if (!formData.amount || Number(formData.amount) <= 0) {
       errors.amount = "Please enter a valid amount";
     }
-  }
 
-  if (!formData.methodType) {
-    errors.methodType = "Please select a payment method";
+    if (!formData.methodType) {
+      errors.methodType = "Please select a payment method";
+    }
   }
 
   return {

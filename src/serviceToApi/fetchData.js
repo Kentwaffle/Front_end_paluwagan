@@ -5,16 +5,21 @@ import api from "./ApiInstance";
 export const useFetchData = (key, endpoint, options = {}) => {
   const { enabled, ...otherOptions } = options;
 
+  const finalizedQueryKey = Array.isArray(key) ? key : [key];
+
   return useQuery({
-    queryKey: [key],
+    queryKey: finalizedQueryKey,
     queryFn: async ({ queryKey }) => {
       const response = await api.get(endpoint);
-      console.log("Fetching data for:" + queryKey, response.data);
+      console.log("Fetching data for:", queryKey, response.data);
       return response.data;
     },
     enabled: (enabled !== undefined ? enabled : true) && !!endpoint,
-    // DAGDAG ITO:
-    staleTime: 3000, // Hindi siya magre-refetch sa loob ng 3 segundo kahit mag-mount ang component
+
+    staleTime: 0,
+    gcTime: 1000 * 60 * 10,
+    refetchOnWindowFocus: false,
+    retry: 1,
     ...otherOptions,
   });
 };

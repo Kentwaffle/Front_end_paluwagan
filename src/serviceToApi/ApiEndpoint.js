@@ -1,8 +1,15 @@
-export const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+export const BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 export const PAYMENT_URL = import.meta.env.VITE_PAYMENT_URL;
 
 export const API_ENDPOINTS = {
-  LOGIN: `${BASE_URL}/api/auth/login`,
+  AUTH: {
+    REFRESH: `${BASE_URL}/api/auth/refresh-token`,
+    LOGIN: `${BASE_URL}/api/auth/login`,
+    LOGOUT: `${BASE_URL}/api/auth/logout`,
+    VERIFY_SESSION: `${BASE_URL}/api/verify/session`,
+  },
+
+  // LOGIN: `${BASE_URL}/api/auth/login`,
   REGISTER: `${BASE_URL}/api/auth/register`,
 
   SEND_OTP: `${BASE_URL}/api/auth/login-send-otp`,
@@ -76,5 +83,30 @@ export const API_ENDPOINTS = {
 
   QRTIMER: (intentId) => `${BASE_URL}/api/payment/status/${intentId}`,
 
-  LOGOUT: `${BASE_URL}/api/auth/logout`,
+  CS: {
+    USER: {
+      REQUEST_POST: `${BASE_URL}/api/chat/user/request`,
+
+      RESPONSE: (ticketId) =>
+        `${BASE_URL}/api/chat/user/ticket/${ticketId}/message`,
+
+      GET_MESSAGES_USER: `${BASE_URL}/api/chat/messages`,
+    },
+
+    ADMIN: {
+      RESPONSE_REPLY: (ticketId) =>
+        `${BASE_URL}/api/chat/admin/ticket/${ticketId}/message`,
+
+      NEXT_QUEUE_TICKET: (ticketId) =>
+        `${BASE_URL}/api/chat/admin/ticket/${ticketId}/claim`,
+
+      QUEUE_LIST: `${BASE_URL}/api/chat/admin/list/tickets`,
+
+      GET_MESSAGES_ADMIN: (ticketId) =>
+        `${BASE_URL}/api/chat/${ticketId}/messages`,
+    },
+  },
+  CHATSSE: (ticketId) => `${BASE_URL}/api/cs/ticket/${ticketId}/subscribe`,
+  //Instance Endpoints
+  REFRESH: `${BASE_URL}/api/auth/refresh-token`,
 };

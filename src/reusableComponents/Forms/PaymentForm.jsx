@@ -77,7 +77,7 @@ function PaymentForm({
 
             {cashPaymentErrors?.amount && (
               <span className="text-red-500 text-xs mt-1 dark:text-red-400">
-                {cashPaymentErrors?.amount}                     
+                {cashPaymentErrors?.amount}
               </span>
             )}
 

@@ -1,11 +1,14 @@
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { API_ENDPOINTS } from "../../serviceToApi/ApiEndpoint";
-
+import { useAuth } from "../../auth/Auth";
 export const useLoanSSE = (shouldConnect, savingsId, isLoan) => {
   const queryClient = useQueryClient();
+  const authContext = useAuth();
+  const user = authContext?.user;
 
   useEffect(() => {
+    if (!user) return;
     console.log("SSE Hook URL:", API_ENDPOINTS.SSE);
     if (!shouldConnect) return;
 
@@ -21,6 +24,14 @@ export const useLoanSSE = (shouldConnect, savingsId, isLoan) => {
             const queryKey = query.queryKey;
             const keyString = JSON.stringify(queryKey);
 
+            if (
+              queryKey.includes("cs_messages") ||
+              queryKey.includes("cs_messages_admin") ||
+              queryKey.includes("queue_list")
+            ) {
+              return false; // 👈 Huwag itong galawin ng Loan SSE! Ligtas dapat ang Chat!
+            }
+
             return (
               keyString.includes(currentSearchKey) ||
               keyString.includes("api/admin/loan") ||
@@ -34,9 +45,7 @@ export const useLoanSSE = (shouldConnect, savingsId, isLoan) => {
                 keyString.includes(
                   `/api/admin/savings/payment/filter/${savingsId}`,
                 )) ||
-              keyString.includes("/api/profile/info") ||
-              keyString.includes("/edit_profile") ||
-              keyString.includes("/header") ||
+              keyString.includes("/userProfile") ||
               keyString.includes("notification_list/markOnce") ||
               keyString.includes("notification_list") ||
               keyString.includes("notifcount") ||
@@ -77,5 +86,5 @@ export const useLoanSSE = (shouldConnect, savingsId, isLoan) => {
         console.log("SSE Connection closed");
       }
     };
-  }, [shouldConnect, savingsId, queryClient, isLoan]);
+  }, [shouldConnect, savingsId, queryClient, isLoan, user]);
 };

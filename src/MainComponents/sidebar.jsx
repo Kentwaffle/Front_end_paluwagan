@@ -1,5 +1,12 @@
 import React from "react";
-import { BadgeCent, HandCoins, PiggyBank, UsersRound } from "lucide-react";
+import {
+  BadgeCent,
+  LibraryBig,
+  PiggyBank,
+  UsersRound,
+  HandCoins,
+  Headset,
+} from "lucide-react";
 import White_PaluwaganLogo from "../assets/images/white_outline_SLP.png";
 import { Link, useLocation } from "react-router-dom";
 
@@ -25,11 +32,16 @@ const LINKS = {
       path: "/admin/memberlist",
       icon: <UsersRound size={25} />,
     },
+    {
+      label: "CS Admin",
+      path: "/admin/cs_admin",
+      icon: <Headset size={25} />,
+    },
   ],
   ROLE_USER: [
     { label: "Loan", path: "/loan", icon: <BadgeCent size={25} /> },
     { label: "Savings", path: "/savings", icon: <PiggyBank size={25} /> },
-    { label: "Payment", path: "/", icon: <HandCoins size={25} /> },
+    { label: "Ledger", path: "/ledger", icon: <LibraryBig size={25} /> },
   ],
 };
 
