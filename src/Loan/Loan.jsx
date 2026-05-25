@@ -18,7 +18,7 @@ import PaymentForm from "../reusableComponents/Forms/PaymentForm";
 import { useForm } from "../reusableComponents/Hooks/HandleChange&Submit";
 import { ValidateSavingsDeposit } from "../validations/CredentialValidation";
 import { generateUUID } from "../reusableComponents/Utils/GeneratedIDS";
-import { useOnlinePayment } from "../reusableComponents/Hooks/useOnlinepayment";
+import { useOnlinePayment } from "../reusableComponents/Hooks/useOnlinePayment";
 import TransactionList from "../reusableComponents/Display/TransactionList";
 import { formatTimeAgo } from "../reusableComponents/Utils/TimeDateformat";
 
