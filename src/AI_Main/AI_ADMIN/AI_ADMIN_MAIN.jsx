@@ -36,7 +36,6 @@ function AI_ADMIN_MAIN() {
   const currtentTicket = queueList?.payload?.current || null;
   const activeTicketId = currtentTicket?.ticketId || claimedTicketId;
 
-  // Makinig sa Real-time SSE updates gamit ang Active Ticket ID
   useChatSSE(activeTicketId);
 
   useEffect(() => {
@@ -70,8 +69,6 @@ function AI_ADMIN_MAIN() {
     adminResponse(responseData, {
       onSuccess: (data) => {
         console.log("Admin Response Success:", data);
-
-        // Dynamic fuzzy match refetch nang walang exact parameter restriction
         queryClient.refetchQueries({
           queryKey: ["cs_messages_admin", activeTicketId],
         });
@@ -100,7 +97,6 @@ function AI_ADMIN_MAIN() {
     }
   };
 
-  // 🎯 KOREKSYON: Tinanggal ang exact: true at isinama si messagesAdmin sa dependency system para mabilis mag-sync ang state
   useEffect(() => {
     if (activeTicketId) {
       console.log(
@@ -117,11 +113,11 @@ function AI_ADMIN_MAIN() {
     : messagesAdmin?.messages || messagesAdmin?.payload?.messages || [];
 
   return (
-    <div className="p-5">
+    <div>
       {view === "queue" && currtentTicket && (
         <div
           onClick={() => setView("ticket")}
-          className="cursor-pointer bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 text-white px-5 py-3.5 rounded-2xl shadow-md hover:shadow-lg hover:scale-[1.01] transition-all duration-300 flex items-center justify-between border border-amber-400 animate-pulse mb-4"
+          className="cursor-pointer bg-gradient-to-r mx-5 mt-5 from-amber-500 via-orange-500 to-amber-500 text-white px-5 py-3.5 rounded-2xl shadow-md hover:shadow-lg hover:scale-[1.01] transition-all duration-300 flex items-center justify-between border border-amber-400 animate-pulse"
         >
           <div className="flex items-center gap-3">
             <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
@@ -145,7 +141,7 @@ function AI_ADMIN_MAIN() {
       )}
 
       {/* QUEUE LOBBY VIEW */}
-      <div className={view === "queue" ? "block" : "hidden"}>
+      <div className={view === "queue" ? "block p-5" : "hidden"}>
         <div className="text-center flex flex-col gap-4 bg-white p-4 rounded-lg border-2 border-dashed border-sky-200 shadow-sm">
           {nextQueue ? (
             <>
@@ -230,7 +226,13 @@ function AI_ADMIN_MAIN() {
       </div>
 
       {/* CHAT PANEL VIEW */}
-      <div className={view === "ticket" ? "block" : "hidden"}>
+      <div
+        className={
+          view === "ticket"
+            ? "flex flex-col flex-1 overflow-hidden min-h-screen"
+            : "hidden"
+        }
+      >
         <div className="flex justify-between">
           <button
             onClick={() => setView("queue")}
@@ -238,14 +240,12 @@ function AI_ADMIN_MAIN() {
           >
             <ChevronLeft />
           </button>
-
           <h1 className="text-lg font-semibold">
             #
             {currtentTicket?.ticketId
               ? currtentTicket.ticketId.substring(0, 8).toUpperCase()
               : "---"}
           </h1>
-
           <div className="dropdown dropdown-end">
             <div
               tabIndex={0}
@@ -280,7 +280,7 @@ function AI_ADMIN_MAIN() {
           </div>
         </div>
 
-        <div className="flex-1 mt-3 overflow-y-auto min-h-[60vh] py-6 space-y-6 pb-32 bg-slate-50/60 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-800/50 rounded-2xl shadow-inner scrollbar-thin">
+        <div className="flex-1 mt-3 overflow-y-auto  py-6 space-y-6 pb-32 bg-slate-50/60 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-800/50 rounded-2xl shadow-inner scrollbar-thin">
           {all_messages.map((msg, index) => {
             const isFromAdminSide = msg?.sentBy?.toUpperCase() !== "USER";
 

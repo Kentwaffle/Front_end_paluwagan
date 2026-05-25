@@ -11,19 +11,21 @@ export const useChatSSE = (ticketId) => {
   const currentUserId = user?.id || user?.userId || user?._id;
 
   useEffect(() => {
-    // Kung walang logged-in user at walang ticket, huwag muna kumonekta
-    if (!currentUserId && !ticketId) return;
+    // ✅ FIX: currentUserId lang ang kailangan para makapasok
+    // kahit walang ticketId pa, para makakonekta ang globalEventSource
+    if (!currentUserId) return;
 
     let eventSource;
+    let globalEventSource = null;
     let reconnectTimeout;
+    let globalReconnectTimeout;
     let debounceTimeout;
 
     const handleChatUpdate = (event) => {
-      console.log(`[⚡ SSE EVENT] Tinamaan ang event: ${event.type}`);
+      console.log(`SSE EVENT: ${event.type}`);
 
       let eventTicketId = null;
 
-      // 🔍 Extraction Logic ng Ticket ID mula sa dynamic payload ng backend
       try {
         if (event.data) {
           let parsedData = event.data;
@@ -31,7 +33,7 @@ export const useChatSSE = (ticketId) => {
             parsedData = JSON.parse(event.data);
           }
 
-          console.log("📄 [SSE Deep Debug] Parsed Data Object:", parsedData);
+          console.log("SSE Deep Debug:", parsedData);
 
           eventTicketId =
             parsedData?.ticketId ||
@@ -41,30 +43,21 @@ export const useChatSSE = (ticketId) => {
             parsedData?.messages?.[0]?.ticketId;
         }
       } catch (error) {
-        console.log(
-          "⚠️ [SSE] Error sa pagkuha ng ticketId mula sa data:",
-          error,
-        );
+        console.log(" [SSE] Error :", error);
       }
 
-      console.log(`🎯 [SSE Extracted Key] Target Ticket ID:`, eventTicketId);
+      console.log(`SSE Key:`, eventTicketId);
 
-      // Debounce para maiwasan ang sunod-sunod na refetch sa database
       if (debounceTimeout) clearTimeout(debounceTimeout);
 
       debounceTimeout = setTimeout(() => {
-        console.log(
-          "🔄 [SSE Trigger] Pwersahang nililinis ang Chat cache frames...",
-        );
+        console.log("SSE Trigger");
 
         const targetId = eventTicketId || ticketId;
 
         if (targetId) {
-          console.log(
-            `🎯 [Targeted Refetch] Gisingin ang chat para kay Ticket: ${targetId}`,
-          );
+          console.log(`Targeted Refetch: ${targetId}`);
 
-          // 🚀 I-REFRESH ANG ADMIN QUERIES
           queryClient.invalidateQueries({
             queryKey: ["cs_messages_admin", targetId],
           });
@@ -72,7 +65,6 @@ export const useChatSSE = (ticketId) => {
             queryKey: ["cs_messages_admin", targetId],
           });
 
-          // 🚀 I-REFRESH ANG USER QUERIES
           queryClient.invalidateQueries({
             queryKey: ["cs_messages", targetId],
           });
@@ -80,86 +72,98 @@ export const useChatSSE = (ticketId) => {
             queryKey: ["cs_messages", targetId],
           });
         } else {
-          console.log(
-            "⚠️ [Fallback Refetch] Malawakang paglilinis ng cache...",
-          );
+          console.log("Fallback Refetch");
           queryClient.invalidateQueries({ queryKey: ["cs_messages_admin"] });
           queryClient.invalidateQueries({ queryKey: ["cs_messages"] });
         }
 
-        // Laging siguraduhing updated ang listahan ng pila (Queue) ng Admin
         queryClient.invalidateQueries({ queryKey: ["queue_list"] });
       }, 300);
     };
 
+    // ─────────────────────────────────────────────────────────────
+    // TICKET-SPECIFIC SSE — /api/cs/ticket/{ticketId}/subscribe
+    // Kokonekta lang kung may ticketId
+    // ─────────────────────────────────────────────────────────────
     const connect = () => {
-      let sseUrl;
+      if (!ticketId) return; // walang ticketId, huwag mag-connect
 
-      // 🎯 DYNAMIC URL DISKARTE:
-      // Kung may ticketId, pumasok sa room subscription ng ticket.
-      // Kung wala pero may currentUserId, kumonekta gamit ang User ID channel endpoint natin.
-      if (ticketId) {
-        sseUrl = API_ENDPOINTS.CHATSSE(ticketId);
-      } else {
-        return;
-      }
-
-      console.log(`🔌 Tinatangkang kumonekta sa SSE Stream: ${sseUrl}`);
+      const sseUrl = API_ENDPOINTS.CHATSSE(ticketId);
+      console.log(`Tinatangkang kumonekta sa SSE Stream: ${sseUrl}`);
       eventSource = new EventSource(sseUrl);
 
-      // --- MGA LISTENERS ---
-
-      // 1. Nakikinig sa general admin alert notifications
       eventSource.addEventListener("chat-notification", handleChatUpdate);
 
-      // 2. Nakikinig sa User ID specific channel (Kapag Spring Boot gamit ang user ID mo)
-      if (currentUserId) {
-        eventSource.addEventListener(
-          `chat-message-${currentUserId}`,
-          handleChatUpdate,
-        );
-        eventSource.addEventListener(
-          `ticket-open-${currentUserId}`,
-          handleChatUpdate,
-        );
-        eventSource.addEventListener(
-          `ticket-closed-${currentUserId}`,
-          handleChatUpdate,
-        );
-      }
-
-      // 3. Nakikinig sa Ticket Room stream identifier (Kapag nag-uusap na si Admin at User)
-      if (ticketId) {
-        eventSource.addEventListener(
-          `chat-message-${ticketId}`,
-          handleChatUpdate,
-        );
-      }
+      eventSource.addEventListener(
+        `chat-message-${currentUserId}`,
+        handleChatUpdate,
+      );
+      eventSource.addEventListener(
+        `ticket-open-${currentUserId}`,
+        handleChatUpdate,
+      );
+      eventSource.addEventListener(
+        `ticket-closed-${currentUserId}`,
+        handleChatUpdate,
+      );
 
       eventSource.onopen = () => {
-        console.log(
-          `[SSE Connected] Nakabukas ang stream listener para sa real-time updates!`,
-        );
+        console.log(`SSE Connected ${ticketId}`);
+        // ✅ Mag-refetch agad kapag nag-reconnect
+        queryClient.invalidateQueries({ queryKey: ["cs_messages", ticketId] });
+        queryClient.refetchQueries({ queryKey: ["cs_messages", ticketId] });
+        queryClient.invalidateQueries({
+          queryKey: ["cs_messages_admin", ticketId],
+        });
+        queryClient.refetchQueries({
+          queryKey: ["cs_messages_admin", ticketId],
+        });
       };
 
       eventSource.onerror = (err) => {
-        console.error("[SSE Error] Reconnecting sa loob ng 3 segundo...", err);
+        console.error("SSE Error", err);
         eventSource.close();
         reconnectTimeout = setTimeout(connect, 3000);
       };
     };
 
-    connect();
+    // ─────────────────────────────────────────────────────────────
+    // GLOBAL SSE — /api/loan/updates
+    // Laging kokonekta kahit walang ticketId pa
+    // Para sa: new-ticket-queue (admin queue notifications)
+    // ─────────────────────────────────────────────────────────────
+    const connectGlobal = () => {
+      const globalUrl = API_ENDPOINTS.SSE;
+      console.log(`Trying to reconnect to Global SSE Stream: ${globalUrl}`);
 
-    // Cleanup phase tuwing mag-a-unmount ang component o magbabago ang dependencies
+      globalEventSource = new EventSource(globalUrl);
+      globalEventSource.addEventListener("new-ticket-queue", handleChatUpdate);
+
+      globalEventSource.onopen = () => {
+        console.log(`Global SSE Connected.`);
+      };
+
+      globalEventSource.onerror = (err) => {
+        console.error("Global SSE Error", err);
+        globalEventSource.close();
+        globalReconnectTimeout = setTimeout(connectGlobal, 3000);
+      };
+    };
+
+    connect();
+    connectGlobal();
+
     return () => {
       if (reconnectTimeout) clearTimeout(reconnectTimeout);
+      if (globalReconnectTimeout) clearTimeout(globalReconnectTimeout);
       if (debounceTimeout) clearTimeout(debounceTimeout);
       if (eventSource) {
         eventSource.close();
-        console.log(
-          "[SSE Disconnected] Sinara ang EventSource connection safely.",
-        );
+        console.log("SSE Disconnected");
+      }
+      if (globalEventSource) {
+        globalEventSource.close();
+        console.log("Global SSE Disconnected");
       }
     };
   }, [ticketId, currentUserId, queryClient]);

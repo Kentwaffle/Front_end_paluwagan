@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useAuth } from "../auth/Auth";
 import AI_ADMIN_MAIN from "./AI_ADMIN/AI_ADMIN_MAIN";
 import AI_USER_MAIN from "./AI_User/AI_USER_MAIN";
@@ -10,22 +10,6 @@ function AI_mainlayout() {
   const role = user?.role;
   const navigate = useNavigate();
   console.log("Current User Role:", role);
-
-  // 🎯 GUMAWA NG SESSION STORAGE STATE:
-  // Babasahin muna nito kung may naka-save nang ticketId sa browser session para hindi mawala sa refresh.
-  const [activeTicketId, setActiveTicketId] = useState(() => {
-    return sessionStorage.getItem("active_chat_ticket_id") || "";
-  });
-
-  // 🎯 EFFECT TRACKER:
-  // Awtomatikong i-aupdate o buburahin ang sessionStorage kapag nagbago ang activeTicketId.
-  useEffect(() => {
-    if (activeTicketId) {
-      sessionStorage.setItem("active_chat_ticket_id", activeTicketId);
-    } else {
-      sessionStorage.removeItem("active_chat_ticket_id");
-    }
-  }, [activeTicketId]);
 
   if (isLoadingAuth) {
     return (
@@ -66,6 +50,7 @@ function AI_mainlayout() {
             <li>
               <button
                 type="button"
+                // onClick={editAlert}
                 className="flex items-center gap-2 py-3 text-error"
               >
                 <Bug size={16} /> <span>Report</span>
@@ -75,18 +60,7 @@ function AI_mainlayout() {
         </div>
       </div>
 
-      {/* 🎯 IPASA ANG SESSION STATES BILANG PROPS */}
-      {role === "ROLE_ADMIN" ? (
-        <AI_ADMIN_MAIN
-          sharedTicketId={activeTicketId}
-          setSharedTicketId={setActiveTicketId}
-        />
-      ) : (
-        <AI_USER_MAIN
-          sharedTicketId={activeTicketId}
-          setSharedTicketId={setActiveTicketId}
-        />
-      )}
+      {role === "ROLE_ADMIN" ? <AI_ADMIN_MAIN /> : <AI_USER_MAIN />}
     </div>
   );
 }
