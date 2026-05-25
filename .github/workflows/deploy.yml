@@ -39,10 +39,20 @@ jobs:
         run: |
           ssh -i ~/.ssh/id_rsa ubuntu@${{ secrets.EC2_HOST }} "mkdir -p /home/ubuntu/frontend/dist"
 
+      - name: Fix permissions on EC2
+        run: |
+          ssh -i ~/.ssh/id_rsa ubuntu@${{ secrets.EC2_HOST }} \
+          "sudo chown -R ubuntu:ubuntu /home/ubuntu/frontend/dist && sudo chmod -R 755 /home/ubuntu/frontend/dist"
+
       - name: Copy build to EC2
         run: |
           scp -i ~/.ssh/id_rsa -r dist/* \
           ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/frontend/dist/
+
+      - name: Fix Nginx permissions after deploy
+        run: |
+          ssh -i ~/.ssh/id_rsa ubuntu@${{ secrets.EC2_HOST }} \
+          "sudo chown -R www-data:www-data /home/ubuntu/frontend/dist && sudo chmod -R 755 /home/ubuntu/frontend/dist"
 
       - name: Restart Nginx
         run: |
