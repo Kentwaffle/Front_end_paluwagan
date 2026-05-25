@@ -27,6 +27,7 @@ jobs:
           npm run build
         env:
           VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+          VITE_PAYMENT_URL: ${{ secrets.VITE_PAYMENT_URL }}
 
       - name: Set up SSH
         run: |
