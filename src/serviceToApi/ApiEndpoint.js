@@ -25,7 +25,11 @@ export const API_ENDPOINTS = {
   PROFILE_POST: `${BASE_URL}/api/profile/update`,
   IMAGE_UPLOAD: `${BASE_URL}/api/profile/upload`,
 
-  LOAN_GET: `${BASE_URL}/api/loan/user-details`,
+  LOAN: {
+    LOAN_GET: `${BASE_URL}/api/loan/user-details`,
+    LOAN_REMIT: `${BASE_URL}/api/loan/remit`,
+  },
+
   APPLY_LOAN: `${BASE_URL}/api/loan/calculate-loan`,
   APPLY_LOAN_POST: `${BASE_URL}/api/loan/apply-loan`,
   APPLICATION_DETAILS: `${BASE_URL}/api/loan/status/details`,
@@ -46,6 +50,10 @@ export const API_ENDPOINTS = {
   SAVINGS_FILTER_APPROVED: `${BASE_URL}/api/admin/savings/payment/filter/{savingsId}`,
   SAVINGS_ACCEPT_PAYMENT: `${BASE_URL}/api/admin/savings/payment`,
   SAVINGS_CARD_OVERVIEW: `${BASE_URL}/api/admin/savings/total`,
+
+  LEDGER: {
+    USER_LEDGER: `${BASE_URL}/api/profile/loan`,
+  },
 
   FUNDS_PAYMENT_LOAN_POST: `${BASE_URL}/api/admin/payment/loan`,
   FUNDS_PAYMENT_LOAN_SEARCH: `${BASE_URL}/api/admin/payment/loan/search`,
@@ -104,9 +112,13 @@ export const API_ENDPOINTS = {
 
       GET_MESSAGES_ADMIN: (ticketId) =>
         `${BASE_URL}/api/chat/${ticketId}/messages`,
+
+      ENDCHAT: (ticketId) =>
+        `${BASE_URL}/api/chat/admin/ticket/${ticketId}/end`,
     },
   },
+
   CHATSSE: (ticketId) => `${BASE_URL}/api/cs/ticket/${ticketId}/subscribe`,
-  //Instance Endpoints
+
   REFRESH: `${BASE_URL}/api/auth/refresh-token`,
 };

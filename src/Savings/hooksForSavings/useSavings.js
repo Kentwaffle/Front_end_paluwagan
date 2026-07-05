@@ -71,7 +71,7 @@ export const useSavings = () => {
 
   const initialOnlineValues = useMemo(
     () => ({
-      // genId: generateUUID(),
+      genId: generateUUID(),
       description: "Online deposit for savings",
       amount: 0,
       paymentType: "SAVINGS",

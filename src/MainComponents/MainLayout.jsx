@@ -31,15 +31,27 @@ function MainLayout({ isStatus, isStatusLoading }) {
     return <Navigate to="/auth" replace />;
   }
   return (
-    <div key={"main-app-layout"} className="min-h-screen">
+    <div
+      key={"main-app-layout"}
+      className="min-h-screen lg:flex lg:flex-row bg-slate-50 dark:bg-slate-950"
+    >
       {!hideLayout && (
         <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} role={roles} />
+      )}
+
+      {!hideLayout && (
+        <div className="hidden lg:block absolute top-4 left-4 z-10">
+          <Header
+            openSideBar={() => setIsOpen(!isOpen)}
+            isDesktopButton={true}
+          />
+        </div>
       )}
 
       {!hideLayout && <Header openSideBar={() => setIsOpen(!isOpen)} />}
       <main
         className={`
-        ${!hideLayout ? "w-full min-h-screen" : ""}
+        ${!hideLayout ? "w-full min-h-screen md:px-25 md:bg-white dark:md:bg-slate-900 md:shadow-lg md:" : ""}
         ${hideLayout && !isCostumerService ? "p-5" : ""} 
         ${isCostumerService ? "p-0" : ""}
       `}

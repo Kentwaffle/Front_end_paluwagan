@@ -3,13 +3,17 @@ import { jwtDecode } from "jwt-decode";
 import api from "../serviceToApi/ApiInstance";
 import { API_ENDPOINTS } from "../serviceToApi/ApiEndpoint";
 import { useQueryClient } from "@tanstack/react-query";
-
+import { useFetchData } from "../serviceToApi/fetchData";
 const AuthContext = createContext();
 
 function Auth({ children }) {
   const [user, setUser] = useState(null);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const queryClient = useQueryClient();
+  const { data: UserDetails, isLoading } = useFetchData(
+    "userProfile",
+    API_ENDPOINTS.PROFILE_GET,
+  );
 
   const verifySession = async () => {
     try {
@@ -57,7 +61,9 @@ function Auth({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, logout, isLoadingAuth }}>
+    <AuthContext.Provider
+      value={{ user, UserDetails, setUser, logout, isLoadingAuth }}
+    >
       {children}
     </AuthContext.Provider>
   );

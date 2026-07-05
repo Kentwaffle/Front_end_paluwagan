@@ -56,6 +56,7 @@ function ApplyLoan() {
   const isStatusFetching = useIsFetching({ queryKey: ["user-status-key"] });
   const statusData = queryClient.getQueryData(["user-status-key"]);
   const payload = statusData?.payload;
+
   useEffect(() => {
     if (payload?.hasPendingApplication) {
       navigate("/pending_status", { replace: true });
