@@ -51,10 +51,10 @@ function MainLayout({ isStatus, isStatusLoading }) {
       {!hideLayout && <Header openSideBar={() => setIsOpen(!isOpen)} />}
       <main
         className={`
-        ${!hideLayout ? "w-full min-h-screen md:px-25 md:bg-white dark:md:bg-slate-900 md:shadow-lg md:" : ""}
-        ${hideLayout && !isCostumerService ? "p-5" : ""} 
-        ${isCostumerService ? "p-0" : ""}
-      `}
+  ${!hideLayout ? "flex-1 min-w-0 min-h-screen md:px-25 md:bg-white dark:md:bg-slate-900 md:shadow-lg" : "w-full"}
+  ${hideLayout && !isCostumerService ? "p-5" : ""} 
+  ${isCostumerService ? "p-0" : ""}
+`}
       >
         <Outlet context={{ roles, isStatus, isStatusLoading }} />
       </main>

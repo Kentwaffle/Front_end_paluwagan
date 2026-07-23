@@ -28,7 +28,10 @@ import {
 } from "../../reusableComponents/Utils/formatter";
 import { useState } from "react";
 import { useInfiniteAutoScroll } from "../../reusableComponents/Hooks/automaticScroll";
-import { formatTimeAgo } from "../../reusableComponents/Utils/TimeDateformat";
+import {
+  formatTimeAgo,
+  formatFullDate,
+} from "../../reusableComponents/Utils/TimeDateformat";
 import { useDeleteData } from "../../serviceToApi/DeleteData";
 import {
   showAlert,
@@ -390,6 +393,7 @@ function ProfileOverview() {
                 sentinelRef={sentinelRef}
                 loadingMembers={loadingMembers}
                 hasMoreMembers={hasMoreMembers}
+                formatFullDate={formatFullDate}
               />
             ) : (
               <div className="flex flex-col items-center justify-center py-16 opacity-50">

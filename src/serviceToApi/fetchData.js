@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import api from "./ApiInstance";
 
 // fetchData.js
@@ -15,11 +15,11 @@ export const useFetchData = (key, endpoint, options = {}) => {
       return response.data;
     },
     enabled: (enabled !== undefined ? enabled : true) && !!endpoint,
-
     staleTime: 0,
     gcTime: 1000 * 60 * 10,
     refetchOnWindowFocus: false,
     retry: 1,
+    placeholderData: keepPreviousData,
     ...otherOptions,
   });
 };

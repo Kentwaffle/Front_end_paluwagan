@@ -43,3 +43,11 @@ export const formatDateForAPI = (date) => {
 
   return d.toLocaleDateString("en-CA");
 };
+
+//Camel Case formatter
+export const capitalizeFirstLetter = (text) => {
+  if (!text) return "";
+
+  const str = text.toString();
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+};

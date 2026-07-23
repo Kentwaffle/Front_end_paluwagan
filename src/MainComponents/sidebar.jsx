@@ -61,16 +61,15 @@ function Sidebar({ isOpen, setIsOpen, role }) {
   return (
     <>
       <div
-        className={`fixed flex flex-col top-0 left-0 bottom-0 p-3 z-50 shadow-2xl bg-slate-900/95 backdrop-blur-md group
-          transition-[width,transform] duration-500 will-change-[width] 
-  
-          lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 lg:shadow-none lg:bg-slate-900 shrink-0
-          ${isOpen ? "w-52" : "w-45 -translate-x-full lg:translate-x-0 lg:w-20"}
-        `}
+        className={`fixed flex flex-col top-0 left-0 bottom-0 p-3 z-50 shadow-2xl bg-slate-900/95 backdrop-blur-md 
+  transition-all duration-300 ease-out
+  lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 lg:shadow-none lg:bg-slate-900 shrink-0
+  ${isOpen ? "w-52" : "w-20 -translate-x-full lg:translate-x-0"}
+`}
       >
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="hidden lg:flex absolute -right-5 top-100 w-10 h-10 cursor-pointer bg-slate-900 rounded-full items-center justify-center text-slate-400 hover:text-white hover:bg-sky-500 hover:border-sky-400 transition-all z-50 shadow-md duration-200"
+          className="hidden lg:flex absolute -right-5 top-100 w-10 h-10 cursor-pointer bg-slate-900 rounded-full items-center justify-center text-slate-400 hover:text-white hover:bg-sky-500 hover:border-sky-400 transition-all z-50 shadow-md duration-[10000ms]"
         >
           <ChevronRight
             size={20}
@@ -130,8 +129,10 @@ function Sidebar({ isOpen, setIsOpen, role }) {
 
                   {/* Itatago ang text label sa desktop view kapag sarado ang sidebar */}
                   <div
-                    className={`text-base font-medium transition-all duration-200 ${
-                      isOpen ? "block" : "block lg:hidden"
+                    className={`overflow-hidden whitespace-nowrap transition-all duration-300 ease-in-out ${
+                      isOpen
+                        ? "max-w-[160px] opacity-100"
+                        : "max-w-0 opacity-0 lg:max-w-0 lg:opacity-0"
                     }`}
                   >
                     {link.label}
@@ -168,7 +169,11 @@ function Sidebar({ isOpen, setIsOpen, role }) {
 
                   {/* Itatago ang profile details kapag mini-sidebar display mode */}
                   <div
-                    className={`flex flex-col min-w-0 ${isOpen ? "block" : "block lg:hidden"}`}
+                    className={`flex flex-col min-w-0 overflow-hidden whitespace-nowrap transition-all duration-300 ease-in-out ${
+                      isOpen
+                        ? "max-w-[140px] opacity-100"
+                        : "max-w-0 opacity-0 lg:max-w-0 lg:opacity-0"
+                    }`}
                   >
                     <span className="text-xs font-semibold text-slate-200 truncate block">
                       {UserDetails?.firstName || "User"}
@@ -181,7 +186,11 @@ function Sidebar({ isOpen, setIsOpen, role }) {
 
                 <ChevronRight
                   size={16}
-                  className={`text-slate-400 shrink-0 ${isOpen ? "block" : "block lg:hidden"}`}
+                  className={`text-slate-400 shrink-0 transition-all duration-300 ease-in-out overflow-hidden ${
+                    isOpen
+                      ? "max-w-4 opacity-100"
+                      : "max-w-0 opacity-0 lg:max-w-0 lg:opacity-0"
+                  }`}
                 />
               </div>
             </Link>

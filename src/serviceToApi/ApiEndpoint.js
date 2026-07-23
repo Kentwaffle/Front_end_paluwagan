@@ -11,7 +11,6 @@ export const API_ENDPOINTS = {
 
   // LOGIN: `${BASE_URL}/api/auth/login`,
   REGISTER: `${BASE_URL}/api/auth/register`,
-
   SEND_OTP: `${BASE_URL}/api/auth/login-send-otp`,
   RESEND_OTP: (userId) => `/api/auth/resend-email/${userId}`,
   VERIFY_OTP: (userId) => `/api/auth/otp/${userId}`,
@@ -53,11 +52,11 @@ export const API_ENDPOINTS = {
 
   LEDGER: {
     USER_LEDGER: `${BASE_URL}/api/profile/loan`,
+    FILTER_LEDGER: `${BASE_URL}/api/profile/ledger/filter`,
   },
 
   FUNDS_PAYMENT_LOAN_POST: `${BASE_URL}/api/admin/payment/loan`,
   FUNDS_PAYMENT_LOAN_SEARCH: `${BASE_URL}/api/admin/payment/loan/search`,
-
   FUNDS_PAYMENT_SAVINGS_POST: `${BASE_URL}/api/admin/payment/savings`,
   FUNDS_PAYMENT_SAVINGS_SEARCH: `${BASE_URL}/api/admin/payment/savings/search`,
 
