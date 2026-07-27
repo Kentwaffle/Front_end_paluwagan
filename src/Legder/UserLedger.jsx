@@ -16,6 +16,8 @@ import { buildQueryString } from "../reusableComponents/Utils/queryHelper";
 import { useInfiniteFetch } from "../serviceToApi/InfiniteScroll";
 import { useInfiniteAutoScroll } from "../reusableComponents/Hooks/automaticScroll";
 import { useMediaQuery } from "../reusableComponents/Hooks/mediaQuery";
+import { useAuth } from "../auth/Auth";
+
 function UserLedger() {
   const [data, setData] = useState(); // undefined
   // const [loading, setLoading] = useState(false);
@@ -28,6 +30,7 @@ function UserLedger() {
     description: "",
     paymentMethod: "",
   });
+  const { user } = useAuth();
 
   const debouncedReference = useDebounce(filteredData.reference, 500);
 
@@ -74,7 +77,9 @@ function UserLedger() {
   );
 
   const InfiniteLedgerData =
-    infiniteLedgerData?.pages.flatMap((page) => page.ledger || []) || [];
+    infiniteLedgerData?.pages.flatMap(
+      (page) => page.content || page.ledger || [],
+    ) || [];
 
   const sentinelRef = useInfiniteAutoScroll(
     fetchNextPage,
@@ -102,7 +107,13 @@ function UserLedger() {
 
   const AllLedgerData =
     filteredLedgerData?.ledger || filteredLedgerData?.content || [];
-  console.log("filteredLedgerData:", filteredLedgerData);
+  const totalElements = filteredLedgerData?.totalElements || 0;
+  const startItem = (currentPage - 1) * 10 + 1;
+  const endItem = Math.min(currentPage * 10, totalElements);
+  const hasData = isDesktop
+    ? AllLedgerData?.length > 0
+    : InfiniteLedgerData?.length > 0;
+
   return (
     <div className="min-h-screen p-4 sm:p-6 lg:p-8 flex flex-col bg-slate-50 dark:bg-slate-950 transition-colors duration-500 text-slate-900 dark:text-white">
       <div className="hidden md:block border-b border-slate-200/60 dark:border-slate-800/80 pb-5 mb-8">
@@ -117,7 +128,22 @@ function UserLedger() {
       {/* Filters */}
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-end mb-4">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-end">
-          <div className="flex items-center gap-4">
+          {hasActiveFilters && (
+            <button
+              onClick={() => {
+                setFilteredData({
+                  reference: "",
+                  description: "",
+                  paymentMethod: "",
+                });
+                setCurrentPage(1);
+              }}
+              className="text-sm font-semibold bg-red-50 rounded-xl p-2 cursor-pointer text-red-500 hover:text-red-700 dark:hover:text-slate-300"
+            >
+              Clear Filters
+            </button>
+          )}
+          <div className="lg:flex items-center gap-4 ">
             <span className="text-sm font-semibold text-slate-500 shrink-0">
               Search
             </span>
@@ -132,55 +158,58 @@ function UserLedger() {
               placeholder="Reference"
             />
           </div>
-          <div className="lg:ml-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-end">
-            <span className="text-sm font-semibold text-slate-500 shrink-0">
-              Status
-            </span>
-            <SelectDropdown
-              name="description"
-              value={filteredData.description}
-              onChange={(e) =>
-                setFilteredData({
-                  ...filteredData,
-                  description: e.target.value,
-                })
-              }
-              label="Status"
-              options={["Loan", "Savings", "Withdrawal", "Completed"]}
-            />
-          </div>
-          <div className="lg:ml-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-end">
-            <span className="text-sm font-semibold text-slate-500 shrink-0">
-              Method
-            </span>
-            <SelectDropdown
-              name="paymentMethod"
-              value={filteredData.paymentMethod}
-              onChange={(e) =>
-                setFilteredData({
-                  ...filteredData,
-                  paymentMethod: e.target.value,
-                })
-              }
-              label="Method"
-              options={["CASH", "GCASH", "MAYA", "QRPH"]}
-            />
+          <div className="flex gap-2 lg:flex-row lg:items-center lg:justify-end">
+            <div className="flex flex-col gap-3 flex-1 lg:flex-row lg:items-center lg:justify-end">
+              <span className="text-sm font-semibold text-slate-500 shrink-0">
+                Transaction Type
+              </span>
+              <SelectDropdown
+                name="description"
+                value={filteredData.description}
+                onChange={(e) =>
+                  setFilteredData({
+                    ...filteredData,
+                    description: e.target.value,
+                  })
+                }
+                label="All types"
+                options={["Loan", "Savings", "Withdrawal", "Completed"]}
+              />
+            </div>
+
+            <div className="flex flex-col gap-3 flex-1 lg:ml-4 lg:flex-row lg:items-center lg:justify-end">
+              <span className="text-sm font-semibold text-slate-500 shrink-0">
+                Payment method
+              </span>
+              <SelectDropdown
+                name="paymentMethod"
+                value={filteredData.paymentMethod}
+                onChange={(e) =>
+                  setFilteredData({
+                    ...filteredData,
+                    paymentMethod: e.target.value,
+                  })
+                }
+                label="All methods"
+                options={["CASH", "GCASH", "MAYA", "QRPH"]}
+                className="lg:w-30"
+              />
+            </div>
           </div>
         </div>
       </div>
 
       <>
-        {AllLedgerData?.length > 0 ? (
+        {hasData ? (
           <LedgerList
             ledgerData={AllLedgerData}
-            // statusColors={statusColors}
-            // transactionIcons={transactionIcons}
+            mobileLedgerData={InfiniteLedgerData}
             formatDate={formatDateTime}
             formatTimeAgo={formatTimeAgo}
             formatFullDate={formatFullDate}
             sentinelRef={sentinelRef}
-            // loadingMembers={loadingMembers}
-            // hasMoreMembers={hasMoreMembers}
+            loadingMembers={isFetchingNextPage}
+            hasMoreMembers={hasNextPage}
             isLoading={filteredLoading}
           />
         ) : (
@@ -188,13 +217,16 @@ function UserLedger() {
             <div className="p-5 bg-slate-100 dark:bg-slate-800 rounded-full mb-3 shadow-inner">
               <Logs size={28} className="text-slate-400" />
             </div>
-            <p className=" text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
               No Transactions
             </p>
           </div>
         )}
         {totalPages > 1 && (
-          <div className="hidden lg:flex justify-end mt-4">
+          <div className="hidden lg:flex justify-between items-center mt-3">
+            <span className="text-xs text-slate-500 dark:text-slate-400">
+              Showing {startItem}-{endItem} of {totalElements}
+            </span>
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}

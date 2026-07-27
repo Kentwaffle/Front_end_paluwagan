@@ -6,8 +6,12 @@ import {
   getTransactionIcon,
   getTypeBadge,
 } from "../../reusableComponents/Display/TransactionSyle";
+import { formatDateTime } from "../Utils/TimeDateformat";
+import { useAuth } from "../../auth/Auth";
+
 function LedgerList({
   ledgerData = [],
+  mobileLedgerData = [],
   statusColors = { bg: {}, badge: {}, text: {} },
   transactionIcons = {},
   formatTimeAgo,
@@ -18,10 +22,12 @@ function LedgerList({
   formatFullDate,
   isLoading,
 }) {
+  const { user } = useAuth();
+  console.log(user);
   return (
     <>
       <div className="flex flex-col gap-3 lg:hidden">
-        {ledgerData.map((content, index) => (
+        {mobileLedgerData.map((content, index) => (
           <div
             key={`${content.id}-${index}`}
             className="group p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm "
@@ -45,9 +51,7 @@ function LedgerList({
                     {content.reference}
                     <Dot size={16} className="text-slate-300" strokeWidth={3} />
                     <span className="font-sans font-bold uppercase text-slate-500">
-                      {content.description === "Withdrawal"
-                        ? "Cash"
-                        : content.modeOfPayment || "Cash"}
+                      {content.modeOfPayment || content.paymentMethod || "N/A"}
                     </span>
                   </div>
                 </div>
@@ -71,15 +75,19 @@ function LedgerList({
                 {content.amount?.toLocaleString()}
               </div>
             </span>
-            <div className="flex justify-between border-t border-t-slate-200 pt-2 px-1 mt-2 dark:border-slate-800">
+            <div
+              className={`flex  ${user === "ROLE_ADMIN" ? "justify-between" : "justify-end"} border-t border-t-slate-200 pt-2 px-1 mt-2 dark:border-slate-800`}
+            >
               <span className="text-xs text-slate-400 font-mono tracking-tighter">
                 {formatTimeAgo
-                  ? formatTimeAgo(content.depositDate)
+                  ? formatDateTime(content.depositDate)
                   : content.depositDate}
               </span>
-              <span className="text-xs text-slate-400 font-mono tracking-tighter">
-                {content.savingsId}
-              </span>
+              {user === "ROLE_ADMIN" && (
+                <span className="text-xs text-slate-400 font-mono tracking-tighter">
+                  {content.savingsId}
+                </span>
+              )}
             </div>
           </div>
         ))}
@@ -131,7 +139,10 @@ function LedgerList({
                       </span>
 
                       <span className="text-xs text-slate-400 dark:text-slate-500 italic ">
-                        ({formatTimeAgo(tx.createdAt)})
+                        (
+                        {formatDateTime(tx.createdAt) ||
+                          formatDateTime(tx.depositDate)}
+                        )
                       </span>
                     </div>
                   </td>
