@@ -14,12 +14,12 @@ function Saving_management() {
 
   const { data: savingsDataPayment, isLoading: savignsLoading } = useFetchData(
     "api/admin/savings/members",
-    API_ENDPOINTS.SAVINGS_ADMIN_MEMBERS,
+    API_ENDPOINTS.SAVINGS.SAVINGS_ADMIN_MEMBERS,
   );
 
   const { data: savingsCardData, isLoading: savingsCardLoading } = useFetchData(
     "api/admin/savings/total",
-    API_ENDPOINTS.SAVINGS_CARD_OVERVIEW,
+    API_ENDPOINTS.SAVINGS.SAVINGS_CARD_OVERVIEW,
   );
 
   const hanldeShowMemberPayment = (id) => {

@@ -16,15 +16,19 @@ export const useInfiniteFetch = (queryKey, endpoint, options = {}) => {
       return res.data;
     },
     getNextPageParam: (lastPage) => {
-      const pagination = lastPage.allPayments ? lastPage.allPayments : lastPage;
+      const pagination = lastPage.allPayments || lastPage;
 
       if (!pagination || pagination.last === true) {
         return undefined;
       }
 
-      // Siguraduhin na number ang kukunin at may fallback na 0
       const currentPage =
-        typeof pagination.number === "number" ? pagination.number : 0;
+        typeof pagination.currentPage === "number"
+          ? pagination.currentPage
+          : typeof pagination.number === "number"
+            ? pagination.number
+            : 0;
+
       return currentPage + 1;
     },
     ...options,

@@ -15,7 +15,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import Beep from "../../assets/images/Cs/Beep.png";
 import { formatDateTime } from "../../reusableComponents/Utils/TimeDateformat";
 import { useChatSSE } from "../../reusableComponents/Hooks/ChatSSE";
-
+import { useAutoScroll } from "../../reusableComponents/Hooks/useAutoScroll";
 function AI_USER_MAIN() {
   const [ticketId, setTicketId] = useState(() => {
     return sessionStorage.getItem("user_active_ticket_id") || "";
@@ -76,9 +76,9 @@ function AI_USER_MAIN() {
 
   const currentMessagesList =
     messages?.messages || messages?.payload?.messages || [];
-
+  const messagesEndRef = useAutoScroll([currentMessagesList]);
   return (
-    <div className="h-screen flex flex-col bg-white dark:bg-slate-900">
+    <div className="h-screen flex flex-col justify-between bg-white dark:bg-slate-900 overflow-hidden">
       <div className="flex-1 overflow-y-auto py-4 space-y-4 pb-28">
         <ChatMessage
           isSender={false}
@@ -99,6 +99,7 @@ function AI_USER_MAIN() {
             }
           />
         ))}
+        <div ref={messagesEndRef} />
       </div>
 
       <div className="fixed bottom-0 w-full p-4 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">

@@ -25,3 +25,23 @@ export const formatDateTime = (isoString) => {
     })
     .toLowerCase();
 };
+
+export const formatFullDate = (isoString) => {
+  if (!isoString) return "";
+
+  try {
+    const date = new Date(isoString);
+
+    // I-check kung valid date ang napasa
+    if (isNaN(date.getTime())) return "Invalid date";
+
+    return date.toLocaleDateString("en-US", {
+      month: "long", // Lalabas: "January"
+      day: "numeric", // Lalabas: "12"
+      year: "numeric", // Lalabas: "2026"
+    });
+  } catch (error) {
+    console.error("Error formatting full date:", error);
+    return "Invalid date";
+  }
+};

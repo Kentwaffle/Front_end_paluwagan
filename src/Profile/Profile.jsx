@@ -31,15 +31,17 @@ import Button from "daisyui/components/button";
 
 function Profile() {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, logout, UserDetails, isLoadingAuth } = useAuth();
   const userRole = user?.role;
   const backPath =
     userRole === "ROLE_ADMIN" ? "/admin/loan_management" : "/loan";
 
-  const { data: profileData, isLoading: loadingProfile } = useFetchData(
-    "userProfile",
-    API_ENDPOINTS.PROFILE_GET,
-  );
+  // const { data: profileData, isLoading: loadingProfile } = useFetchData(
+  //   "userProfile",
+  //   API_ENDPOINTS.PROFILE_GET,
+  // );
+  const profileData = UserDetails;
+  const loadingProfile = isLoadingAuth;
 
   const calculateAge = (birthday) => {
     if (!birthday) return "";

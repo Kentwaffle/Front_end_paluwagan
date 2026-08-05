@@ -17,7 +17,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { ProfileLoading } from "../reusableComponents/Feedbacks/loading";
 import imageCompression from "browser-image-compression";
 import { usePostData } from "../serviceToApi/PostData";
-
+import { useAuth } from "../auth/Auth";
 function Edit_Profile() {
   const passwordField = usePasswordToggle();
   const newPassword = usePasswordToggle();
@@ -25,6 +25,15 @@ function Edit_Profile() {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const queryClient = useQueryClient();
+  const { UserDetails, isLoadingAuth } = useAuth();
+
+  // const { data: editData, isLoading: loadingEdit } = useFetchData(
+  //   "userProfile",
+  //   API_ENDPOINTS.PROFILE_GET,
+  // );
+
+  const editData = UserDetails;
+  const loadingEdit = isLoadingAuth;
 
   useEffect(() => {
     const ua = navigator.userAgent || window.opera;
@@ -37,11 +46,6 @@ function Edit_Profile() {
       );
     }
   }, []);
-
-  const { data: editData, isLoading: loadingEdit } = useFetchData(
-    "userProfile",
-    API_ENDPOINTS.PROFILE_GET,
-  );
 
   const { mutate: editMutate } = usePatchData(
     "api/profile/update",
@@ -62,8 +66,8 @@ function Edit_Profile() {
         suffix: editData?.suffix || "",
         email: editData?.email || "",
         phoneNumber: editData?.phoneNumber || "",
-        newPassword: null,
-        oldPassword: null,
+        newPassword: "",
+        oldPassword: "",
         gender: editData?.gender || "",
         address: editData?.address || "",
         birthDay: editData?.birthday || "",

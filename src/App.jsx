@@ -67,6 +67,8 @@ import QRCODE from "./Savings/QRCODE";
 import Settings from "./Profile/Settings";
 import AI_mainlayout from "./AI_Main/AI_mainlayout";
 import AI_ADMIN_MAIN from "./AI_Main/AI_ADMIN/AI_ADMIN_MAIN";
+import UserLedger from "./Legder/UserLedger";
+
 const queryClient = new QueryClient();
 
 const UserIndexRedirect = ({ isStatus }) => {
@@ -251,6 +253,7 @@ const App = () => {
           ],
         },
         { path: "apply_savings", element: <Apply_savings /> },
+        { path: "ledger", element: <UserLedger /> },
       ],
     },
     // ADMIN ROUTES

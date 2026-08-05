@@ -25,7 +25,7 @@ function AI_mainlayout() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-      <div className="flex items-center justify-between gap-4 sticky top-0 bg-slate-50 dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 p-4">
+      <div className="flex items-center justify-between gap-4 sticky top-0 bg-white dark:bg-slate-900 z-20 border-b border-slate-100 dark:border-slate-800 p-4">
         <button
           className="p-2 bg-white dark:bg-slate-900 shadow-sm rounded-xl text-slate-600"
           onClick={() => navigate("/profile")}

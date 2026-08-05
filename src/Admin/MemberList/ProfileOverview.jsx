@@ -28,7 +28,10 @@ import {
 } from "../../reusableComponents/Utils/formatter";
 import { useState } from "react";
 import { useInfiniteAutoScroll } from "../../reusableComponents/Hooks/automaticScroll";
-import { formatTimeAgo } from "../../reusableComponents/Utils/TimeDateformat";
+import {
+  formatTimeAgo,
+  formatFullDate,
+} from "../../reusableComponents/Utils/TimeDateformat";
 import { useDeleteData } from "../../serviceToApi/DeleteData";
 import {
   showAlert,
@@ -37,7 +40,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { calculateAge } from "../../reusableComponents/Utils/CalculateAge";
-
+import LedgerList from "../../reusableComponents/Display/LedgerList";
 function ProfileOverview() {
   const { user_id } = useParams();
   const navigate = useNavigate();
@@ -382,86 +385,16 @@ function ProfileOverview() {
         {activeTab === "ledger" && (
           <>
             {LedgerData.length > 0 ? (
-              <div className="flex flex-col gap-3">
-                {LedgerData.map((content, index) => (
-                  <div
-                    key={`${content.id}-${index}`}
-                    className="group p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm"
-                  >
-                    <div className="flex l items-center gap-4">
-                      <div
-                        className={`${statusColors.bg[content.description] || statusColors.bg.Default} p-3 rounded-full`}
-                      >
-                        {transactionIcons[content.description] ||
-                          transactionIcons.Default}
-                      </div>
-                      <div className="flex justify-between w-full items-center">
-                        <div>
-                          <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 leading-tight">
-                            {content.description === "Withdrawal"
-                              ? "Withdrawal completed"
-                              : content.description === "Completed"
-                                ? "Loan Completed"
-                                : "Payment"}
-                          </h4>
-                          <div className="flex  text-slate-400 font-semibold text-[11px]">
-                            {content.reference}
-                            <Dot
-                              size={16}
-                              className="text-slate-300"
-                              strokeWidth={3}
-                            />
-                            <span className="font-sans font-bold uppercase text-slate-500">
-                              {content.description === "Withdrawal"
-                                ? "Cash" // ? "Abanta to need ng mod sa with kung san mapupunta pera Cash/Gcash/nigga"
-                                : content.modeOfPayment || "Cash"}
-                            </span>
-                          </div>
-                        </div>
-                        <span>
-                          <div
-                            className={`${statusColors.badge[content.description] || statusColors.badge.Default} text-[9px] font-black uppercase px-2 py-0.5 rounded-md tracking-wider`}
-                          >
-                            {content.description === "Loan" ||
-                            content.description === "Completed"
-                              ? "Loan"
-                              : "Savings"}
-                          </div>
-                        </span>
-                      </div>
-                    </div>
-                    <span className="px-5">
-                      <div
-                        className={`font-black text-2xl ml-3 leading-none ${statusColors.text[content.description] || statusColors.text.Default}`}
-                      >
-                        {content.description === "Withdrawal" ? "-" : "+"}₱
-                        {content.amount.toLocaleString()}
-                      </div>
-                    </span>
-                    <div className="flex justify-between border-t border-t-slate-200 pt-2 px-1">
-                      <span className="text-xs text-slate-400 font-mono tracking-tighter">
-                        {formatTimeAgo(content.depositDate)}
-                      </span>
-                      <span className="text-xs text-slate-400 font-mono tracking-tighter">
-                        {content.savingsId}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-                <div ref={sentinelRef} className="text-center">
-                  {loadingMembers ? (
-                    <span className="loading loading-dots text-slate-400"></span>
-                  ) : hasMoreMembers ? (
-                    <span className="text-[10px] font-black text-slate-400 animate-bounce">
-                      Scroll to load more details.
-                    </span>
-                  ) : (
-                    <span className="text-xs italic text-slate-400">
-                      -End of ledger. -
-                    </span>
-                  )}
-                </div>
-              </div>
+              <LedgerList
+                ledgerData={LedgerData}
+                statusColors={statusColors}
+                transactionIcons={transactionIcons}
+                formatTimeAgo={formatTimeAgo}
+                sentinelRef={sentinelRef}
+                loadingMembers={loadingMembers}
+                hasMoreMembers={hasMoreMembers}
+                formatFullDate={formatFullDate}
+              />
             ) : (
               <div className="flex flex-col items-center justify-center py-16 opacity-50">
                 <div className="p-5 bg-slate-100 dark:bg-slate-800 rounded-full mb-3 shadow-inner">
