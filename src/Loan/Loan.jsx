@@ -285,74 +285,18 @@ function Loan() {
               />
             </div>
           </div>
-          <div className="space-y-4 mt-2">
-            <div className="space-y-4 mt-4">
+          <div className="space-y-4">
+            <div className="space-y-4">
               {/* HEADER & FILTER CONTROLS BAR */}
               <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between px-1">
                 {/* Title Section */}
                 <div>
                   <h3 className="font-black text-xl text-slate-900 dark:text-white tracking-tight">
-                    Transactions History
+                    Recent Transactions
                   </h3>
                   <p className="text-xs text-slate-400 dark:text-slate-500">
-                    Audit and track ledger accounts actions.
+                    Track and review recent account activity.
                   </p>
-                </div>
-
-                {/* Controls Component Group (Search and Date Dropdown) */}
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
-                  {/* 🔍 Smart Search Bar */}
-                  <div className="relative group min-w-[220px] grow sm:grow-0">
-                    <Search
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-sky-500 transition-colors"
-                      size={16}
-                    />
-                    <input
-                      type="search"
-                      value={searchRef}
-                      placeholder="Search reference..."
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm outline-none shadow-sm focus:border-sky-500 dark:focus:border-sky-500 focus:ring-2 focus:ring-sky-500/10 dark:focus:ring-sky-400/10 transition-all placeholder:text-slate-400/80"
-                      onChange={(e) => setSearchRef(e.target.value)}
-                    />
-                  </div>
-
-                  {/* 📅 Pro Date Range Dropdown Select */}
-                  <div className="relative min-w-[160px] grow sm:grow-0">
-                    <select
-                      value={dateRange}
-                      onChange={(e) => setDateRange(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm font-semibold text-slate-700 dark:text-slate-300 outline-none shadow-sm focus:border-sky-500 dark:focus:border-sky-500 focus:ring-2 focus:ring-sky-500/10 cursor-pointer appearance-none pr-10"
-                    >
-                      <option value="all">All Time</option>
-                      <option value="7days">Past 7 Days</option>
-                      <option value="30days">Past 30 Days</option>
-                      <option value="3months">Past 3 Months</option>
-                    </select>
-
-                    {/* Custom Chevron Indicator para magmukhang Pro at hindi generic browser dropdown */}
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400 border-l border-slate-100 dark:border-slate-800 my-2">
-                      <svg
-                        className="fill-current h-4 w-4"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                      >
-                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                      </svg>
-                    </div>
-                  </div>
-
-                  {/* 🧹 Clear Button (Lilitaw kung binago ang search o dropdown) */}
-                  {(searchRef || dateRange !== "all") && (
-                    <button
-                      onClick={() => {
-                        setSearchRef("");
-                        setDateRange("all");
-                      }}
-                      className="text-xs font-bold text-rose-500 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/20 hover:bg-rose-100 dark:hover:bg-rose-950/40 px-4 py-2.5 rounded-xl transition-colors text-center"
-                    >
-                      Reset
-                    </button>
-                  )}
                 </div>
               </div>
             </div>

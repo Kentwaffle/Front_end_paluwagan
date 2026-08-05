@@ -1,8 +1,19 @@
 import React from "react";
-import { PhilippinePeso, ArrowRight, CircleAlert } from "lucide-react";
+import {
+  PhilippinePeso,
+  ArrowRight,
+  CircleAlert,
+  Wallet,
+  Banknote,
+} from "lucide-react";
 import Inputform from "./Inputform";
 import RadioField from "./RadioField";
 import { paymentOptions, paymentTabs } from "../../Constants/paymentsOptions";
+
+const tabIcons = {
+  online: Wallet,
+  cash: Banknote,
+};
 
 function PaymentForm({
   paymentMode,
@@ -25,22 +36,36 @@ function PaymentForm({
   return (
     <div>
       {!isLoan && (
-        <div className="grid grid-cols-2 gap-3">
-          {paymentTabs.map((mode) => (
-            <button
-              key={mode.value}
-              onClick={() => setPaymentMode(mode.value)}
-              className={`p-4 rounded-2xl border-2 flex flex-col items-center gap-2 transition-all ${
-                paymentMode === mode.value
-                  ? "border-sky-500 bg-sky-50/50 text-sky-600 dark:bg-sky-900/20"
-                  : "border-slate-100 bg-white text-slate-400 dark:bg-slate-800 dark:border-slate-700"
-              }`}
-            >
-              <span className="text-xs font-bold uppercase tracking-tight">
-                {mode.label}
-              </span>
-            </button>
-          ))}
+        <div className="relative grid grid-cols-2 p-1.5 rounded-2xl bg-slate-100 dark:bg-slate-800/60">
+          <div
+            className="absolute top-1.5 bottom-1.5 w-[calc(50%-0.375rem)] rounded-xl bg-white dark:bg-slate-900 shadow-sm transition-transform duration-300 ease-out"
+            style={{
+              transform:
+                paymentMode === "online"
+                  ? "translateX(3%)"
+                  : "translateX(calc(100% + 0.375rem))",
+            }}
+          />
+          {paymentTabs.map((mode) => {
+            const Icon = tabIcons[mode.value];
+            const isActive = paymentMode === mode.value;
+            return (
+              <button
+                key={mode.value}
+                onClick={() => setPaymentMode(mode.value)}
+                className={`relative z-10 flex items-center justify-center gap-2 py-3 rounded-xl transition-colors cursor-pointer ${
+                  isActive
+                    ? "text-sky-600 dark:text-sky-400"
+                    : "text-slate-400 hover:text-slate-500 dark:hover:text-slate-300"
+                }`}
+              >
+                {Icon && <Icon size={16} strokeWidth={isActive ? 2.5 : 2} />}
+                <span className="text-xs font-bold uppercase tracking-tight">
+                  {mode.label}
+                </span>
+              </button>
+            );
+          })}
         </div>
       )}
 

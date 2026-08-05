@@ -16,7 +16,6 @@ import { buildQueryString } from "../reusableComponents/Utils/queryHelper";
 import { useInfiniteFetch } from "../serviceToApi/InfiniteScroll";
 import { useInfiniteAutoScroll } from "../reusableComponents/Hooks/automaticScroll";
 import { useMediaQuery } from "../reusableComponents/Hooks/mediaQuery";
-import { useAuth } from "../auth/Auth";
 
 function UserLedger() {
   const [data, setData] = useState(); // undefined
@@ -30,7 +29,6 @@ function UserLedger() {
     description: "",
     paymentMethod: "",
   });
-  const { user } = useAuth();
 
   const debouncedReference = useDebounce(filteredData.reference, 500);
 

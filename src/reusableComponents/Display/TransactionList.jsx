@@ -92,32 +92,43 @@ function TransactionList({
                     >
                       {/* Reference / ID */}
                       <td className="py-4 px-4 font-mono text-xs text-slate-600 dark:text-slate-400 font-semibold">
-                        {tx.referenceNumber || tx.id || "N/A"}
+                        {tx.referenceNumber || tx.id || tx.reference || "N/A"}
                       </td>
 
                       {/* Date */}
                       <td className="py-4 px-4  text-slate-500 dark:text-slate-400">
                         <div className="flex   items-center gap-1">
                           <span className="font-medium">
-                            {formatDate(tx.paymentDate || tx.createdAt) ||
-                              "N/A"}
+                            {formatDate(
+                              tx.paymentDate || tx.createdAt || tx.remitDate,
+                            ) || "N/A"}
                           </span>
 
                           <span className="text-xs text-slate-400 dark:text-slate-500 italic">
-                            ({formatTimeAgo(tx.paymentDate || tx.createdAt)})
+                            (
+                            {formatTimeAgo(
+                              tx.paymentDate || tx.createdAt || tx.remitDate,
+                            )}
+                            )
                           </span>
                         </div>
                       </td>
 
                       {/* Payment Method */}
                       <td className="py-4 px-4 text-slate-600 dark:text-slate-300 font-medium">
-                        {tx.currentMethod || tx.methodType || "Online"}
+                        {tx.currentMethod ||
+                          tx.methodType ||
+                          tx.paymentMethod ||
+                          "Online"}
                       </td>
 
                       {/* Amount */}
                       <td className="py-4 px-4 text-right font-bold text-slate-900 dark:text-white text-base">
                         {formatCurrency(
-                          tx.amountPaid || tx.amountDeposit || "0.00",
+                          tx.amountPaid ||
+                            tx.amountDeposit ||
+                            tx.amountRemit ||
+                            "0.00",
                         )}
                       </td>
                     </tr>

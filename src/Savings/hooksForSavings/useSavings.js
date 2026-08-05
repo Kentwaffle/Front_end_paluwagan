@@ -34,18 +34,18 @@ export const useSavings = () => {
   //API CALLS
   const { data: savingData, isLoading: loadingSummary } = useFetchData(
     "/api/savings/summary",
-    API_ENDPOINTS.SAVINGS_DETAILS,
+    API_ENDPOINTS.SAVINGS.SAVINGS_DETAILS,
     { staleTime: 1000 * 60 * 5, refetchOnWindowFocus: true },
   );
 
   const { mutate: savingDeposit } = usePostData(
     "/api/savings/remit",
-    API_ENDPOINTS.SAVINGS_DEPOSIT,
+    API_ENDPOINTS.SAVINGS.SAVINGS_DEPOSIT,
   );
 
   const { mutate: savingOffset } = usePostData(
     "/api/savings/withdraw",
-    API_ENDPOINTS.SAVINGS_OFFSET,
+    API_ENDPOINTS.SAVINGS.SAVINGS_OFFSET,
   );
 
   //Data maps
@@ -140,7 +140,7 @@ export const useSavings = () => {
     });
   };
 
-  const handleOffsetAction = (e) => {
+  const handleOffsetAction = (e, onSuccessCallback) => {
     if (offsetForm.formData.agreementText?.trim().toUpperCase() === "I AGREE") {
       showAlert.loading("Submitting", "Please wait");
       savingOffset(
@@ -160,6 +160,7 @@ export const useSavings = () => {
                   queryClient.invalidateQueries({
                     queryKey: ["/api/savings/summary"],
                   });
+                  if (onSuccessCallback) onSuccessCallback();
                 });
             } else {
               showAlert.warning("Failed", res?.message);
@@ -172,7 +173,7 @@ export const useSavings = () => {
     }
   };
 
-  const agreeOffset = (e) => {
+  const agreeOffset = (e, onSuccessCallback) => {
     offsetForm.handleSubmit(e, async () => {
       const modalCfg = isMature
         ? {
@@ -188,7 +189,7 @@ export const useSavings = () => {
             icon: "warning",
           };
       const ok = await swalModal(modalCfg);
-      if (ok) handleOffsetAction(e);
+      if (ok) handleOffsetAction(e, onSuccessCallback);
     });
   };
 
