@@ -14,15 +14,21 @@ import { useFetchData } from "../../serviceToApi/fetchData";
 import { useQueryClient } from "@tanstack/react-query";
 import Beep from "../../assets/images/Cs/Beep.png";
 import { formatDateTime } from "../../reusableComponents/Utils/TimeDateformat";
-import { useChatSSE } from "../../reusableComponents/Hooks/ChatSSE";
+import api from "../../serviceToApi/ApiInstance";
+import { useChatWebSocket } from "../../reusableComponents/Hooks/useChatWebSocket";
 import { useAutoScroll } from "../../reusableComponents/Hooks/useAutoScroll";
+
 function AI_USER_MAIN() {
   const [ticketId, setTicketId] = useState(() => {
     return sessionStorage.getItem("user_active_ticket_id") || "";
   });
+  const [isSending, setIsSending] = useState(false);
 
   const queryClient = useQueryClient();
-  useChatSSE(ticketId);
+
+  // Connect real-time STOMP WebSocket for the active ticket
+  useChatWebSocket(ticketId);
+
   useEffect(() => {
     if (ticketId) {
       sessionStorage.setItem("user_active_ticket_id", ticketId);
@@ -30,11 +36,6 @@ function AI_USER_MAIN() {
       sessionStorage.removeItem("user_active_ticket_id");
     }
   }, [ticketId]);
-
-  const { mutate: requestMutate, isPending } = usePostData(
-    API_ENDPOINTS.CS.USER.REQUEST_POST,
-    "cs_request",
-  );
 
   const { formData: user, handleChange: handleChangeUser } = useForm({
     message: "",
@@ -46,32 +47,72 @@ function AI_USER_MAIN() {
   );
 
   const handleSendMessage = async () => {
-    if (!user.message.trim() || isPending) return;
+    const textToSend = user.message.trim();
+    if (!textToSend || isSending) return;
 
-    requestMutate(user, {
-      onSuccess: (data) => {
-        console.log("User Response Success payload:", data);
-        const actualTicketId = data?.ticketId || data?.data?.ticketId;
+    // Clear input box immediately for responsive UI
+    user.message = "";
 
-        if (actualTicketId) {
-          setTicketId(actualTicketId);
-          queryClient.refetchQueries({
-            queryKey: ["cs_messages_admin", actualTicketId],
-          });
-          queryClient.refetchQueries({
-            queryKey: ["cs_messages", actualTicketId],
-          });
-        } else {
-          queryClient.refetchQueries({ queryKey: ["cs_messages"] });
-        }
+    const endpoint = ticketId
+      ? API_ENDPOINTS.CS.USER.RESPONSE(ticketId)
+      : API_ENDPOINTS.CS.USER.REQUEST_POST;
 
-        queryClient.invalidateQueries({ queryKey: ["queue_list"] });
-        user.message = "";
-      },
-      onError: (error) => {
-        console.error("User Send Error:", error);
-      },
+    // Optimistically push message to cache immediately
+    const optimisticMessage = {
+      id: "temp-" + Date.now(),
+      message: textToSend,
+      sentBy: "USER",
+      createdAt: new Date().toISOString(),
+    };
+
+    const targetQueryKey = ticketId ? ["cs_messages", ticketId] : ["cs_messages"];
+
+    queryClient.setQueryData(targetQueryKey, (oldData) => {
+      if (!oldData) {
+        return { messages: [optimisticMessage] };
+      }
+      if (Array.isArray(oldData)) {
+        return [...oldData, optimisticMessage];
+      }
+      if (oldData.payload && Array.isArray(oldData.payload.messages)) {
+        return {
+          ...oldData,
+          payload: {
+            ...oldData.payload,
+            messages: [...oldData.payload.messages, optimisticMessage],
+          },
+        };
+      }
+      if (Array.isArray(oldData.messages)) {
+        return {
+          ...oldData,
+          messages: [...oldData.messages, optimisticMessage],
+        };
+      }
+      return { ...oldData, messages: [optimisticMessage] };
     });
+
+    setIsSending(true);
+    try {
+      const response = await api.post(endpoint, { message: textToSend });
+      console.log("User Send Message Success:", response.data);
+      const actualTicketId =
+        response.data?.ticketId || response.data?.data?.ticketId || ticketId;
+
+      if (actualTicketId && actualTicketId !== ticketId) {
+        setTicketId(actualTicketId);
+      }
+
+      queryClient.invalidateQueries({
+        queryKey: ["cs_messages", actualTicketId || ticketId],
+      });
+      queryClient.invalidateQueries({ queryKey: ["queue_list"] });
+    } catch (error) {
+      console.error("User Send Message Error:", error);
+      queryClient.invalidateQueries({ queryKey: targetQueryKey });
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const currentMessagesList =
@@ -104,21 +145,27 @@ function AI_USER_MAIN() {
 
       <div className="fixed bottom-0 w-full p-4 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-2 rounded-2xl">
-          <input
-            type="text"
+          <textarea
             name="message"
+            rows={1}
             value={user.message}
             onChange={handleChangeUser}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleSendMessage();
+              }
+            }}
             placeholder="Type your message..."
-            className="outline-none flex-1 bg-transparent border-none focus:ring-0 text-sm px-2 dark:text-white"
+            className="outline-none flex-1 bg-transparent border-none focus:ring-0 text-sm px-2 dark:text-white resize-none max-h-32 scrollbar-none py-1.5"
           />
           <button
             type="button"
-            disabled={isPending}
+            disabled={isSending}
             onClick={handleSendMessage}
             className="bg-sky-500 text-white p-2 rounded-xl hover:bg-sky-600 transition-all"
           >
-            {isPending ? (
+            {isSending ? (
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
             ) : (
               <SendHorizonal size={16} />

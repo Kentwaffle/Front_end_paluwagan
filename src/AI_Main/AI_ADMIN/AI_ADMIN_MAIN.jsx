@@ -10,7 +10,7 @@ import {
 import { API_ENDPOINTS } from "../../serviceToApi/ApiEndpoint";
 import { useNavigate } from "react-router-dom";
 import { useFetchData } from "../../serviceToApi/fetchData";
-import axios from "axios";
+import api from "../../serviceToApi/ApiInstance";
 import { formatTimeAgo } from "../../reusableComponents/Utils/TimeDateformat";
 import { useQueryClient } from "@tanstack/react-query";
 import ChatMessage from "../ChatMessage";
@@ -18,11 +18,13 @@ import { formatDateTime } from "../../reusableComponents/Utils/TimeDateformat";
 import { getProfileImage } from "../../reusableComponents/Hooks/ImageGet";
 import { useForm } from "../../reusableComponents/Hooks/HandleChange&Submit";
 import { usePostData } from "../../serviceToApi/PostData";
-import { useChatSSE } from "../../reusableComponents/Hooks/ChatSSE";
+import { useChatWebSocket } from "../../reusableComponents/Hooks/useChatWebSocket";
 import { useAutoScroll } from "../../reusableComponents/Hooks/useAutoScroll";
+
 function AI_ADMIN_MAIN() {
   const [view, setView] = useState("queue");
   const [claimedTicketId, setClaimedTicketId] = useState(null);
+  const [isClaiming, setIsClaiming] = useState(false);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -36,7 +38,8 @@ function AI_ADMIN_MAIN() {
   const currtentTicket = queueList?.payload?.current || null;
   const activeTicketId = currtentTicket?.ticketId || claimedTicketId;
 
-  useChatSSE(activeTicketId);
+  // Connect STOMP WebSocket for the active ticket
+  useChatWebSocket(activeTicketId);
 
   useEffect(() => {
     if (currtentTicket?.ticketId) {
@@ -64,36 +67,92 @@ function AI_ADMIN_MAIN() {
   );
 
   const handleSendMessageAdmin = async () => {
-    if (!responseData.message.trim() || isPending) return;
+    const textToSend = responseData.message.trim();
+    if (!textToSend || isPending) return;
 
-    adminResponse(responseData, {
-      onSuccess: (data) => {
-        console.log("Admin Response Success:", data);
-        queryClient.refetchQueries({
-          queryKey: ["cs_messages_admin", activeTicketId],
-        });
-        queryClient.invalidateQueries({
-          queryKey: ["cs_messages", activeTicketId],
-        });
-        queryClient.invalidateQueries({ queryKey: ["queue_list"] });
-        responseData.message = "";
-      },
-      onError: (error) => {
-        console.error("Admin Response Error:", error);
-      },
+    // Clear input box immediately for responsive UI
+    responseData.message = "";
+
+    const optimisticMessage = {
+      id: "temp-" + Date.now(),
+      message: textToSend,
+      sentBy: "ADMIN",
+      senderName: "Admin",
+      createdAt: new Date().toISOString(),
+    };
+
+    const targetQueryKey = ["cs_messages_admin", activeTicketId];
+
+    queryClient.setQueryData(targetQueryKey, (oldData) => {
+      if (!oldData) return [optimisticMessage];
+      if (Array.isArray(oldData)) return [...oldData, optimisticMessage];
+      if (oldData.payload && Array.isArray(oldData.payload.messages)) {
+        return {
+          ...oldData,
+          payload: {
+            ...oldData.payload,
+            messages: [...oldData.payload.messages, optimisticMessage],
+          },
+        };
+      }
+      if (Array.isArray(oldData.messages)) {
+        return {
+          ...oldData,
+          messages: [...oldData.messages, optimisticMessage],
+        };
+      }
+      return [optimisticMessage];
     });
+
+    adminResponse(
+      { message: textToSend },
+      {
+        onSuccess: (data) => {
+          console.log("Admin Response Success:", data);
+          queryClient.invalidateQueries({
+            queryKey: ["cs_messages_admin", activeTicketId],
+          });
+          queryClient.invalidateQueries({
+            queryKey: ["cs_messages", activeTicketId],
+          });
+          queryClient.invalidateQueries({ queryKey: ["queue_list"] });
+        },
+        onError: (error) => {
+          console.error("Admin Response Error:", error);
+          queryClient.invalidateQueries({ queryKey: targetQueryKey });
+        },
+      },
+    );
   };
 
   const getNextQueue = async () => {
+    if (!nextQueue || isClaiming) return;
     const getNextQueueURL = API_ENDPOINTS.CS.ADMIN.NEXT_QUEUE_TICKET(nextQueue);
+    setIsClaiming(true);
     try {
-      const response = await axios.put(getNextQueueURL, {});
+      const response = await api.put(getNextQueueURL, {});
       console.log("Success Claim Ticket Data:", response.data);
       queryClient.invalidateQueries({ queryKey: ["queue_list"] });
       setClaimedTicketId(nextQueue);
       setView("ticket");
     } catch (error) {
-      console.error("Error fetching next queue via Axios:", error);
+      console.error("Error claiming next queue ticket via API:", error);
+    } finally {
+      setIsClaiming(false);
+    }
+  };
+
+  const handleEndChat = async () => {
+    if (!activeTicketId) return;
+    try {
+      const endChatURL = API_ENDPOINTS.CS.ADMIN.ENDCHAT(activeTicketId);
+      await api.post(endChatURL, {});
+      console.log("Chat ended successfully");
+      setClaimedTicketId(null);
+      queryClient.invalidateQueries({ queryKey: ["queue_list"] });
+      setView("queue");
+    } catch (error) {
+      console.error("Error ending chat:", error);
     }
   };
 
@@ -166,18 +225,20 @@ function AI_ADMIN_MAIN() {
 
           <button
             onClick={() => getNextQueue()}
-            disabled={!!currtentTicket || !nextQueue}
+            disabled={!!currtentTicket || !nextQueue || isClaiming}
             className={`font-bold py-2 px-4 rounded transition-all ${
-              currtentTicket || !nextQueue
+              currtentTicket || !nextQueue || isClaiming
                 ? "bg-slate-200 text-slate-400 cursor-not-allowed"
                 : "bg-sky-500 hover:bg-sky-600 text-white shadow-sm"
             }`}
           >
-            {currtentTicket
-              ? "Finish Open Session First"
-              : !nextQueue
-                ? "No Tickets to Claim"
-                : "Get Next Ticket"}
+            {isClaiming
+              ? "Claiming Ticket..."
+              : currtentTicket
+                ? "Finish Open Session First"
+                : !nextQueue
+                  ? "No Tickets to Claim"
+                  : "Get Next Ticket"}
           </button>
         </div>
 
@@ -271,7 +332,8 @@ function AI_ADMIN_MAIN() {
               <li>
                 <button
                   type="button"
-                  className="flex items-center gap-2 py-3 text-error font-bold"
+                  onClick={handleEndChat}
+                  className="flex items-center gap-2 py-3 text-error font-bold w-full text-left"
                 >
                   <PhoneMissed size={16} /> <span>End Chat</span>
                 </button>
@@ -307,13 +369,19 @@ function AI_ADMIN_MAIN() {
 
           <div className="fixed bottom-0 w-full p-4 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
             <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-2 rounded-2xl">
-              <input
-                type="text"
+              <textarea
                 name="message"
+                rows={1}
                 value={responseData.message}
                 onChange={handleChangeAdminResponse}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendMessageAdmin();
+                  }
+                }}
                 placeholder="Type your message..."
-                className="outline-none flex-1 bg-transparent border-none focus:ring-0 text-sm px-2 dark:text-white"
+                className="outline-none flex-1 bg-transparent border-none focus:ring-0 text-sm px-2 dark:text-white resize-none max-h-32 scrollbar-none py-1.5"
               />
               <button
                 type="button"

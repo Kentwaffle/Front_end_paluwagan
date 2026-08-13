@@ -2,8 +2,14 @@ import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../../auth/Auth";
 import { API_ENDPOINTS } from "../../serviceToApi/ApiEndpoint";
+import { useChatWebSocket } from "./useChatWebSocket";
+
+export { useChatWebSocket };
 
 export const useChatSSE = (ticketId) => {
+  // Integrate the new STOMP WebSocket connection
+  useChatWebSocket(ticketId);
+
   const queryClient = useQueryClient();
   const authContext = useAuth();
   const user = authContext?.user;

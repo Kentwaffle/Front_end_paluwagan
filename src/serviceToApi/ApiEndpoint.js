@@ -125,11 +125,12 @@ export const API_ENDPOINTS = {
         `${BASE_URL}/api/chat/${ticketId}/messages`,
 
       ENDCHAT: (ticketId) =>
-        `${BASE_URL}/api/chat/admin/ticket/${ticketId}/end`,
+        `${BASE_URL}/api/chat/admin/ticket/${ticketId}/close`,
     },
   },
 
   CHATSSE: (ticketId) => `${BASE_URL}/api/cs/ticket/${ticketId}/subscribe`,
+  CHAT_WS: BASE_URL ? `${BASE_URL}/ws` : "https://api.savingsandloan.online/ws",
 
   REFRESH: `${BASE_URL}/api/auth/refresh-token`,
 };

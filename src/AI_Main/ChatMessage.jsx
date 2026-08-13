@@ -18,7 +18,7 @@ function ChatMessage({ message, isSender, profile, timeCurrent }) {
       </div>
 
       <div
-        className={`max-w-[75%] p-4 rounded-2xl text-sm font-medium shadow-sm 
+        className={`max-w-[75%] p-4 rounded-2xl text-sm font-medium shadow-sm whitespace-pre-wrap break-words
             ${isSender ? "bg-sky-500 text-white self-end" : "bg-slate-100 text-slate-800"}
         `}
       >
