@@ -23,19 +23,19 @@ function LedgerList({
   isLoading,
 }) {
   const { user } = useAuth();
-  console.log(user);
+  const displayMobileData = mobileLedgerData && mobileLedgerData.length > 0 ? mobileLedgerData : ledgerData;
+
   return (
     <>
+      {/* Mobile View */}
       <div className="flex flex-col gap-3 lg:hidden">
-        {mobileLedgerData.map((content, index) => (
+        {displayMobileData.map((content, index) => (
           <div
             key={`${content.id}-${index}`}
-            className="group p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm "
+            className="group p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm text-left"
           >
             <div className="flex items-center gap-4">
-              <div
-                className={`${getTransactionIcon(content.description) ? "bg-slate-100 dark:bg-slate-800" : "bg-slate-100 dark:bg-slate-800"} p-3 rounded-full`}
-              >
+              <div className="bg-slate-100 dark:bg-slate-800 p-3 rounded-full shrink-0">
                 {getTransactionIcon(content.description)}
               </div>
               <div className="flex justify-between w-full items-center">
@@ -76,7 +76,7 @@ function LedgerList({
               </div>
             </span>
             <div
-              className={`flex  ${user === "ROLE_ADMIN" ? "justify-between" : "justify-end"} border-t border-t-slate-200 pt-2 px-1 mt-2 dark:border-slate-800`}
+              className={`flex ${user === "ROLE_ADMIN" ? "justify-between" : "justify-end"} border-t border-t-slate-200 pt-2 px-1 mt-2 dark:border-slate-800`}
             >
               <span className="text-xs text-slate-400 font-mono tracking-tighter">
                 {formatTimeAgo
@@ -102,25 +102,25 @@ function LedgerList({
             </span>
           ) : (
             <span className="text-xs italic text-slate-400">
-              -End of ledger. -
+              - End of ledger. -
             </span>
           )}
         </div>
       </div>
 
       {/* Desktop View */}
-      <div className="hidden lg:block relative overflow-x-auto bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
+      <div className="hidden lg:block relative max-h-[480px] overflow-y-auto overflow-x-auto bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm scrollbar-thin">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="text-[11px]  uppercase tracking-wider text-white bg-slate-800 dark:bg-slate-900/80 border-b border-slate-100 dark:border-slate-800">
-              <th className="py-7 px-7 ">Transaction ID</th>
-              <th className="py-7 px-7 ">Date</th>
-              <th className="py-7 px-7 ">Method</th>
-              <th className="py-7 px-7 ">Transaction Type</th>
-              <th className="py-7 px-7  text-right ">Amount</th>
+            <tr className="text-[11px] uppercase tracking-wider text-white bg-slate-800 dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 sticky top-0 z-[5]">
+              <th className="py-5 px-6">Transaction ID</th>
+              <th className="py-5 px-6">Date</th>
+              <th className="py-5 px-6">Method</th>
+              <th className="py-5 px-6">Transaction Type</th>
+              <th className="py-5 px-6 text-right">Amount</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100 dark:divide-slate-800/40 text-sm">
+          <tbody className="divide-y divide-slate-100 dark:divide-slate-800/45 text-xs">
             {ledgerData.map((tx, index) => {
               return (
                 <tr
@@ -128,17 +128,17 @@ function LedgerList({
                   className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors group"
                 >
                   {/* Reference / ID */}
-                  <td className="py-4 px-4 font-mono text-slate-600 dark:text-slate-400 font-semibold">
+                  <td className="py-4 px-6 font-mono text-slate-600 dark:text-slate-400 font-semibold">
                     {tx.reference || "N/A"}
                   </td>
                   {/* Date */}
-                  <td className="py-4 px-4  text-slate-500 dark:text-slate-400 text-xs">
-                    <div className="flex   items-center gap-1">
+                  <td className="py-4 px-6 text-slate-500 dark:text-slate-400 text-xs">
+                    <div className="flex items-center gap-1">
                       <span className="font-semibold">
                         {formatFullDate(tx.depositDate) || "N/A"}
                       </span>
 
-                      <span className="text-xs text-slate-400 dark:text-slate-500 italic ">
+                      <span className="text-[10px] text-slate-400 dark:text-slate-555 italic">
                         (
                         {formatDateTime(tx.createdAt) ||
                           formatDateTime(tx.depositDate)}
@@ -147,16 +147,16 @@ function LedgerList({
                     </div>
                   </td>
                   {/* Payment Method */}
-                  <td className="py-4 px-4 text-slate-600 dark:text-white text-xs font-semibold">
+                  <td className="py-4 px-6 text-slate-600 dark:text-white text-xs font-semibold">
                     {capitalizeFirstLetter(tx.modeOfPayment) ||
                       capitalizeFirstLetter(tx.paymentMethod) ||
                       "N/A"}
                   </td>
 
-                  {/* Trasaction Type*/}
-                  <td className="py-4 px-4 text-slate-600 dark:text-slate-300 font-medium text-xs">
+                  {/* Transaction Type */}
+                  <td className="py-4 px-6 text-slate-600 dark:text-slate-300 font-medium text-xs">
                     <span
-                      className={`${getTypeBadge(tx.description)} inline-block text-xs font-semibold px-3 py-1 rounded-full`}
+                      className={`${getTypeBadge(tx.description)} inline-block text-[10px] font-bold px-2.5 py-0.5 rounded-full`}
                     >
                       {tx.description || "Online"}
                     </span>
@@ -164,7 +164,7 @@ function LedgerList({
 
                   {/* Amount */}
                   <td
-                    className={`py-4 px-4 text-right font-bold dark:text-white text-base ${getStatusColor("text", tx.description)}`}
+                    className={`py-4 px-6 text-right font-bold dark:text-white text-sm ${getStatusColor("text", tx.description)}`}
                   >
                     {tx.description === "Withdrawal" ? "-" : "+"}
                     {formatCurrency(tx.amount || "0.00")}
@@ -174,6 +174,22 @@ function LedgerList({
             })}
           </tbody>
         </table>
+
+        {/* Infinite Scroll / Loading Indicators for Desktop */}
+        <div ref={sentinelRef} className="text-center py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+          {loadingMembers ? (
+            <span className="loading loading-dots text-blue-600"></span>
+          ) : hasMoreMembers ? (
+            <span className="text-[10px] font-black text-slate-400 animate-pulse uppercase tracking-wider">
+              Scroll to load more details.
+            </span>
+          ) : (
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              - End of ledger -
+            </span>
+          )}
+        </div>
+
         {isLoading && (
           <div className="absolute inset-0 bg-white/60 dark:bg-slate-900/60 flex items-center justify-center rounded-2xl">
             <div className="flex items-center gap-3">

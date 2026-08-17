@@ -14,8 +14,13 @@ export const useChatWebSocket = (ticketId) => {
   const clientRef = useRef(null);
 
   useEffect(() => {
+    if (!ticketId) {
+      console.log("🔌 STOMP WebSocket Connection skipped: No active ticketId.");
+      return;
+    }
+
     const wsUrl = getWebSocketUrl();
-    console.log(`🔌 STOMP WebSocket Attempting Connection to: ${wsUrl}`);
+    console.log(`🔌 STOMP WebSocket Attempting Connection to: ${wsUrl} for ticket: ${ticketId}`);
 
     const client = new Client({
       webSocketFactory: () => new SockJS(wsUrl),
