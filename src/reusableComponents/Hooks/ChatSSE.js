@@ -1,176 +1,169 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "../../auth/Auth";
-import { API_ENDPOINTS } from "../../serviceToApi/ApiEndpoint";
-import { useChatWebSocket } from "./useChatWebSocket";
+import { Client } from "@stomp/stompjs";
+import SockJS from "sockjs-client";
+import { getWebSocketUrl } from "../../serviceToApi/ApiEndpoint";
 
-export { useChatWebSocket };
+// Ensure global window reference for sockjs-client compatibility if needed in browser
+if (typeof window !== "undefined" && !window.global) {
+  window.global = window;
+}
 
-export const useChatSSE = (ticketId) => {
-  // Integrate the new STOMP WebSocket connection
-  useChatWebSocket(ticketId);
-
+export const useChatWebSocket = (ticketId) => {
   const queryClient = useQueryClient();
-  const authContext = useAuth();
-  const user = authContext?.user;
-
-  const currentUserId = user?.id || user?.userId || user?._id;
+  const clientRef = useRef(null);
 
   useEffect(() => {
-    // ✅ FIX: currentUserId lang ang kailangan para makapasok
-    // kahit walang ticketId pa, para makakonekta ang globalEventSource
-    if (!currentUserId) return;
+    const wsUrl = getWebSocketUrl();
+    console.log(`🔌 STOMP WebSocket Attempting Connection to: ${wsUrl}`);
 
-    let eventSource;
-    let globalEventSource = null;
-    let reconnectTimeout;
-    let globalReconnectTimeout;
-    let debounceTimeout;
-
-    const handleChatUpdate = (event) => {
-      console.log(`SSE EVENT: ${event.type}`);
-
-      let eventTicketId = null;
-
-      try {
-        if (event.data) {
-          let parsedData = event.data;
-          if (typeof event.data === "string") {
-            parsedData = JSON.parse(event.data);
-          }
-
-          console.log("SSE Deep Debug:", parsedData);
-
-          eventTicketId =
-            parsedData?.ticketId ||
-            parsedData?.payload?.ticketId ||
-            parsedData?.data?.ticketId ||
-            parsedData?.payload?.messages?.[0]?.ticketId ||
-            parsedData?.messages?.[0]?.ticketId;
+    const client = new Client({
+      webSocketFactory: () => new SockJS(wsUrl),
+      reconnectDelay: 5000,
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
+      debug: (msg) => {
+        if (import.meta.env.DEV) {
+          console.log("[STOMP Debug]", msg);
         }
-      } catch (error) {
-        console.log(" [SSE] Error :", error);
-      }
+      },
+      onConnect: () => {
+        console.log("✅ STOMP WebSocket Connected Successfully!");
 
-      console.log(`SSE Key:`, eventTicketId);
-
-      if (debounceTimeout) clearTimeout(debounceTimeout);
-
-      debounceTimeout = setTimeout(() => {
-        console.log("SSE Trigger");
-
-        const targetId = eventTicketId || ticketId;
-
-        if (targetId) {
-          console.log(`Targeted Refetch: ${targetId}`);
-
+        // Refetch queries on connection/reconnection to ensure cache is fresh
+        if (ticketId) {
           queryClient.invalidateQueries({
-            queryKey: ["cs_messages_admin", targetId],
+            queryKey: ["cs_messages_admin", ticketId],
           });
           queryClient.refetchQueries({
-            queryKey: ["cs_messages_admin", targetId],
+            queryKey: ["cs_messages_admin", ticketId],
           });
-
           queryClient.invalidateQueries({
-            queryKey: ["cs_messages", targetId],
+            queryKey: ["cs_messages", ticketId],
           });
           queryClient.refetchQueries({
-            queryKey: ["cs_messages", targetId],
+            queryKey: ["cs_messages", ticketId],
           });
-        } else {
-          console.log("Fallback Refetch");
-          queryClient.invalidateQueries({ queryKey: ["cs_messages_admin"] });
-          queryClient.invalidateQueries({ queryKey: ["cs_messages"] });
         }
-
         queryClient.invalidateQueries({ queryKey: ["queue_list"] });
-      }, 300);
-    };
 
-    // ─────────────────────────────────────────────────────────────
-    // TICKET-SPECIFIC SSE — /api/cs/ticket/{ticketId}/subscribe
-    // Kokonekta lang kung may ticketId
-    // ─────────────────────────────────────────────────────────────
-    const connect = () => {
-      if (!ticketId) return; // walang ticketId, huwag mag-connect
+        // Subscribe to ticket-specific topic if ticketId exists
+        if (ticketId) {
+          const destination = `/topic/chat/${ticketId}`;
+          console.log(`📡 STOMP Subscribed to topic: ${destination}`);
 
-      const sseUrl = API_ENDPOINTS.CHATSSE(ticketId);
-      console.log(`Tinatangkang kumonekta sa SSE Stream: ${sseUrl}`);
-      eventSource = new EventSource(sseUrl);
+          client.subscribe(destination, (frame) => {
+            console.log("📩 STOMP Incoming Frame:", frame.body);
 
-      eventSource.addEventListener("chat-notification", handleChatUpdate);
+            try {
+              let parsedMessage = null;
+              if (frame.body) {
+                parsedMessage = JSON.parse(frame.body);
+              }
 
-      eventSource.addEventListener(
-        `chat-message-${currentUserId}`,
-        handleChatUpdate,
-      );
-      eventSource.addEventListener(
-        `ticket-open-${currentUserId}`,
-        handleChatUpdate,
-      );
-      eventSource.addEventListener(
-        `ticket-closed-${currentUserId}`,
-        handleChatUpdate,
-      );
+              // Optimistically update React Query cache if message object exists
+              if (parsedMessage && (parsedMessage.message || parsedMessage.msg)) {
+                const newMsgObj = {
+                  id: parsedMessage.id || Date.now(),
+                  ticketId: parsedMessage.ticketId || ticketId,
+                  sentBy: parsedMessage.sentBy || "USER",
+                  senderName: parsedMessage.senderName || "",
+                  profileImage: parsedMessage.senderProfileImage || parsedMessage.profileImage || "",
+                  message: parsedMessage.message || parsedMessage.msg,
+                  createdAt: parsedMessage.createdAt || new Date().toISOString(),
+                };
 
-      eventSource.onopen = () => {
-        console.log(`SSE Connected ${ticketId}`);
-        // ✅ Mag-refetch agad kapag nag-reconnect
-        queryClient.invalidateQueries({ queryKey: ["cs_messages", ticketId] });
-        queryClient.refetchQueries({ queryKey: ["cs_messages", ticketId] });
-        queryClient.invalidateQueries({
-          queryKey: ["cs_messages_admin", ticketId],
-        });
-        queryClient.refetchQueries({
-          queryKey: ["cs_messages_admin", ticketId],
-        });
-      };
+                // Update User messages cache
+                queryClient.setQueryData(["cs_messages", ticketId], (oldData) => {
+                  if (!oldData) return { messages: [newMsgObj] };
+                  const existingList = Array.isArray(oldData)
+                    ? oldData
+                    : oldData.messages || oldData.payload?.messages || [];
 
-      eventSource.onerror = (err) => {
-        console.error("SSE Error", err);
-        eventSource.close();
-        reconnectTimeout = setTimeout(connect, 3000);
-      };
-    };
+                  // Avoid duplicates
+                  const exists = existingList.some(
+                    (m) =>
+                      (m.id && m.id === newMsgObj.id) ||
+                      (m.createdAt === newMsgObj.createdAt && m.message === newMsgObj.message)
+                  );
 
-    // ─────────────────────────────────────────────────────────────
-    // GLOBAL SSE — /api/loan/updates
-    // Laging kokonekta kahit walang ticketId pa
-    // Para sa: new-ticket-queue (admin queue notifications)
-    // ─────────────────────────────────────────────────────────────
-    const connectGlobal = () => {
-      const globalUrl = API_ENDPOINTS.SSE;
-      console.log(`Trying to reconnect to Global SSE Stream: ${globalUrl}`);
+                  if (exists) return oldData;
 
-      globalEventSource = new EventSource(globalUrl);
-      globalEventSource.addEventListener("new-ticket-queue", handleChatUpdate);
+                  if (Array.isArray(oldData)) return [...oldData, newMsgObj];
+                  return {
+                    ...oldData,
+                    messages: [...existingList, newMsgObj],
+                  };
+                });
 
-      globalEventSource.onopen = () => {
-        console.log(`Global SSE Connected.`);
-      };
+                // Update Admin messages cache
+                queryClient.setQueryData(["cs_messages_admin", ticketId], (oldData) => {
+                  if (!oldData) return [newMsgObj];
+                  const existingList = Array.isArray(oldData)
+                    ? oldData
+                    : oldData.messages || oldData.payload?.messages || [];
 
-      globalEventSource.onerror = (err) => {
-        console.error("Global SSE Error", err);
-        globalEventSource.close();
-        globalReconnectTimeout = setTimeout(connectGlobal, 3000);
-      };
-    };
+                  const exists = existingList.some(
+                    (m) =>
+                      (m.id && m.id === newMsgObj.id) ||
+                      (m.createdAt === newMsgObj.createdAt && m.message === newMsgObj.message)
+                  );
 
-    connect();
-    connectGlobal();
+                  if (exists) return oldData;
+
+                  if (Array.isArray(oldData)) return [...oldData, newMsgObj];
+                  return {
+                    ...oldData,
+                    messages: [...existingList, newMsgObj],
+                  };
+                });
+              }
+            } catch (err) {
+              console.error("Error processing incoming STOMP frame:", err);
+            }
+
+            // Always invalidate/refetch queries to synchronize state
+            queryClient.invalidateQueries({
+              queryKey: ["cs_messages_admin", ticketId],
+            });
+            queryClient.refetchQueries({
+              queryKey: ["cs_messages_admin", ticketId],
+            });
+            queryClient.invalidateQueries({
+              queryKey: ["cs_messages", ticketId],
+            });
+            queryClient.refetchQueries({
+              queryKey: ["cs_messages", ticketId],
+            });
+            queryClient.invalidateQueries({ queryKey: ["queue_list"] });
+          });
+        }
+      },
+      onStompError: (frame) => {
+        console.error("❌ STOMP Error:", frame.headers["message"], frame.body);
+      },
+      onWebSocketError: (err) => {
+        console.error("❌ STOMP WebSocket Connection Error:", err);
+      },
+      onDisconnect: () => {
+        console.log("🔌 STOMP Disconnected");
+      },
+    });
+
+    client.activate();
+    clientRef.current = client;
 
     return () => {
-      if (reconnectTimeout) clearTimeout(reconnectTimeout);
-      if (globalReconnectTimeout) clearTimeout(globalReconnectTimeout);
-      if (debounceTimeout) clearTimeout(debounceTimeout);
-      if (eventSource) {
-        eventSource.close();
-        console.log("SSE Disconnected");
-      }
-      if (globalEventSource) {
-        globalEventSource.close();
-        console.log("Global SSE Disconnected");
+      if (clientRef.current) {
+        console.log("🔌 Deactivating STOMP client");
+        clientRef.current.deactivate();
+        clientRef.current = null;
       }
     };
-  }, [ticketId, currentUserId, queryClient]);
+  }, [ticketId, queryClient]);
+
+  return clientRef.current;
 };
+
+// Backwards compatibility export so existing useChatSSE calls work seamlessly
+export const useChatSSE = useChatWebSocket;

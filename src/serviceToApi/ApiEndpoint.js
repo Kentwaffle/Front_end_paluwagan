@@ -1,6 +1,16 @@
 export const BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 export const PAYMENT_URL = import.meta.env.VITE_PAYMENT_URL;
 
+export const getWebSocketUrl = () => {
+  if (BASE_URL) {
+    return `${BASE_URL.replace(/\/$/, "")}/ws`;
+  }
+  if (typeof window !== "undefined" && window.location?.origin) {
+    return `${window.location.origin}/ws`;
+  }
+  return "/ws";
+};
+
 export const API_ENDPOINTS = {
   AUTH: {
     REFRESH: `${BASE_URL}/api/auth/refresh-token`,
@@ -103,6 +113,7 @@ export const API_ENDPOINTS = {
   QRTIMER: (intentId) => `${BASE_URL}/api/payment/status/${intentId}`,
 
   CS: {
+    WEBSOCKET: getWebSocketUrl(),
     USER: {
       REQUEST_POST: `${BASE_URL}/api/chat/user/request`,
 

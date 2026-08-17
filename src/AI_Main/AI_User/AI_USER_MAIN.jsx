@@ -8,14 +8,13 @@ import {
 } from "lucide-react";
 import { getProfileImage } from "../../reusableComponents/Hooks/ImageGet";
 import { API_ENDPOINTS } from "../../serviceToApi/ApiEndpoint";
-import { usePostData } from "../../serviceToApi/PostData";
+import api from "../../serviceToApi/ApiInstance";
 import { useForm } from "../../reusableComponents/Hooks/HandleChange&Submit";
 import { useFetchData } from "../../serviceToApi/fetchData";
 import { useQueryClient } from "@tanstack/react-query";
 import Beep from "../../assets/images/Cs/Beep.png";
 import { formatDateTime } from "../../reusableComponents/Utils/TimeDateformat";
-import api from "../../serviceToApi/ApiInstance";
-import { useChatWebSocket } from "../../reusableComponents/Hooks/useChatWebSocket";
+import { useChatWebSocket } from "../../reusableComponents/Hooks/ChatSSE";
 import { useAutoScroll } from "../../reusableComponents/Hooks/useAutoScroll";
 
 function AI_USER_MAIN() {
@@ -25,8 +24,6 @@ function AI_USER_MAIN() {
   const [isSending, setIsSending] = useState(false);
 
   const queryClient = useQueryClient();
-
-  // Connect real-time STOMP WebSocket for the active ticket
   useChatWebSocket(ticketId);
 
   useEffect(() => {
@@ -37,7 +34,11 @@ function AI_USER_MAIN() {
     }
   }, [ticketId]);
 
-  const { formData: user, handleChange: handleChangeUser } = useForm({
+  const {
+    formData: user,
+    setFormData: setUserData,
+    handleChange: handleChangeUser,
+  } = useForm({
     message: "",
   });
 
@@ -46,70 +47,89 @@ function AI_USER_MAIN() {
     API_ENDPOINTS.CS.USER.GET_MESSAGES_USER,
   );
 
+  useEffect(() => {
+    if (messages) {
+      const fetchedTicketId = messages.ticketId || messages.payload?.ticketId;
+      if (fetchedTicketId) {
+        if (fetchedTicketId !== ticketId) {
+          setTicketId(fetchedTicketId);
+        }
+      } else {
+        if (ticketId) {
+          setTicketId("");
+        }
+      }
+    }
+  }, [messages, ticketId]);
+
   const handleSendMessage = async () => {
-    const textToSend = user.message.trim();
-    if (!textToSend || isSending) return;
-
-    // Clear input box immediately for responsive UI
-    user.message = "";
-
-    const endpoint = ticketId
-      ? API_ENDPOINTS.CS.USER.RESPONSE(ticketId)
-      : API_ENDPOINTS.CS.USER.REQUEST_POST;
-
-    // Optimistically push message to cache immediately
-    const optimisticMessage = {
-      id: "temp-" + Date.now(),
-      message: textToSend,
-      sentBy: "USER",
-      createdAt: new Date().toISOString(),
-    };
-
-    const targetQueryKey = ticketId ? ["cs_messages", ticketId] : ["cs_messages"];
-
-    queryClient.setQueryData(targetQueryKey, (oldData) => {
-      if (!oldData) {
-        return { messages: [optimisticMessage] };
-      }
-      if (Array.isArray(oldData)) {
-        return [...oldData, optimisticMessage];
-      }
-      if (oldData.payload && Array.isArray(oldData.payload.messages)) {
-        return {
-          ...oldData,
-          payload: {
-            ...oldData.payload,
-            messages: [...oldData.payload.messages, optimisticMessage],
-          },
-        };
-      }
-      if (Array.isArray(oldData.messages)) {
-        return {
-          ...oldData,
-          messages: [...oldData.messages, optimisticMessage],
-        };
-      }
-      return { ...oldData, messages: [optimisticMessage] };
-    });
+    const text = user.message.trim();
+    if (!text || isSending) return;
 
     setIsSending(true);
+    const payload = { message: text };
+    setUserData({ message: "" });
+
     try {
-      const response = await api.post(endpoint, { message: textToSend });
-      console.log("User Send Message Success:", response.data);
+      const endpoint = ticketId
+        ? API_ENDPOINTS.CS.USER.RESPONSE(ticketId)
+        : API_ENDPOINTS.CS.USER.REQUEST_POST;
+
+      const response = await api.post(endpoint, payload);
+      const data = response.data;
+      console.log("User Send Response:", data);
+
       const actualTicketId =
-        response.data?.ticketId || response.data?.data?.ticketId || ticketId;
+        data?.ticketId || data?.data?.ticketId || data?.payload?.ticketId || ticketId;
 
       if (actualTicketId && actualTicketId !== ticketId) {
         setTicketId(actualTicketId);
       }
 
-      queryClient.invalidateQueries({
-        queryKey: ["cs_messages", actualTicketId || ticketId],
-      });
+      const activeId = actualTicketId || ticketId;
+      if (activeId) {
+        queryClient.invalidateQueries({ queryKey: ["cs_messages", activeId] });
+        queryClient.refetchQueries({ queryKey: ["cs_messages", activeId] });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ["cs_messages"] });
+      }
       queryClient.invalidateQueries({ queryKey: ["queue_list"] });
     } catch (error) {
-      console.error("User Send Message Error:", error);
-      queryClient.invalidateQueries({ queryKey: targetQueryKey });
+      console.error("User Send Error:", error);
+      const errorMsg = error.response?.data?.message || error.message || "";
+      const isTicketError =
+        errorMsg === "Ticket not found." ||
+        errorMsg === "Ticket has already been closed." ||
+        error.response?.status === 404 ||
+        (error.response?.status === 500 && errorMsg.includes("Ticket not found"));
+
+      if (isTicketError && ticketId) {
+        console.warn("Session expired or ticket closed. Re-initiating chat...");
+        setTicketId("");
+        sessionStorage.removeItem("user_active_ticket_id");
+
+        try {
+          const fallbackResponse = await api.post(API_ENDPOINTS.CS.USER.REQUEST_POST, payload);
+          const fallbackData = fallbackResponse.data;
+          console.log("Fallback Send Response:", fallbackData);
+
+          const newTicketId =
+            fallbackData?.ticketId ||
+            fallbackData?.data?.ticketId ||
+            fallbackData?.payload?.ticketId;
+
+          if (newTicketId) {
+            setTicketId(newTicketId);
+            queryClient.invalidateQueries({ queryKey: ["cs_messages", newTicketId] });
+            queryClient.refetchQueries({ queryKey: ["cs_messages", newTicketId] });
+          } else {
+            queryClient.invalidateQueries({ queryKey: ["cs_messages"] });
+          }
+          queryClient.invalidateQueries({ queryKey: ["queue_list"] });
+        } catch (fallbackError) {
+          console.error("Fallback Send Error:", fallbackError);
+        }
+      }
     } finally {
       setIsSending(false);
     }
@@ -118,6 +138,7 @@ function AI_USER_MAIN() {
   const currentMessagesList =
     messages?.messages || messages?.payload?.messages || [];
   const messagesEndRef = useAutoScroll([currentMessagesList]);
+
   return (
     <div className="h-screen flex flex-col justify-between bg-white dark:bg-slate-900 overflow-hidden">
       <div className="flex-1 overflow-y-auto py-4 space-y-4 pb-28">
@@ -151,7 +172,7 @@ function AI_USER_MAIN() {
             value={user.message}
             onChange={handleChangeUser}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
+              if (e.key === "Enter") {
                 e.preventDefault();
                 handleSendMessage();
               }
@@ -163,7 +184,7 @@ function AI_USER_MAIN() {
             type="button"
             disabled={isSending}
             onClick={handleSendMessage}
-            className="bg-sky-500 text-white p-2 rounded-xl hover:bg-sky-600 transition-all"
+            className="bg-sky-500 text-white p-2 rounded-xl hover:bg-sky-600 transition-all disabled:opacity-50"
           >
             {isSending ? (
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>

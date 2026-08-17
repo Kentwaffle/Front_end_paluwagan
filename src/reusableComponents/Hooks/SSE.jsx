@@ -56,12 +56,18 @@ export const useLoanSSE = (shouldConnect, savingsId, isLoan) => {
       }, 500);
     };
 
+    const handleNewTicketQueue = (event) => {
+      console.log("Realtime new-ticket-queue update received via SSE!", event.data);
+      queryClient.invalidateQueries({ queryKey: ["queue_list"] });
+    };
+
     const connect = () => {
       console.log("Attempting SSE connection...");
       if (eventSource?.readyState === 1) return;
       eventSource = new EventSource(API_ENDPOINTS.SSE);
 
       eventSource.addEventListener("loan-update", handleUpdate);
+      eventSource.addEventListener("new-ticket-queue", handleNewTicketQueue);
 
       eventSource.onopen = () => {
         console.log("SSE Connected successfully");
@@ -80,8 +86,9 @@ export const useLoanSSE = (shouldConnect, savingsId, isLoan) => {
     return () => {
       if (reconnectTimeout) clearTimeout(reconnectTimeout);
       if (eventSource) {
-        // Ngayon, kilala na ni cleanup si handleUpdate
+        // Ngayon, kilala na ni cleanup si handleUpdate at handleNewTicketQueue
         eventSource.removeEventListener("loan-update", handleUpdate);
+        eventSource.removeEventListener("new-ticket-queue", handleNewTicketQueue);
         eventSource.close();
         console.log("SSE Connection closed");
       }

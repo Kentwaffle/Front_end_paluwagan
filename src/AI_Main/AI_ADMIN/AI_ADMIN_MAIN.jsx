@@ -18,7 +18,7 @@ import { formatDateTime } from "../../reusableComponents/Utils/TimeDateformat";
 import { getProfileImage } from "../../reusableComponents/Hooks/ImageGet";
 import { useForm } from "../../reusableComponents/Hooks/HandleChange&Submit";
 import { usePostData } from "../../serviceToApi/PostData";
-import { useChatWebSocket } from "../../reusableComponents/Hooks/useChatWebSocket";
+import { useChatWebSocket } from "../../reusableComponents/Hooks/ChatSSE";
 import { useAutoScroll } from "../../reusableComponents/Hooks/useAutoScroll";
 
 function AI_ADMIN_MAIN() {
@@ -38,7 +38,6 @@ function AI_ADMIN_MAIN() {
   const currtentTicket = queueList?.payload?.current || null;
   const activeTicketId = currtentTicket?.ticketId || claimedTicketId;
 
-  // Connect STOMP WebSocket for the active ticket
   useChatWebSocket(activeTicketId);
 
   useEffect(() => {
@@ -52,10 +51,13 @@ function AI_ADMIN_MAIN() {
     ["admin_response", activeTicketId],
   );
 
-  const { formData: responseData, handleChange: handleChangeAdminResponse } =
-    useForm({
-      message: "",
-    });
+  const {
+    formData: responseData,
+    setFormData: setResponseData,
+    handleChange: handleChangeAdminResponse,
+  } = useForm({
+    message: "",
+  });
 
   const { data: messagesAdmin } = useFetchData(
     activeTicketId
@@ -70,59 +72,48 @@ function AI_ADMIN_MAIN() {
     const textToSend = responseData.message.trim();
     if (!textToSend || isPending) return;
 
-    // Clear input box immediately for responsive UI
-    responseData.message = "";
-
-    const optimisticMessage = {
-      id: "temp-" + Date.now(),
-      message: textToSend,
-      sentBy: "ADMIN",
-      senderName: "Admin",
-      createdAt: new Date().toISOString(),
-    };
-
-    const targetQueryKey = ["cs_messages_admin", activeTicketId];
-
-    queryClient.setQueryData(targetQueryKey, (oldData) => {
-      if (!oldData) return [optimisticMessage];
-      if (Array.isArray(oldData)) return [...oldData, optimisticMessage];
-      if (oldData.payload && Array.isArray(oldData.payload.messages)) {
-        return {
-          ...oldData,
-          payload: {
-            ...oldData.payload,
-            messages: [...oldData.payload.messages, optimisticMessage],
-          },
-        };
-      }
-      if (Array.isArray(oldData.messages)) {
-        return {
-          ...oldData,
-          messages: [...oldData.messages, optimisticMessage],
-        };
-      }
-      return [optimisticMessage];
-    });
-
-    adminResponse(
-      { message: textToSend },
-      {
-        onSuccess: (data) => {
-          console.log("Admin Response Success:", data);
-          queryClient.invalidateQueries({
-            queryKey: ["cs_messages_admin", activeTicketId],
-          });
-          queryClient.invalidateQueries({
-            queryKey: ["cs_messages", activeTicketId],
-          });
-          queryClient.invalidateQueries({ queryKey: ["queue_list"] });
-        },
-        onError: (error) => {
-          console.error("Admin Response Error:", error);
-          queryClient.invalidateQueries({ queryKey: targetQueryKey });
-        },
+    adminResponse(responseData, {
+      onSuccess: (data) => {
+        console.log("Admin Response Success:", data);
+        queryClient.refetchQueries({
+          queryKey: ["cs_messages_admin", activeTicketId],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["cs_messages", activeTicketId],
+        });
+        queryClient.invalidateQueries({ queryKey: ["queue_list"] });
+        setResponseData({ message: "" });
       },
-    );
+      onError: (error) => {
+        console.error("Admin Response Error:", error);
+      },
+    });
+  };
+
+  const [isEndingChat, setIsEndingChat] = useState(false);
+
+  const handleEndChat = async () => {
+    if (!activeTicketId || isEndingChat) return;
+
+    setIsEndingChat(true);
+    try {
+      const closeUrl = API_ENDPOINTS.CS.ADMIN.ENDCHAT(activeTicketId);
+      console.log(`Closing ticket: ${activeTicketId} at ${closeUrl}`);
+      const response = await api.post(closeUrl, {});
+      console.log("Success Close Ticket Data:", response.data);
+
+      queryClient.invalidateQueries({ queryKey: ["queue_list"] });
+      queryClient.invalidateQueries({
+        queryKey: ["cs_messages_admin", activeTicketId],
+      });
+
+      setClaimedTicketId(null);
+      setView("queue");
+    } catch (error) {
+      console.error("Error closing ticket via API:", error);
+    } finally {
+      setIsEndingChat(false);
+    }
   };
 
   const getNextQueue = async () => {
@@ -136,23 +127,7 @@ function AI_ADMIN_MAIN() {
       setClaimedTicketId(nextQueue);
       setView("ticket");
     } catch (error) {
-      console.error("Error claiming next queue ticket via API:", error);
-    } finally {
-      setIsClaiming(false);
-    }
-  };
-
-  const handleEndChat = async () => {
-    if (!activeTicketId) return;
-    try {
-      const endChatURL = API_ENDPOINTS.CS.ADMIN.ENDCHAT(activeTicketId);
-      await api.post(endChatURL, {});
-      console.log("Chat ended successfully");
-      setClaimedTicketId(null);
-      queryClient.invalidateQueries({ queryKey: ["queue_list"] });
-      setView("queue");
-    } catch (error) {
-      console.error("Error ending chat:", error);
+      console.error("Error fetching next queue via API:", error);
     }
   };
 
@@ -226,11 +201,10 @@ function AI_ADMIN_MAIN() {
           <button
             onClick={() => getNextQueue()}
             disabled={!!currtentTicket || !nextQueue || isClaiming}
-            className={`font-bold py-2 px-4 rounded transition-all ${
-              currtentTicket || !nextQueue || isClaiming
+            className={`font-bold py-2 px-4 rounded transition-all ${currtentTicket || !nextQueue || isClaiming
                 ? "bg-slate-200 text-slate-400 cursor-not-allowed"
                 : "bg-sky-500 hover:bg-sky-600 text-white shadow-sm"
-            }`}
+              }`}
           >
             {isClaiming
               ? "Claiming Ticket..."
@@ -332,10 +306,12 @@ function AI_ADMIN_MAIN() {
               <li>
                 <button
                   type="button"
+                  disabled={isEndingChat}
                   onClick={handleEndChat}
-                  className="flex items-center gap-2 py-3 text-error font-bold w-full text-left"
+                  className="flex items-center gap-2 py-3 text-error font-bold disabled:opacity-50"
                 >
-                  <PhoneMissed size={16} /> <span>End Chat</span>
+                  <PhoneMissed size={16} />{" "}
+                  <span>{isEndingChat ? "Ending..." : "End Chat"}</span>
                 </button>
               </li>
             </ul>
@@ -375,7 +351,7 @@ function AI_ADMIN_MAIN() {
                 value={responseData.message}
                 onChange={handleChangeAdminResponse}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
+                  if (e.key === "Enter") {
                     e.preventDefault();
                     handleSendMessageAdmin();
                   }
