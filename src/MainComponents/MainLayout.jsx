@@ -1,16 +1,17 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { Outlet, Navigate, useLocation } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
 import Sidebar from "./sidebar";
 import Header from "./Header";
 import { useAuth } from "../auth/Auth";
-import { MessageSquare } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { PAGE_META } from "./pageHeader";
+import Notification from "./Notification";
+import { Bell } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import NotificationBell from "./NotificationBell";
+
 function MainLayout({ isStatus, isStatusLoading }) {
   const [isOpen, setIsOpen] = useState(false);
-  const { user } = useAuth();
-  const navigate = useNavigate();
-
+  const { user, UserDetails } = useAuth();
   const location = useLocation();
   const isProfilePage = location.pathname === "/profile";
   const isEditProfilePage = location.pathname === "/profile/edit_profile";
@@ -18,15 +19,22 @@ function MainLayout({ isStatus, isStatusLoading }) {
   const isSettings = location.pathname === "/Settings";
   const isCostumerService = location.pathname === "/customer-service";
   const hideLayout =
-    isProfilePage ||
-    isEditProfilePage ||
-    isNotification ||
-    isSettings ||
-    isCostumerService;
+    isProfilePage || isEditProfilePage || isSettings || isCostumerService;
   const roles = user?.role;
+  const pageMeta = PAGE_META[location.pathname];
+  const hideNotificationButton = isNotification;
+  const resolvedTitle =
+    typeof pageMeta?.title === "function"
+      ? pageMeta.title(UserDetails?.firstName || "User")
+      : pageMeta?.title;
 
   const hideFooter = isCostumerService;
-  // Redirect kung walang token o invalid
+  const queryClient = useQueryClient();
+  const notifCount =
+    queryClient.getQueryData(["notifCount", user?.userId]) || 0;
+
+  console.log("notifCount ", notifCount);
+
   if (!user || !roles) {
     return <Navigate to="/auth" replace />;
   }
@@ -56,6 +64,21 @@ function MainLayout({ isStatus, isStatusLoading }) {
   ${isCostumerService ? "p-0" : ""}
 `}
       >
+        {pageMeta && !hideNotificationButton && (
+          <div className="hidden lg:flex items-center justify-between border-b border-slate-200/60 dark:border-slate-800/80 pt-8 pb-5 px-8 bg-slate-50 dark:bg-slate-950 transition-colors duration-500">
+            <div>
+              <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                {resolvedTitle}
+              </h1>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                {pageMeta.description}
+              </p>
+            </div>
+
+            <NotificationBell />
+          </div>
+        )}
+
         <Outlet context={{ roles, isStatus, isStatusLoading }} />
       </main>
 

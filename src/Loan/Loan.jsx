@@ -140,18 +140,6 @@ function Loan() {
         <LoadingLoan key="loading-spinner" />
       ) : (
         <div className="min-h-screen p-4 sm:p-6 lg:p-8 flex flex-col gap-8 bg-slate-50 dark:bg-slate-950 transition-colors duration-500 text-slate-900 dark:text-white">
-          <div className="hidden md:block border-b border-slate-200/60 dark:border-slate-800/80 pb-5">
-            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">
-              Welcome back,{" "}
-              <span className="text-sky-600 dark:text-sky-400">
-                {username}!
-              </span>
-            </h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Track your payment progression and manage active settlements.
-            </p>
-          </div>
-
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
             <div className="lg:col-span-2 card w-full rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/80 shadow-sm overflow-hidden">
               <div className="relative overflow-hidden flex flex-col gap-1 justify-center items-center py-10 bg-gradient-to-br from-slate-950 via-blue-950 to-sky-900 text-white border-b border-sky-900/30">

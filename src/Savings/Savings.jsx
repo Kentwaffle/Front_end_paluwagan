@@ -57,14 +57,6 @@ function Savings() {
           key={"savings"}
           className="min-h-screen p-4 sm:p-6 lg:p-8 flex flex-col gap-8 bg-slate-50 dark:bg-slate-950 transition-colors duration-500 text-slate-900 dark:text-white"
         >
-          <div className="hidden md:block border-b border-slate-200/60 dark:border-slate-800/80 pb-5">
-            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">
-              Savings Overview
-            </h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Keep track of your active deposits and overall growth.
-            </p>
-          </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
             <div className="lg:col-span-2 ">
               <SavingsSummary useSavingsDatas={useSavingsDatas} />

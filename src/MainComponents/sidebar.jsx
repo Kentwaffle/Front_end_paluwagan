@@ -15,7 +15,7 @@ import White_PaluwaganLogo from "../assets/images/white_outline_SLP.png";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../auth/Auth";
 import { getProfileImage } from "../reusableComponents/Hooks/ImageGet";
-
+import { useQueryClient } from "@tanstack/react-query";
 const LINKS = {
   ROLE_ADMIN: [
     {
@@ -57,7 +57,9 @@ function Sidebar({ isOpen, setIsOpen, role }) {
   const pathSegments = location.pathname.split("/").filter(Boolean);
   const isChildRoute = pathSegments.length > 2;
   const { logout, user, UserDetails, isLoadingAuth } = useAuth();
-
+  const queryClient = useQueryClient();
+  const notifCount =
+    queryClient.getQueryData(["notifCount", user?.userId]) || 0;
   return (
     <>
       <div
@@ -78,7 +80,7 @@ function Sidebar({ isOpen, setIsOpen, role }) {
         </button>
 
         {/* LOGO AREA */}
-        <div className="flex justify-center items-center w-full pb-5 shrink-0">
+        <div className="flex justify-center items-center w-full pb-5 shrink-0 border-b-2 border-white/5">
           <img
             src={White_PaluwaganLogo}
             alt="Logo"
@@ -118,11 +120,11 @@ function Sidebar({ isOpen, setIsOpen, role }) {
                   }}
                 >
                   <div
-                    className={
+                    className={`relative ${
                       isActive
                         ? "text-sky-400"
                         : "text-slate-400 group-hover:text-slate-200"
-                    }
+                    }`}
                   >
                     {link.icon}
                   </div>

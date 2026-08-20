@@ -114,15 +114,6 @@ function UserLedger() {
 
   return (
     <div className="min-h-screen p-4 sm:p-6 lg:p-8 flex flex-col bg-slate-50 dark:bg-slate-950 transition-colors duration-500 text-slate-900 dark:text-white">
-      <div className="hidden md:block border-b border-slate-200/60 dark:border-slate-800/80 pb-5 mb-8">
-        <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">
-          Activity Audit
-        </h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Review complete transaction footprints, verified historical logs, and
-          ledger status values.
-        </p>
-      </div>
       {/* Filters */}
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-end mb-4">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-end">

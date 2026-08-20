@@ -1,4 +1,11 @@
-import { WalletCards, CheckCircle2, CreditCard } from "lucide-react";
+import {
+  WalletCards,
+  CheckCircle2,
+  CreditCard,
+  PiggyBank,
+  Landmark,
+  Bell,
+} from "lucide-react";
 
 export const statusColors = {
   text: {
@@ -44,3 +51,24 @@ export const getTransactionIcon = (description) =>
 
 export const getTypeBadge = (description) =>
   typeBadgeStyles[description] || typeBadgeStyles.Default;
+
+// Notification-type badge (icon + solid color circle) — separate mapping
+// from the ones above since notification.type uses SAVINGS/LOAN, not
+// the Withdrawal/Completed transaction statuses.
+export const notificationBadges = {
+  SAVINGS: {
+    icon: <PiggyBank className="w-3 h-3 text-white" />,
+    bg: "bg-emerald-500",
+  },
+  LOAN: {
+    icon: <Landmark className="w-3 h-3 text-white" />,
+    bg: "bg-sky-500",
+  },
+  Default: {
+    icon: <Bell className="w-3 h-3 text-white" />,
+    bg: "bg-slate-500",
+  },
+};
+
+export const getNotificationBadge = (type) =>
+  notificationBadges[type] || notificationBadges.Default;
